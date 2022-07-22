@@ -15,6 +15,7 @@ const BGMap = memo(({markers}) => {
       ],
       center: new LatLng(45.040034, 38.975828),
       zoom: 2.5,
+      // zoom: 13,
       zoomControl: false
     }));
   }, []);

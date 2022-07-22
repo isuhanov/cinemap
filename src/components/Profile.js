@@ -16,7 +16,7 @@ const Profile = memo(({}) => {
                         person
                     </span>
                 }
-                <div className="profile__avatar__plane"></div>
+                <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
             </button>
             { menuIsVisible && (
                 <ClickAwayListener onClickAway={() => setMenuVisible(false)}>
