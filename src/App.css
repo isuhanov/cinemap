@@ -85,6 +85,7 @@
   cursor: pointer;
 }
 
+
 /* ------------------------------ SearchInput --------------------------------------- */
 
 .search {
@@ -141,19 +142,24 @@
 .profile__avatar {
   position: relative;
   background-color: white;
-  color: black;
+  border-radius: 50%;
   width: 40px;
   height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
   overflow: hidden;
+}
+
+.profile__avatar-circle {
+  width: 40px;
+  height: 40px; 
+  border-radius: 50%;
+  background-color: white;
 }
 
 .profile__avatar__plane {
   position: absolute;
-  z-index: 100;
+  top: 0;
+  left: 0;
+  z-index: 250;
   width: 100%;
   height: 100%;
   transition: all .15s ease-out;
@@ -167,21 +173,14 @@
   background-color: rgba(0, 0, 0, 0.421);
 }
 
-.profile__avatar__img {
-  max-width: 100%;
-}
-
-.profile__avatar:hover {
-  background-color: black;
-}
 
 
 /* ------------------------------ LocationCard --------------------------------------- */
 
 .location-card {
-  position: absolute;
+  position: relative;
   z-index: 100;
-  bottom: 20px;
+  /* bottom: 20px; */
   background-color: white;
   width: 340px;
   height: 525px;
@@ -267,7 +266,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 5px 15px;
-  /* border-radius: 7px; */
   border-bottom: 1px solid rgb(143, 143, 143);
 }
 
@@ -294,10 +292,8 @@
   border: 1px solid black;
   width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;  
   background-color: rgba(221, 235, 255, 1);
+  overflow: hidden;
 }
 
 .location-films-timing span{

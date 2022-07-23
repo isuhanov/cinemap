@@ -1,4 +1,5 @@
 import { memo } from "react";
+import ProfileAvatar from "./ui/profileAvatar/ProfileAvatar";
 
 const LocationCard = memo(() => {
     let imgSrc;
@@ -42,7 +43,10 @@ const LocationCard = memo(() => {
                         <p className="creator__profile-username">
                             Суханов Игнат
                         </p>
-                        <div className="creator__profile-userimg">
+                        {/* <ProfileAvatar otherClassName="creator__profile-userimg"/> */}
+
+                        <ProfileAvatar otherClassName="creator__profile-userimg" imgSrc="https://i.pinimg.com/originals/ae/89/e3/ae89e34032214aa0887ef96203f970dc.jpg"/>
+                        {/* <div className="creator__profile-userimg">
                             { imgSrc ?
                                 <img className="profile__avatar__img" src={imgSrc} alt="Аватар"/>
                                 :
@@ -50,7 +54,7 @@ const LocationCard = memo(() => {
                                     person
                                 </span>
                             }
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
