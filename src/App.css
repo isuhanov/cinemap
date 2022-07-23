@@ -7,19 +7,6 @@
     height: 100%;
   
     z-index: 0;
-  }
-
-.container {
-  padding: 20px;
-  height: 100vh;
-}
-
-.material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 48
 }
 
 
@@ -31,6 +18,8 @@
   overflow: hidden;
   position: relative;
   z-index: 100;
+
+  box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
 }
 
 .menu-item {
@@ -86,17 +75,36 @@
 }
 
 
+/* ------------------------------ header --------------------------------------- */
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.header .profile-block {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
 /* ------------------------------ SearchInput --------------------------------------- */
 
 .search {
   position: relative;
-  display: inline;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
 }
 
 .search__input {
   width: 350px;
   height: 40px;
-  border-radius: 10px;
   padding: 0 50px 0 10px;
   font-size: 16px;
 }
@@ -139,19 +147,16 @@
 
 /* ------------------------------ Profile --------------------------------------- */
 
-.profile__avatar {
+.profile__avatar-btn {
   position: relative;
-  background-color: white;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
+  overflow: hidden;  
+  box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
 }
 
 .profile__avatar-circle {
-  width: 40px;
-  height: 40px; 
-  border-radius: 50%;
+  width: 60px;
+  height: 60px; 
   background-color: white;
 }
 
@@ -183,10 +188,8 @@
   /* bottom: 20px; */
   background-color: white;
   width: 340px;
-  height: 525px;
   border-radius: 10px;
   padding: 13px;
-  padding-bottom: 0; 
 }
 
 .location-card div,
@@ -232,7 +235,8 @@
 }
 
 .location-card__main {
-  height: 94%;
+  /* height: 94%; */
+  height: 490px;
   overflow: scroll;
   padding-right: 10px;
 }
@@ -305,4 +309,48 @@
   color: #3C4FFC;
   font-size: 13px;
   cursor: text;
+}
+
+.location-card-btn-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.location-card-btn-container button {
+  min-width: 150px;
+  padding: 10px;
+  border-radius: 7px;
+  font-weight: 700;
+}
+
+.location-card-btn-edit {
+  background-color: #3C89FC;
+  color: white;
+}
+
+.location-card-btn-delete {
+  background-color: #FC3C75;
+  color: white;
+}
+
+.location-card-btn-edit:hover {
+  background-color: #2b76e5;
+  color: white;
+}
+
+.location-card-btn-delete:hover {
+  background-color: #c92c5b;
+  color: white;
+}
+
+.location-card-btn-edit:active {
+  background-color: #1a59b6;
+  color: white;
+}
+
+.location-card-btn-delete:active {
+  background-color: #a31641;
+  color: white;
 }

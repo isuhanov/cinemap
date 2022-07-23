@@ -11,9 +11,17 @@ function App() {
     <div className="App">
       <BGMap />
       <div className="container">
-        {/* <ProfileAvatar /> */}
-        <Profile />
-        <LocationCard /> 
+        <header className="header">
+          <div className="profile-block">
+            <Profile />
+          </div>
+          <div className="search-input-block">
+            <SearchInput />  
+          </div>
+          <div className="side-bar-block">
+            <SideBar />
+          </div>
+        </header>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ const Profile = memo(({}) => {
     const [menuIsVisible, setMenuVisible] = useState(false);
     return (
         <div className="profile">
-            <button className="profile__avatar" onClick={() => setMenuVisible(true)}>
+            <button className="profile__avatar-btn" onClick={() => setMenuVisible(true)}>
                 <ProfileAvatar otherClassName="profile__avatar-circle"/>
                 <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
             </button>
@@ -24,7 +24,6 @@ const Profile = memo(({}) => {
                 </ClickAwayListener>
                 )
             }
-            
         </div>
     );
 })

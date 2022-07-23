@@ -43,18 +43,7 @@ const LocationCard = memo(() => {
                         <p className="creator__profile-username">
                             Суханов Игнат
                         </p>
-                        {/* <ProfileAvatar otherClassName="creator__profile-userimg"/> */}
-
                         <ProfileAvatar otherClassName="creator__profile-userimg" imgSrc="https://i.pinimg.com/originals/ae/89/e3/ae89e34032214aa0887ef96203f970dc.jpg"/>
-                        {/* <div className="creator__profile-userimg">
-                            { imgSrc ?
-                                <img className="profile__avatar__img" src={imgSrc} alt="Аватар"/>
-                                :
-                                <span className="material-symbols-outlined">
-                                    person
-                                </span>
-                            }
-                        </div> */}
                     </div>
                 </div>
 
@@ -103,6 +92,19 @@ const LocationCard = memo(() => {
                 </div>            
 
             </div>
+
+            { 
+                <footer>
+                    <div className="location-card-btn-container">
+                        <button className="location-card-btn location-card-btn-edit">
+                            Редактировать
+                        </button>
+                        <button className="location-card-btn location-card-btn-delete">
+                            Удалить
+                        </button>
+                    </div>
+                </footer>
+            }
         </div>
     )
 });
