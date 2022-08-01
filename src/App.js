@@ -1,6 +1,6 @@
 import './App.css';
 import LocationCard from './components/LocationCard';
-import BGMap from './components/Map';
+import BGMap from './components/BGMap';
 import Profile from './components/Profile';
 import SearchInput from './components/SearchInput';
 import SideBar from './components/SideBar';

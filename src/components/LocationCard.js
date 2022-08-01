@@ -77,7 +77,7 @@ const LocationCard = memo(() => {
                     <span className="location-films-timing__subtitle subtitle">
                         Тайминг:
                     </span>
-                    <span className="location-films-timing__text">15:49</span>
+                    <span className="location-films-timing__text">15:49:49</span>
                 </p> 
 
                 <div className="location-users-films-photo">
