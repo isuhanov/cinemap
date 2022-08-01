@@ -1,7 +1,16 @@
-import { memo } from "react";
+import axios from "axios";
+import { memo, useEffect, useState } from "react";
 import ProfileAvatar from "./ui/profileAvatar/ProfileAvatar";
 
 const LocationCard = memo(({ otherClassName, location, onClose }) => {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        axios.get(`http://localhost:8000/users?location_id=${location.location_id}`).then(res => {
+            setUser(u => res.data);
+        })
+        .catch(err => console.log(err));
+    }, [])
 
     return (
         <div className={`location-card ${otherClassName}`}>
@@ -39,12 +48,14 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
                     <p className="location-creator__subtitle subtitle">
                         Сделано:
                     </p>
-                    <div className="location-creator__profile">
-                        <p className="creator__profile-username">
-                            Суханов Игнат
-                        </p>
-                        <ProfileAvatar otherClassName="creator__profile-userimg" imgSrc="https://i.pinimg.com/originals/ae/89/e3/ae89e34032214aa0887ef96203f970dc.jpg"/>
-                    </div>
+                    { user && 
+                        <div className="location-creator__profile">
+                            <p className="creator__profile-username">
+                                { `${user.user_surname} ${user.user_name}`  }
+                            </p>
+                            <ProfileAvatar otherClassName="creator__profile-userimg" imgSrc={user.user_img_path}/>
+                        </div>
+                    }
                 </div>
 
                 <div className="location-films-photo">

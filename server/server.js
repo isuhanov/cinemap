@@ -38,6 +38,29 @@ app.get("/locations", function(req, res){ // обработка GET запрос
     );
 });
 
+//---------------------------------------------- users ---------------------------------------------- 
+
+app.get("/users", function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
+    if (req.query.location_id) {
+        connection.query(  // получение id пользователя 
+            `SELECT * FROM users_locations WHERE location_id = ${req.query.location_id};`,
+            function(err, results, fields) {
+                if (results.length === 0) {
+                    res.status(404).send('Not found');
+                } else {
+                    connection.query(  // получение пользователя 
+                        `SELECT * FROM users WHERE user_id=${results[0].user_id};`,
+                        function(err, results, fields) {
+                            res.send(results[0]); // отправка результата
+                       }
+                    );
+                }
+            }
+        );
+    }
+});
+
+
   
 app.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
     console.log("Сервер запущен на 8000 порту");
