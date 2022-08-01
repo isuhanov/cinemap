@@ -6,11 +6,13 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
+        console.log(location);
+        setUser(null);
         axios.get(`http://localhost:8000/users?location_id=${location.location_id}`).then(res => {
             setUser(u => res.data);
         })
         .catch(err => console.log(err));
-    }, [])
+    }, [location])
 
     return (
         <div className={`location-card ${otherClassName}`}>
