@@ -1,17 +1,16 @@
 import axios from 'axios';
-import { Icon, LatLng, Map, marker, Marker, Popup, tileLayer, TileLayer } from 'leaflet';
-import { memo, useEffect, useLayoutEffect, useState } from 'react';
+import { Icon, LatLng, Map, Marker, TileLayer } from 'leaflet';
+import { memo, useEffect, useState } from 'react';
 import LocationIcon from '../assets/place-marker.svg';
 
 import '../App.css';
+import LocationCard from './LocationCard';
 
 const BGMap = memo(({markers}) => {
   const [map, setMap] = useState(null);
   const [locations, setLocations] = useState([]);
-
-  function getLocations() {
-    
-  }
+  const [currentLocationId, setCurrentLocationId] = useState(0);
+  const [isCardVisible, setIsCardVisible] = useState(false);
 
   useEffect(() => {
     if (map === null) {
@@ -42,7 +41,8 @@ const BGMap = memo(({markers}) => {
   
           marker.addTo(map)
           marker.addEventListener('click', () => {
-            // console.log(location);
+            setCurrentLocationId(location.location_id);
+            setIsCardVisible(true);
           })
 
         }
@@ -53,12 +53,16 @@ const BGMap = memo(({markers}) => {
     }
   }, [map]);
 
-  useEffect(() => {
-    console.log(locations);
-  }, [locations])
-
   return (
+    <>
       <div id="map-container"></div>
+      { isCardVisible &&
+        <LocationCard 
+            location={locations.find(location => location.location_id === currentLocationId)}
+            onClose={() => setIsCardVisible(false)}
+          />
+      } 
+    </>
   );
 })
 

@@ -1,8 +1,8 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import ProfileAvatar from "./ui/profileAvatar/ProfileAvatar";
 
-const LocationCard = memo(() => {
-    let imgSrc;
+const LocationCard = memo(({ location, onClose }) => {
+
     return (
         <div className="location-card">
             <header className="location-card__header">
@@ -11,19 +11,19 @@ const LocationCard = memo(() => {
                 </p>
                 <div className="location-card__btn-container">
                     <button className="location-card__btn">
-                        <span class="material-symbols-outlined">bookmark</span>
+                        <span className="material-symbols-outlined">bookmark</span>
                     </button>
-                    <button className="location-card__btn">
-                        <span class="material-symbols-outlined">close</span>
+                    <button className="location-card__btn" onClick={() => onClose() }>
+                        <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
             </header>
             <div className="location-card__main">
                 <p className="location-card__film">
-                    Фильм
+                    { location.location_film }
                 </p>
                 <p className="location-card__address">
-                    Адрес
+                    { location.location_address }
                 </p>
 
                 <div className="location-route">
@@ -31,7 +31,7 @@ const LocationCard = memo(() => {
                         Как пройти:
                     </p>
                     <p className="location-route__text">
-                        Значимость этих проблем настолько очевидна, что сложившаяся структура организации в значительной степени обуславливает создание дальнейших направлений развития.
+                        { location.location_route }                    
                     </p>
                 </div>
 
@@ -77,7 +77,7 @@ const LocationCard = memo(() => {
                     <span className="location-films-timing__subtitle subtitle">
                         Тайминг:
                     </span>
-                    <span className="location-films-timing__text">15:49:49</span>
+                    <span className="location-films-timing__text">{ location.location_timing }</span>
                 </p> 
 
                 <div className="location-users-films-photo">

@@ -183,7 +183,9 @@
 /* ------------------------------ LocationCard --------------------------------------- */
 
 .location-card {
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  margin: 20px;
   z-index: 100;
   /* bottom: 20px; */
   background-color: white;
