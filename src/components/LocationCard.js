@@ -1,10 +1,10 @@
-import { memo, useEffect } from "react";
+import { memo } from "react";
 import ProfileAvatar from "./ui/profileAvatar/ProfileAvatar";
 
-const LocationCard = memo(({ location, onClose }) => {
+const LocationCard = memo(({ otherClassName, location, onClose }) => {
 
     return (
-        <div className="location-card">
+        <div className={`location-card ${otherClassName}`}>
             <header className="location-card__header">
                 <p className="location-title title">
                     Название локации

@@ -57,7 +57,8 @@ const BGMap = memo(({markers}) => {
     <>
       <div id="map-container"></div>
       { isCardVisible &&
-        <LocationCard 
+        <LocationCard  
+            otherClassName="shadow-block"
             location={locations.find(location => location.location_id === currentLocationId)}
             onClose={() => setIsCardVisible(false)}
           />
