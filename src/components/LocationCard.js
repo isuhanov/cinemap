@@ -4,21 +4,26 @@ import ProfileAvatar from "./ui/profileAvatar/ProfileAvatar";
 
 const LocationCard = memo(({ otherClassName, location, onClose }) => {
     const [user, setUser] = useState(null);
+    const [locationPhoto, setLocationPhoto] = useState([]);
 
     useEffect(() => {
-        console.log(location);
         setUser(null);
         axios.get(`http://localhost:8000/users?location_id=${location.location_id}`).then(res => {
             setUser(u => res.data);
         })
         .catch(err => console.log(err));
+
+        axios.get(`http://localhost:8000/photos?location_id=${location.location_id}`).then(res => {
+            setLocationPhoto(res.data);
+        }).catch(err => console.log(err));
+
     }, [location])
 
     return (
         <div className={`location-card ${otherClassName}`}>
             <header className="location-card__header">
                 <p className="location-title title">
-                    Название локации
+                    { location.location_name }
                 </p>
                 <div className="location-card__btn-container">
                     <button className="location-card__btn">
@@ -64,26 +69,20 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
                     <p className="location-films-photo__subtitle subtitle">
                         Фото из фильма:
                     </p>
-                    <div className="location-films-photo__container photo-container">
-                        <div className="photo-item">
-                            <img src="https://trikky.ru/wp-content/blogs.dir/1/files/2022/02/12/gp.jpg" alt=""/>
+                    { locationPhoto &&
+                        <div className="location-films-photo__container photo-container">
+                            { locationPhoto.map(photo => {
+                                if (photo.locations_photo_status === 'film') {
+                                    return (
+                                        <div className="photo-item" key={photo.locations_photo_id}>
+                                            <img src={photo.locations_photo_path} alt={location.location_name}/>
+                                        </div>
+                                    )
+                                }
+                                return null;
+                            })}
                         </div>
-                        <div className="photo-item">
-                            <img src="https://tillthemoneyrunsout.com/wp-content/uploads/2015/11/Hogwarts-Castle-Visiting-Harry-Potter-World-Orlando.jpg" alt=""/>
-                        </div>
-                        <div className="photo-item">
-                            <img src="https://kartinkin.net/uploads/posts/2020-07/1593730353_36-p-foni-iz-khogvartsa-44.jpg" alt=""/>
-                        </div>
-                        <div className="photo-item">
-                            <img src="https://i.etsystatic.com/12344246/r/il/a3dd43/2645058226/il_794xN.2645058226_7fxd.jpg" alt=""/>
-                        </div>
-                        <div className="photo-item">
-                            <img src="https://trikky.ru/wp-content/blogs.dir/1/files/2020/09/20/large_5339f71f88841969582215.jpg" alt=""/>
-                        </div>
-                        <div className="photo-item">
-                            <img src="https://avatars.mds.yandex.net/get-zen_doc/1565406/pub_5d93ab9198930900af86f819_5d93b23c98930900af86f851/scale_1200" alt=""/>
-                        </div>
-                    </div>
+                    }
                 </div>     
 
                 <p className="location-films-timing">
@@ -97,11 +96,20 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
                     <p className="location-users-films-photo__subtitle subtitle">
                         Фото пользователя:
                     </p>
-                    <div className="location-users-films-photo__container photo-container">
-                        <div className="photo-item">
-                            <img src="https://avatars.mds.yandex.net/get-zen_doc/1565406/pub_5d93ab9198930900af86f819_5d93b23c98930900af86f851/scale_1200" alt=""/>
+                    { locationPhoto &&
+                        <div className="location-users-films-photo__container photo-container">
+                            { locationPhoto.map(photo => {
+                                if (photo.locations_photo_status === 'user') {
+                                    return (
+                                        <div className="photo-item" key={photo.locations_photo_id}>
+                                            <img src={photo.locations_photo_path} alt={location.location_name}/>
+                                        </div>
+                                    )
+                                }
+                                return null;
+                            })}
                         </div>
-                    </div>
+                    }
                 </div>            
 
             </div>

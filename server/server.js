@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(fileUpload());
 
+app.use(express.static('img'));
+
 const connection = mysql.createConnection({ // подключение к БД
     host: 'localhost',
     user: 'root',
@@ -38,6 +40,7 @@ app.get("/locations", function(req, res){ // обработка GET запрос
     );
 });
 
+
 //---------------------------------------------- users ---------------------------------------------- 
 
 app.get("/users", function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
@@ -61,6 +64,19 @@ app.get("/users", function(req, res){ // обработка GET запроса �
 });
 
 
+//---------------------------------------------- photos ---------------------------------------------- 
+
+app.get("/photos", function(req, res){ // обработка GET запроса на выборку из таблицы locations_photo
+    if (req.query.location_id) {
+        connection.query(
+            `SELECT * FROM locations_photos WHERE location_id=${req.query.location_id};`,
+            function(err, results, fields) {
+                // console.log(results);
+                res.send(results);  // отправка результата в ответ на запрос
+            }
+        );
+    }   
+});
   
 app.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
     console.log("Сервер запущен на 8000 порту");
