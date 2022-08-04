@@ -1,6 +1,6 @@
 import axios from "axios";
 import { memo, useEffect, useState } from "react";
-import ProfileAvatar from "./ui/profileAvatar/ProfileAvatar";
+import ProfileAvatar from "./ui/ProfileAvatar/ProfileAvatar";
 
 const LocationCard = memo(({ otherClassName, location, onClose }) => {
     const [user, setUser] = useState(null);

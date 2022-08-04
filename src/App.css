@@ -363,3 +363,56 @@
   background-color: #a31641;
   color: white;
 }
+
+
+/* ------------------------------ LocationForm --------------------------------------- */
+
+.location-form-container {
+  position: absolute;
+  z-index: 150;
+  background-color: rgba(0, 0, 0, 0.79);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-form {
+  background-color: white;
+  width: 450px;
+  padding: 13px;
+  border-radius: 10px;
+}
+
+.field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 10px auto;
+  width: 95%;
+}
+
+.timing-block {
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 30px;
+}
+
+.field {
+  border: 1px solid black;
+  border-radius: 5px;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.field-route {
+  border: 1px solid black;
+  border-radius: 5px;
+  height: 70px;
+  padding: 10px;
+  font-size: 13px;
+  background-color: rgba(221, 235, 255, 1);
+  resize: none;
+}
