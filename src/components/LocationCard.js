@@ -7,6 +7,7 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
     const [locationPhoto, setLocationPhoto] = useState([]);
 
     useEffect(() => {
+        // async function fetchData() {
         setUser(null);
         axios.get(`http://localhost:8000/users?location_id=${location.location_id}`).then(res => {
             setUser(u => res.data);
@@ -16,7 +17,8 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
         axios.get(`http://localhost:8000/photos?location_id=${location.location_id}`).then(res => {
             setLocationPhoto(res.data);
         }).catch(err => console.log(err));
-
+        // }
+        // fetchData();
     }, [location])
 
     return (

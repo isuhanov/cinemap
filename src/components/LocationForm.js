@@ -1,4 +1,5 @@
 import { memo } from "react";
+import DragAndDropFiles from "./ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "./ui/TimingInput/TimingInput";
 
 const LocationForm = memo(() => {
@@ -24,23 +25,33 @@ const LocationForm = memo(() => {
                             </label>
                             <input id="location-name" className="field"/>
                         </div>
+
                         <div className="field-block">
                             <label htmlFor="location-film">
                                 Название фильма
                             </label>
                             <input id="location-film" className="field"/>
                         </div>
+
                         <div className="field-block">
                             <label htmlFor="location-route">
                                 Как пройти
                             </label>
                             <textarea id="location-route" className="field-route"></textarea>
                         </div>
+
                         <div className="field-block timing-block">
                             <label htmlFor="location-timing">
                                 Тайминг
                             </label>
                             <TimingInput />
+                        </div>
+
+                        <div className="field-block">
+                            <label>
+                                Фото из фильма                                
+                            </label>
+                            <DragAndDropFiles />
                         </div>
                     </form>
                 </div>

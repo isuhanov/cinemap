@@ -13,6 +13,30 @@ const BGMap = memo(({markers}) => {
   const [isCardVisible, setIsCardVisible] = useState(false);
 
   useEffect(() => {
+    async function fetchLocation() {
+      axios.get('http://localhost:8000/locations').then(res => {
+        setLocations(res.data);
+        for (const location of res.data) {
+          const marker = new Marker(
+            [location.location_latitude, location.location_longitude],
+            {
+              icon: new Icon({
+                iconUrl: LocationIcon,
+                iconSize: [ 23, 23 ]
+              })
+            }
+          )
+          marker.addTo(map)
+          marker.addEventListener('click', () => {
+            setCurrentLocationId(location.location_id);
+            setIsCardVisible(true);
+          })
+        }
+      }).catch(err => {
+        console.log(err);
+      })
+    }
+    
     if (map === null) {
       setMap(new Map('map-container', {
         layers: [
@@ -26,30 +50,7 @@ const BGMap = memo(({markers}) => {
         zoomControl: false
       }))
     } else {
-      axios.get('http://localhost:8000/locations').then(res => {
-        setLocations(res.data);
-        for (const location of res.data) {
-          const marker = new Marker(
-            [location.location_latitude, location.location_longitude],
-            {
-              icon: new Icon({
-                iconUrl: LocationIcon,
-                iconSize: [ 23, 23 ]
-              })
-            }
-          )
-  
-          marker.addTo(map)
-          marker.addEventListener('click', () => {
-            setCurrentLocationId(location.location_id);
-            setIsCardVisible(true);
-          })
-
-        }
-      }).catch(err => {
-        console.log(err);
-      })
-      
+      fetchLocation();
     }
   }, [map]);
 
