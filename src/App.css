@@ -243,12 +243,18 @@
   color: white;
 }
 
-.location-card__main {
-  /* height: 94%; */
-  height: 490px;
+.location-card__main,
+.location-form__main {
   overflow: scroll;
   padding-right: 10px;
 }
+.location-card__main {
+  height: 490px;
+}
+.location-form__main {
+  height: 550px;
+}
+
 
 .location-card__main > p,
 .location-card__main > div {
@@ -320,14 +326,21 @@
   cursor: text;
 }
 
-.location-card-btn-container {
+.location-card-btn-container, 
+.location-form-btn-container {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+.location-card-btn-container {
   justify-content: space-between;
 }
+.location-form-btn-container {
+  justify-content: center;
+}
 
-.location-card-btn-container button {
+
+.location-card-btn {
   min-width: 150px;
   padding: 10px;
   border-radius: 7px;
@@ -378,6 +391,8 @@
   justify-content: center;
 }
 
+
+
 .location-form {
   background-color: white;
   width: 450px;
@@ -395,7 +410,9 @@
 
 .timing-block {
   flex-direction: row;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  gap: 70px;
   padding: 10px 30px;
 }
 

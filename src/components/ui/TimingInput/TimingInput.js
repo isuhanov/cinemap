@@ -28,7 +28,7 @@ const TimingInput = memo(() => {
 
     return(
         <>
-            <input ref={inputRef} id="location-timing" value={value} onChange={(e) => setTimingValue(e)} className="timing-input"/>
+            <input  placeholder={ value.length>0 ? '' : '00:00:00' } ref={inputRef} id="location-timing" value={value} onChange={(e) => setTimingValue(e)} className="timing-input"/>
         </>
     );
 });
