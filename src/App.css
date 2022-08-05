@@ -252,7 +252,7 @@
   height: 490px;
 }
 .location-form__main {
-  height: 550px;
+  height: 600px;
 }
 
 
@@ -345,6 +345,8 @@
   padding: 10px;
   border-radius: 7px;
   font-weight: 700;
+  /* transition: all .2s ; */
+  transition: all .2s ease-out;
 }
 
 .location-card-btn-edit {
@@ -390,8 +392,6 @@
   align-items: center;
   justify-content: center;
 }
-
-
 
 .location-form {
   background-color: white;

@@ -1,13 +1,10 @@
-import { memo, useRef, useState } from "react";
+import { memo } from "react";
 
 import './TimingInput.css'
 
-const TimingInput = memo(() => {
+const TimingInput = memo(({ value, setValue }) => {
     // const [value, setValue] = useState('00:00:00');
-    const [value, setValue] = useState('');
-
-    const inputRef = useRef();
-
+    // const [value, setValue] = useState('');
     function setTimingValue(event) {
         if (!(event.target.value.split(':').reduce((res ,el) => !isNaN(el), true))) return;  // если элемент между ':' не является числом, то возвращается false (выход из функции); (isNaN('123') = false - проверка на число)
         
@@ -28,7 +25,7 @@ const TimingInput = memo(() => {
 
     return(
         <>
-            <input  placeholder={ value.length>0 ? '' : '00:00:00' } ref={inputRef} id="location-timing" value={value} onChange={(e) => setTimingValue(e)} className="timing-input"/>
+            <input  placeholder={ value.length>0 ? '' : '00:00:00' } id="location-timing" value={value} onChange={(e) => setTimingValue(e)} className="timing-input"/>
         </>
     );
 });

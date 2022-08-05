@@ -2,12 +2,12 @@ import { memo } from 'react';
 
 import '../App.css';
 
-const SideBar = memo(({}) => {
+const SideBar = memo(({onClickAdd}) => {
     return (
         <div className="side-bar menu">
             <nav>
                 <ul>
-                    <li className="side-bar__item menu-item">Добавить<span className="material-symbols-outlined">add</span></li>
+                    <li className="side-bar__item menu-item" onClick={onClickAdd}>Добавить<span className="material-symbols-outlined">add</span></li>
                     <li className="side-bar__item menu-item">Фильтровать<span className="material-symbols-outlined">tune</span></li>
                     <li className="side-bar__item menu-item">Мессенджер<span className="material-symbols-outlined">mode_comment</span></li>
                     <li className="side-bar__item menu-item">Маршрут<span className="material-symbols-outlined">pin_drop</span></li>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap';
 import LocationForm from './components/LocationForm';
@@ -6,10 +7,20 @@ import SearchInput from './components/SearchInput';
 import SideBar from './components/SideBar';
 
 function App() {
+  const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
+
+  function openLocationForm() { // ф-ия для откытия формы локации
+    setIsOpenLocationForm(true);
+  }
+
+  function closeLocationForm() { // ф-ия для закрытия формы локации
+    setIsOpenLocationForm(false);
+  }
+
   return (
     <div className="App">
       <BGMap />
-      <LocationForm />
+      { isOpenLocationForm && <LocationForm onClickClose={closeLocationForm}/>}
       <div className="container">
         <div className="profile-block">
           <Profile />
@@ -18,7 +29,7 @@ function App() {
           <SearchInput />  
         </div>
         <div className="side-bar-block">
-          <SideBar />
+          <SideBar onClickAdd={openLocationForm} />
         </div>
       </div>
     </div>

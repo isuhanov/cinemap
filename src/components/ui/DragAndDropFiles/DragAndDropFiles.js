@@ -2,57 +2,50 @@ import { memo, useEffect, useRef, useState } from "react";
 
 import './DragAndDropFiles.css';
 
-const DragAndDropFiles = memo(() => {
+const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
     const [drag, setDrag] = useState(false);
-    const [fileList, setFileList] = useState([]);
-    // const [fileList, setFileList] = useState([
-    //     'файл',
-    //     'файл',
-    //     'файл',
-    //     'файл'
-    // ]);
+    const [fileList, setFileList] = useState(photoList);
     const dropRef = useRef();
-    let dragCounter;
-
-    function handleDrag(e) {
-        e.preventDefault()
-        e.stopPropagation()
-    }
     
-    function handleDragIn(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        dragCounter++
-        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-            setDrag(true)
-        }
-    }
-    
-    function handleDragOut(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        dragCounter--
-        if (dragCounter === 0) {
-            setDrag(false);
-        }
-    }
-    
-    function handleDrop(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        setDrag(false);
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            let files = fileList;
-            for (const file of e.dataTransfer.files) {
-                files.push(file);
-                setFileList(files);
-            }
-            console.log(files);
-            dragCounter = 0    
-        }
-    }
-
     useEffect(() => {
+        let dragCounter;
+        function handleDrag(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        function handleDragIn(e) {
+            e.preventDefault()
+            e.stopPropagation()
+            dragCounter++
+            if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+                setDrag(true)
+            }
+        }
+        function handleDragOut(e) {
+            e.preventDefault()
+            e.stopPropagation()
+            dragCounter--
+            if (dragCounter === 0) {
+                setDrag(false);
+            }
+        }
+        function handleDrop(e) {
+            e.preventDefault()
+            e.stopPropagation()
+            setDrag(false);
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                let files = fileList;
+                for (const file of e.dataTransfer.files) {
+                    files.push(file);
+                    setFileList(files);
+
+                    onDropFiles(files);
+                }
+                // console.log(files);
+                dragCounter = 0    
+            }
+        }
+
         let div = dropRef.current;
         div.addEventListener('dragenter', handleDragIn)
         div.addEventListener('dragleave', handleDragOut)
@@ -74,7 +67,6 @@ const DragAndDropFiles = memo(() => {
                     </ul>
                     :
                     <p className="drag-and-drop-empty-filelist">Вы не добавили фото...</p>
-                    // <p className="drag-and-drop-empty-filelist">ВЫ ПОКА НЕ ДОБАВИЛИ ФОТОГ</p>
                 }
             </div>
             <div className="drag-and-drop__img-block">
