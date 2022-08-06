@@ -25,7 +25,7 @@ const TimingInput = memo(({ value, setValue }) => {
 
     return(
         <>
-            <input  placeholder={ value.length>0 ? '' : '00:00:00' } id="location-timing" value={value} onChange={(e) => setTimingValue(e)} className="timing-input"/>
+            <input autoComplete="off" placeholder={ value.length>0 ? '' : '00:00:00' } id="location-timing" value={value} onChange={(e) => setTimingValue(e)} className="timing-input"/>
         </>
     );
 });

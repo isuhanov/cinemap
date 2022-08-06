@@ -1,6 +1,10 @@
+import axios from "axios";
 import { memo, useCallback, useState } from "react";
 import DragAndDropFiles from "./ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "./ui/TimingInput/TimingInput";
+
+import { AddressSuggestions } from 'react-dadata';
+import 'react-dadata/dist/react-dadata.css';
 
 const LocationForm = memo(({ onClickClose }) => {
     const [name, setName] = useState(''); // стейт для названия локации
@@ -12,13 +16,31 @@ const LocationForm = memo(({ onClickClose }) => {
     const [usersPhoto, setUsersPhoto] = useState([]); // стейт для фото пользователя
 
     function onClickSave() {
-        console.log(name);
-        console.log(filmName);
-        console.log(address);
-        console.log(route);
-        console.log(timing);
-        console.log(filmsPhoto);
-        console.log(usersPhoto);
+        // console.log(address);
+        let queryLocationObj = {
+            name,
+            filmName,
+            route,
+            timing,
+            filmsPhoto,
+            usersPhoto
+        }
+        // country city
+        let osmQuery =  address.replace(/[^\w][а-я][.]/i, ' ').replace(/^[а-я][.]/i, ' ')
+
+        axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {
+            queryLocationObj['address'] = res.data[0].display_name;
+            queryLocationObj['latitude'] = res.data[0].lat;
+            queryLocationObj['longitude'] = res.data[0].lon;
+
+            axios.post(`http://localhost:8000/locations`, queryLocationObj).then(res => {
+                console.log(res);
+                onClickClose();
+            }).catch(err => console.log(err));
+
+        }).catch(err => console.log(err));
+
+        // console.log(queryLocationObj);
     }
 
     const onTimingChange = useCallback((value) => setTiming(value));
@@ -64,6 +86,7 @@ const LocationForm = memo(({ onClickClose }) => {
                             <label htmlFor="location-address">
                                 Адрес:
                             </label>
+                            {/* <AddressSuggestions token="c2e5ee63d9065eed0e5d62a51054901ddd64c398" value={address} onChange={setAddress} /> */}
                             <input value={address} onChange={(e) => setAddress(e.target.value)} id="location-address" className="field"/>
                         </div>
 

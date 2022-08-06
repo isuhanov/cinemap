@@ -31,7 +31,7 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 
 //---------------------------------------------- locations ---------------------------------------------- 
 
-app.get("/locations", function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
     connection.query(
         `SELECT * FROM locations;`,
         function(err, results, fields) {
@@ -40,10 +40,21 @@ app.get("/locations", function(req, res){ // обработка GET запрос
     );
 });
 
+app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
+    console.log(req.body);
+    // connection.query(
+    //     `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
+    //     VALUES ('${req.body.name}', '${req.body.filmName}', '${req.body.address}', '${req.body.latitude}', '${req.body.longitude}', '${req.body.route}', '${req.body.timing}');`,
+    //     function(err, results, fields) {
+    //         res.send(results); // отправка результата в ответ на запрос
+    //     }
+    // ); 
+});
+
 
 //---------------------------------------------- users ---------------------------------------------- 
 
-app.get("/users", function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
+app.get('/users', function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
     if (req.query.location_id) {
         connection.query(  // получение id пользователя 
             `SELECT * FROM users_locations WHERE location_id = ${req.query.location_id};`,
@@ -66,7 +77,7 @@ app.get("/users", function(req, res){ // обработка GET запроса �
 
 //---------------------------------------------- photos ---------------------------------------------- 
 
-app.get("/photos", function(req, res){ // обработка GET запроса на выборку из таблицы locations_photo
+app.get('/photos', function(req, res){ // обработка GET запроса на выборку из таблицы locations_photo
     if (req.query.location_id) {
         connection.query(
             `SELECT * FROM locations_photos WHERE location_id=${req.query.location_id};`,
