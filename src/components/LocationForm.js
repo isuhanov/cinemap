@@ -1,5 +1,5 @@
 import axios from "axios";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import DragAndDropFiles from "./ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "./ui/TimingInput/TimingInput";
 
@@ -15,32 +15,46 @@ const LocationForm = memo(({ onClickClose }) => {
     const [filmsPhoto, setFilmsPhoto] = useState([]); // стейт для фото из фильма
     const [usersPhoto, setUsersPhoto] = useState([]); // стейт для фото пользователя
 
+    const formRef = useRef();
+
+    function postLocation(data) {
+        const formData = new FormData();
+        usersPhoto.forEach(element => {
+            formData.append('usersPhoto', element);
+        });        
+        filmsPhoto.forEach(element => {
+            formData.append('filmsPhoto', element);
+        });    
+
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        axios.post(`http://localhost:8000/locations`, formData).then(response => {
+            console.log(response);
+            onClickClose();
+        }).catch(err => console.log(err));
+    }
+
     function onClickSave() {
-        // console.log(address);
         let queryLocationObj = {
             name,
             filmName,
             route,
             timing,
-            filmsPhoto,
-            usersPhoto
         }
-        // country city
+        
+        //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
         let osmQuery =  address.replace(/[^\w][а-я][.]/i, ' ').replace(/^[а-я][.]/i, ' ')
+        //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
 
         axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {
             queryLocationObj['address'] = res.data[0].display_name;
             queryLocationObj['latitude'] = res.data[0].lat;
             queryLocationObj['longitude'] = res.data[0].lon;
-
-            axios.post(`http://localhost:8000/locations`, queryLocationObj).then(res => {
-                console.log(res);
-                onClickClose();
-            }).catch(err => console.log(err));
-
+        }).then(res => {
+            postLocation(queryLocationObj);
         }).catch(err => console.log(err));
-
-        // console.log(queryLocationObj);
     }
 
     const onTimingChange = useCallback((value) => setTiming(value));
@@ -67,7 +81,7 @@ const LocationForm = memo(({ onClickClose }) => {
                     </div>
                 </header>
                 <div className="location-form__main">
-                    <form>
+                    <form ref={formRef}>
                         <div className="field-block">
                             <label htmlFor="location-name">
                                 Название локации:

@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
 
+const fs = require('fs');
+
 const app = express();
 
 // настрока парсера сервера для запросов
@@ -41,14 +43,20 @@ app.get('/locations', function(req, res){ // обработка GET запрос
 });
 
 app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
-    console.log(req.body);
-    // connection.query(
-    //     `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
-    //     VALUES ('${req.body.name}', '${req.body.filmName}', '${req.body.address}', '${req.body.latitude}', '${req.body.longitude}', '${req.body.route}', '${req.body.timing}');`,
-    //     function(err, results, fields) {
-    //         res.send(results); // отправка результата в ответ на запрос
-    //     }
-    // ); 
+    connection.query(
+        `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
+        VALUES ('${req.body.name}', '${req.body.filmName}', '${req.body.address}', '${req.body.latitude}', '${req.body.longitude}', '${req.body.route}', '${req.body.timing}');`,
+        function(err, results, fields) {
+            fs.mkdir(`./img/photo/locationphoto/${results.insertId}`, (err) => console.log(err));
+            fs.mkdir(`./img/photo/locationphoto/${results.insertId}/film`, (err) => console.log(err));
+            fs.mkdir(`./img/photo/locationphoto/${results.insertId}/user`, (err) => console.log(err));
+            
+            addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${results.insertId}/user/`);
+            addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${results.insertId}/film/`);
+
+            res.send(results); // отправка результата в ответ на запрос
+        }
+    ); 
 });
 
 
@@ -82,7 +90,6 @@ app.get('/photos', function(req, res){ // обработка GET запроса 
         connection.query(
             `SELECT * FROM locations_photos WHERE location_id=${req.query.location_id};`,
             function(err, results, fields) {
-                // console.log(results);
                 res.send(results);  // отправка результата в ответ на запрос
             }
         );
@@ -92,3 +99,15 @@ app.get('/photos', function(req, res){ // обработка GET запроса 
 app.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
     console.log("Сервер запущен на 8000 порту");
 });
+
+
+
+function addPhotos(photos, path) { // ф-ия добавления фото
+    if (Array.isArray(photos)) {
+        for (const photo of photos) {
+            photo.mv(path + photo.name);
+        }
+    } else {
+        photos.mv(path + photos.name);
+    }
+}
