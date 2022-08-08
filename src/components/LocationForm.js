@@ -15,9 +15,9 @@ const LocationForm = memo(({ onClickClose }) => {
     const [filmsPhoto, setFilmsPhoto] = useState([]); // стейт для фото из фильма
     const [usersPhoto, setUsersPhoto] = useState([]); // стейт для фото пользователя
 
-    const formRef = useRef();
+    const formRef = useRef(); // ссылка на DOM-объект формы
 
-    function postLocation(data) {
+    function postLocation(data) { //  post-запрос на добавление локации в БД 
         const formData = new FormData();
         usersPhoto.forEach(element => {
             formData.append('usersPhoto', element);
@@ -25,18 +25,17 @@ const LocationForm = memo(({ onClickClose }) => {
         filmsPhoto.forEach(element => {
             formData.append('filmsPhoto', element);
         });    
-
         for (const key in data) {
             formData.append(key, data[key]);
         }
 
         axios.post(`http://localhost:8000/locations`, formData).then(response => {
             console.log(response);
-            onClickClose();
+            onClickClose(); // закрытие формы при удачном добавлении
         }).catch(err => console.log(err));
     }
 
-    function onClickSave() {
+    function onClickSave() { // обработчик нажатия на кнопку сохранения
         let queryLocationObj = {
             name,
             filmName,
@@ -48,22 +47,23 @@ const LocationForm = memo(({ onClickClose }) => {
         let osmQuery =  address.replace(/[^\w][а-я][.]/i, ' ').replace(/^[а-я][.]/i, ' ')
         //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
 
-        axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {
+        // получение координат и адреса от OSM 
+        axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {  
             queryLocationObj['address'] = res.data[0].display_name;
             queryLocationObj['latitude'] = res.data[0].lat;
             queryLocationObj['longitude'] = res.data[0].lon;
         }).then(res => {
-            postLocation(queryLocationObj);
+            postLocation(queryLocationObj); // добавление локации в БД
         }).catch(err => console.log(err));
     }
 
-    const onTimingChange = useCallback((value) => setTiming(value));
+    const onTimingChange = useCallback((value) => setTiming(value)); // обработка значения поля тайминга
 
-    const onDropFilmsPhoto = useCallback((photos) => {
+    const onDropFilmsPhoto = useCallback((photos) => { // обработка значения поля фотографий фильма
         setFilmsPhoto(photos);
     })
     
-    const onDropUsersPhoto = useCallback((photos) => {
+    const onDropUsersPhoto = useCallback((photos) => { // обработка значения поля фотографий пользователя
         setUsersPhoto(photos);
     })
     

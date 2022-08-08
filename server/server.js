@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
 
+const path = require('path');
+
 const fs = require('fs');
 
 const app = express();
@@ -47,14 +49,23 @@ app.post('/locations', function(req, res){ // обработка POST запро
         `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
         VALUES ('${req.body.name}', '${req.body.filmName}', '${req.body.address}', '${req.body.latitude}', '${req.body.longitude}', '${req.body.route}', '${req.body.timing}');`,
         function(err, results, fields) {
+            if (err) {
+                res.status(500).send(err); // отправка ошибки в ответ на запрос при неудачном добавлении локации
+                return
+            } 
+
             fs.mkdir(`./img/photo/locationphoto/${results.insertId}`, (err) => console.log(err));
             fs.mkdir(`./img/photo/locationphoto/${results.insertId}/film`, (err) => console.log(err));
             fs.mkdir(`./img/photo/locationphoto/${results.insertId}/user`, (err) => console.log(err));
             
-            addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${results.insertId}/user/`);
-            addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${results.insertId}/film/`);
+            let fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${results.insertId}/user/`, 'user', results.insertId); 
+            fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${results.insertId}/film/`, 'film', results.insertId);
 
-            res.send(results); // отправка результата в ответ на запрос
+            if (fail) {
+                res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
+            } else {
+                res.send(results); // отправка результата в ответ на запрос
+            }
         }
     ); 
 });
@@ -102,12 +113,31 @@ app.listen(8000, () => { // запус и прослушка сервера на
 
 
 
-function addPhotos(photos, path) { // ф-ия добавления фото
+function addPhotos(photos, path, status, locationId) { // ф-ия добавления фото
+    let photoPath;
     if (Array.isArray(photos)) {
         for (const photo of photos) {
             photo.mv(path + photo.name);
+            photoPath = `http://localhost:8000${path.slice(5)}${photo.name}`;
+            connection.query(
+                `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
+                function(err, results, fields) {
+                    if (err) {
+                        return err;
+                    }
+                }
+            ); 
         }
     } else {
         photos.mv(path + photos.name);
+        photoPath = `http://localhost:8000${path.slice(5)}${photos.name}`;
+        connection.query(
+            `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
+            function(err, results, fields) {
+                if (err) {
+                    return err;
+                }
+            }
+        );
     }
 }
