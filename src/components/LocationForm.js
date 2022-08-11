@@ -6,7 +6,7 @@ import TimingInput from "./ui/TimingInput/TimingInput";
 import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
 
-const LocationForm = memo(({ onClickClose }) => {
+const LocationForm = memo(({ onClickClose, onReload }) => {
     const [name, setName] = useState(''); // стейт для названия локации
     const [filmName, setFilmName] = useState(''); // стейт для названия фильма
     const [address, setAddress] = useState(''); // стейт для адреса локации
@@ -32,6 +32,7 @@ const LocationForm = memo(({ onClickClose }) => {
         axios.post(`http://localhost:8000/locations`, formData).then(response => {
             console.log(response);
             onClickClose(); // закрытие формы при удачном добавлении
+            onReload(); // обновляю карту
         }).catch(err => console.log(err));
     }
 

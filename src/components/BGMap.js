@@ -6,18 +6,40 @@ import LocationIcon from '../assets/place-marker.svg';
 import '../App.css';
 import LocationCard from './LocationCard';
 
-const BGMap = memo(({markers}) => {
-  const [map, setMap] = useState(null);
-  const [locations, setLocations] = useState([]);
-  const [currentLocationId, setCurrentLocationId] = useState(0);
-  const [isCardVisible, setIsCardVisible] = useState(false);
+const BGMap = memo(({ reload, onReload }) => {
+  const [map, setMap] = useState(null);  // стейт карты
+  const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте
+  const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
+  const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
+  const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
+  // const [isMapReload, setIsMapReload] = useState(false);  // стейт для локальной переменной обновления
 
   useEffect(() => {
-    async function fetchLocation() {
-      axios.get('http://localhost:8000/locations').then(res => {
-        setLocations(res.data);
+    const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
+      onReload();
+      // setIsMapReload(prev => !prev);
+    }, 60000);
+    return () => clearInterval(id);
+  }, [])
+
+  
+  useEffect(() => {
+
+    async function fetchLocation() { // ф-ия выборки данных из БД
+      axios.get('http://localhost:8000/locations').then(res => {  // запрос на сервер для получения данных
+        setLocations(res.data); // сохраняю данные
         for (const location of res.data) {
-          const marker = new Marker(
+          // ----------- очищаю маркеры ------------------      
+          for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
+            const latlng = marker.getLatLng();
+            if (!(latlng.lat === location.location_latitude &&  latlng.lng === location.location_longitude)) {
+              map.removeLayer(marker);
+            } 
+          }
+          setMarkers([]);
+          // ----------- очищаю маркеры ------------------
+
+          const marker = new Marker( // создаю маркер
             [location.location_latitude, location.location_longitude],
             {
               icon: new Icon({
@@ -26,18 +48,22 @@ const BGMap = memo(({markers}) => {
               })
             }
           )
-          marker.addTo(map)
+          setMarkers(prevMarkers => [...prevMarkers, marker]); // добавляю маркер в стейт массив
+
+          // ------ прикрепления маркера к карте ------
+          map.addLayer(marker); 
           marker.addEventListener('click', () => {
             setCurrentLocationId(location.location_id);
             setIsCardVisible(true);
           })
+          // ------ прикрепления маркера к карте ------
         }
       }).catch(err => {
         console.log(err);
       })
     }
-    
-    if (map === null) {
+  
+    if (map === null) { // если карты еще нет, то добавляю, иначе получаю данные
       setMap(new Map('map-container', {
         layers: [
           new TileLayer("https://{s}.google.com/vt?x={x}&y={y}&z={z}", {
@@ -50,9 +76,10 @@ const BGMap = memo(({markers}) => {
         zoomControl: false
       }))
     } else {
-      fetchLocation();
+      fetchLocation(); 
     }
-  }, [map]);
+  }, [map, reload]);
+  // }, [map, reload, isMapReload]);
 
   return (
     <>
