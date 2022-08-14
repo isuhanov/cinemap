@@ -17,7 +17,6 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     const usersParentRef = useRef();
     // -------------------- ссылка на родительские блоки полей -------------------
 
-
     const onNameChange = (name) => { // обработка значения поля названия локации
         setName(prev => ({
             ...prev,
@@ -39,10 +38,38 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
         }))
     }
 
-    const onTimingChange = useCallback((value) => setTiming(value)); // обработка значения поля тайминга
+    const onRouteChange = (route) => { // обработка значения поля пути
+        setRoute(prev => ({
+            ...prev,
+            ...route
+        }))
+    }
+
+    const onTimingChange = useCallback((timing) => { // обработка значения поля тайминга
+        let timingObj
+        if (typeof timing === 'object' && timing !== null) {
+            timingObj = {...timing};    
+        } else {
+            timingObj = {value: timing, isTouched: true};
+
+        }
+        setTiming(prev => ({
+            ...prev,
+            ...timingObj
+        }))
+    }); 
 
     const onDropFilmsPhoto = useCallback((photos) => { // обработка значения поля фотографий фильма
-        setFilmsPhoto(photos);
+        let photosObj;
+        if (Array.isArray(photos)) {
+            photosObj = {value: photos, isTouched: true};
+        } else if (typeof photos === 'object' && photos !== null) {
+            photosObj = {...photos};    
+        }
+        setFilmsPhoto(prev => ({
+            ...prev,
+            ...photosObj
+        }))
     })
 
     const onDropUsersPhoto = useCallback((photos) => { // обработка значения поля фотографий пользователя
@@ -78,37 +105,46 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
         value: '',
         error: '',
         parent: routeParentRef,
-        isTouched: false
+        isTouched: false,
+        set: onRouteChange
     });  
     // стейт для тайминга
     const [timing, setTiming] = useState({
         value: '',
         error: '',
         parent: timingParentRef,
-        isTouched: false
+        isTouched: false,
+        set: onTimingChange
     }); 
     // стейт для фото из фильма
     const [filmsPhoto, setFilmsPhoto] = useState({
-        value: '',
+        value: [],
         error: '',
         parent: filmsPhotoParentRef,
-        isTouched: false
+        isTouched: false,
+        set: onDropFilmsPhoto
     }); 
     // стейт для фото пользователя
     const [usersPhoto, setUsersPhoto] = useState({
-        value: '',
+        value: [],
         error: '',
         parent: usersParentRef,
         isTouched: false
     }); 
 
+    // объект для хранения полей формы
     const form = {
         name,
         filmName,
-        address
+        address,
+        route,
+        timing,
+        filmsPhoto
     }
 
+
     useEffect(() => {
+        // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
         if (form.name.isTouched) {
             textFieldIsValid(form.name, 200);
         }
@@ -118,26 +154,74 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
         if (form.address.isTouched) {
             textFieldIsValid(form.address);
         }
-    }, [name.value, filmName.value, address.value])
+        if (form.route.isTouched) {
+            textFieldIsValid(form.route);
+        }
+        if (form.timing.isTouched) {
+            if (form.timing.value.length === 0) {
+                form.timing.parent.current.classList.add('error');
+                form.timing.set({
+                    error: 'Пустое поле'
+                })
+            } else if (form.timing.value.length < 8) {
+                form.timing.parent.current.classList.add('error');
+                form.timing.set({
+                    error: 'Поле не заполнено до конца'
+                })
+            } else {
+                let timingArr = form.timing.value.split(':');
+                console.log(timingArr);
+                if (Number(timingArr[1]) > 59) {
+                    form.timing.parent.current.classList.add('error');
+                    form.timing.set({
+                        error: 'Кол-во минут превышает 59'
+                    })
+                } else if (Number(timingArr[2]) > 59) {
+                    form.timing.parent.current.classList.add('error');
+                    form.timing.set({
+                        error: 'Кол-во секунд превышает 59'
+                    })
+                } else {
+                    form.timing.parent.current.classList.remove('error');
+                    form.timing.set({
+                        error: '',
+                    })
+                }
+            }
+            
+            // textFieldIsValid(form.route);
+        }
+    }, [name.value, filmName.value, address.value, route.value, timing.value])
+
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения
         let formIsValid = true;
+        // for (const key in form.filmsPhoto){
+        //     console.log(key);
+        //     console.log(form.filmsPhoto[key]);
+        // }
+        console.log(form);
+
         for (const key in form) {
-            if ((!form[key].value) || (form[key].error !== '')) {
+            // если значение поля формы пустое, то вывести сообщение об ошибке
+            if (form[key].value.length === 0) {
                 form[key].set({
                     error: 'Пустое поле'
                 });
                 form[key].parent.current.classList.add('error');
                 formIsValid = false;
             }
+            // если имеется ошибка, то форма не валидна
+            if (form[key].error !== '') {
+                formIsValid = false;
+            }
         }
-        if (formIsValid) {   
-            console.log('выборка');
-        }
+        if (!formIsValid) return
+        console.log('выборка');
     }
 
     function postLocation(data) { //  post-запрос на добавление локации в БД 
-        const formData = new FormData();
+        const formData = new FormData(); // объект для хранения данных отправляемой формы
         usersPhoto.forEach(element => {
             formData.append('usersPhoto', element);
         });        
@@ -178,7 +262,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     // }
 
 
-    function textFieldIsValid(formItem, max = undefined) {
+    function textFieldIsValid(formItem, max = undefined) { // ф-ия для валидации текстовых полей
         if (formItem.value.length === 0) {
             formItem.parent.current.classList.add('error');
             formItem.set({
@@ -269,40 +353,46 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
                             }
                         </div>
 
-                        <div className="field-block">
+                        <div className="field-block" ref={routeParentRef}>
                             <label htmlFor="location-route">
                                 Как пройти:
                             </label>
-                            <textarea value={route} onChange={(e) => setRoute(e.target.value)} id="location-route" className="field-route"></textarea>
-                            {/* { form.route.error && 
+                            <textarea value={route.value} 
+                                        onChange={(e) => onRouteChange({
+                                            value: e.target.value,
+                                            isTouched: true
+                                        })} 
+                                        id="location-route" className="field-route"
+                            ></textarea>
+                            { route.error && 
                                 <p>
-                                    { form.route.error }
+                                    { route.error }
                                 </p>
-                            } */}
+                            }
                         </div>
 
-                        <div className="field-block timing-block">
+                        <div className="field-block timing-block" ref={timingParentRef}>
                             <label htmlFor="location-timing">
                                 Тайминг:
                             </label>
-                            <TimingInput value={timing} setValue={onTimingChange} />
-                            {/* { form.timing.error && 
+                            <TimingInput value={timing.value} setValue={onTimingChange} />
+                            { timing.error && 
                                 <p>
-                                    { form.timing.error }
+                                    { timing.error }
                                 </p>
-                            } */}
+                            }
                         </div>
 
-                        <div className="field-block">
+                        <div className="field-block" ref={filmsPhotoParentRef}>
                             <label>
                                 Фото из фильма:                              
                             </label>
-                            <DragAndDropFiles photoList={filmsPhoto} onDropFiles={onDropFilmsPhoto} />
-                            {/* { form.filmsPhoto.error && 
+                            <DragAndDropFiles photoList={filmsPhoto.value} onDropFiles={onDropFilmsPhoto} />
+                            { filmsPhoto.error && 
                                 <p>
-                                    { form.filmsPhoto.error }
+                                    { filmsPhoto.error }
                                 </p>
-                            } */}
+                            }
                         </div>
 
                         <div className="field-block">

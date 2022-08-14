@@ -30,6 +30,7 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
             }
         }
         function handleDrop(e) {
+            // debugger
             e.preventDefault()
             e.stopPropagation()
             setDrag(false);
@@ -37,11 +38,9 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
                 let files = fileList;
                 for (const file of e.dataTransfer.files) {
                     files.push(file);
-                    setFileList(files);
-
-                    onDropFiles(files);
                 }
-                // console.log(files);
+                setFileList(files);
+                onDropFiles(files);
                 dragCounter = 0    
             }
         }
@@ -56,9 +55,9 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
     return (
         <div ref={dropRef} className="drag-and-drop-container">
             <div className="drag-and-drop-filelist-container">
-                { fileList.length > 0 ?
+                { photoList.length > 0 ?
                     <ul className="drag-and-drop-filelist">
-                        { fileList.map((file, index) => {
+                        { photoList.map((file, index) => {
                             return <li className="drag-and-drop-file" key={index}>
                                 <span className="material-symbols-outlined">image</span>
                                 <span>{ file.name }</span>
