@@ -1,10 +1,13 @@
 import axios from "axios";
-import { memo, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
+// import { ReloadContext } from "../App";
 import ProfileAvatar from "./ui/ProfileAvatar/ProfileAvatar";
 
-const LocationCard = memo(({ otherClassName, location, onClose }) => {
+const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     const [user, setUser] = useState(null);
     const [locationPhoto, setLocationPhoto] = useState([]);
+
+    // const reloadContext = useContext(ReloadContext);
 
     useEffect(() => {
         // async function fetchData() {
@@ -20,6 +23,15 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
         // }
         // fetchData();
     }, [location])
+
+    function onDelete() {
+        onClose();
+        axios.delete(`http://localhost:8000/locations?location_id=${location.location_id}`).then(res => {
+            console.log(res);
+            onReload();
+            console.log('delete');
+        }).catch(err => console.log(err));
+    }
 
     return (
         <div className={`location-card ${otherClassName}`}>
@@ -122,7 +134,7 @@ const LocationCard = memo(({ otherClassName, location, onClose }) => {
                         <button className="location-card-btn location-card-btn-edit">
                             Редактировать
                         </button>
-                        <button className="location-card-btn location-card-btn-delete">
+                        <button onClick={onDelete} className="location-card-btn location-card-btn-delete">
                             Удалить
                         </button>
                     </div>

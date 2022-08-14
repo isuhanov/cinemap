@@ -70,6 +70,15 @@ app.post('/locations', function(req, res){ // обработка POST запро
     ); 
 });
 
+app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
+    connection.query(
+        `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`,
+        function(err, results, fields) {
+            res.send(err); // отправка ошибок в ответ на запрос
+        }
+    ); 
+});
+
 
 //---------------------------------------------- users ---------------------------------------------- 
 

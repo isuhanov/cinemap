@@ -89,6 +89,7 @@ const BGMap = memo(({ reload, onReload }) => {
             otherClassName="shadow-block"
             location={locations.find(location => location.location_id === currentLocationId)}
             onClose={() => setIsCardVisible(false)}
+            onReload={onReload}
           />
       } 
     </>
