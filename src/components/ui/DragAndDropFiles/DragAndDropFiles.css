@@ -57,6 +57,18 @@
     animation: icon-move 1.2s infinite ease-in alternate;
 }
 
+.file-remove-btn {
+    background-color: inherit;
+    color: #2571e1;
+}
+
+.file-remove-btn :hover {
+    color: #FC3C75;
+}
+
+.file-remove-btn :active {
+    color: #fdabc5;
+}
 
 /* анимация подпригивания иконки файла */
 @keyframes icon-move {
