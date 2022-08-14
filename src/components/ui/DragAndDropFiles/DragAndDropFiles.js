@@ -30,7 +30,6 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
             }
         }
         function handleDrop(e) {
-            // debugger
             e.preventDefault()
             e.stopPropagation()
             setDrag(false);

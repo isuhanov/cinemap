@@ -3,8 +3,6 @@ import { memo } from "react";
 import './TimingInput.css'
 
 const TimingInput = memo(({ value, setValue }) => {
-    // const [value, setValue] = useState('00:00:00');
-    // const [value, setValue] = useState('');
     function setTimingValue(event) {
         if (!(event.target.value.split(':').reduce((res ,el) => !isNaN(el), true))) return;  // если элемент между ':' не является числом, то возвращается false (выход из функции); (isNaN('123') = false - проверка на число)
         
@@ -12,7 +10,6 @@ const TimingInput = memo(({ value, setValue }) => {
         let timingValue = event.target.value;
         if (timingValue.length < 9){
             if (event.target.selectionEnd === 2 || event.target.selectionEnd === 5) {
-                console.log();
                 if (lastValue.length < timingValue.length && (timingValue.split(':').length - 1 !== 2)) {
                     timingValue += ':';  
                 } else {

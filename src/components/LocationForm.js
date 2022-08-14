@@ -2,8 +2,7 @@ import axios from "axios";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import DragAndDropFiles from "./ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "./ui/TimingInput/TimingInput";
-
-import { AddressSuggestions } from 'react-dadata';
+// import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
 
 const LocationForm = memo(({ onClickClose, onReload }) => {
@@ -60,21 +59,25 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     }); 
 
     const onDropFilmsPhoto = useCallback((photos) => { // обработка значения поля фотографий фильма
+        changePhotos(photos, setFilmsPhoto);
+    })
+
+    const onDropUsersPhoto = useCallback((photos) => { // обработка значения поля фотографий пользователя
+        changePhotos(photos, setUsersPhoto);
+    })
+
+    function changePhotos(photos, setPhoto) {
         let photosObj;
         if (Array.isArray(photos)) {
             photosObj = {value: photos, isTouched: true};
         } else if (typeof photos === 'object' && photos !== null) {
             photosObj = {...photos};    
         }
-        setFilmsPhoto(prev => ({
+        setPhoto(prev => ({
             ...prev,
             ...photosObj
         }))
-    })
-
-    const onDropUsersPhoto = useCallback((photos) => { // обработка значения поля фотографий пользователя
-        setUsersPhoto(photos);
-    })
+    }
 
     // стейт для названия локации
     const [name, setName] = useState({
@@ -118,7 +121,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     }); 
     // стейт для фото из фильма
     const [filmsPhoto, setFilmsPhoto] = useState({
-        value: [],
+        value: new Array(),
         error: '',
         parent: filmsPhotoParentRef,
         isTouched: false,
@@ -126,10 +129,11 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     }); 
     // стейт для фото пользователя
     const [usersPhoto, setUsersPhoto] = useState({
-        value: [],
+        value: new Array(),
         error: '',
         parent: usersParentRef,
-        isTouched: false
+        isTouched: false,
+        set: onDropUsersPhoto
     }); 
 
     // объект для хранения полей формы
@@ -139,7 +143,8 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
         address,
         route,
         timing,
-        filmsPhoto
+        filmsPhoto,
+        usersPhoto
     }
 
 
@@ -158,50 +163,19 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
             textFieldIsValid(form.route);
         }
         if (form.timing.isTouched) {
-            if (form.timing.value.length === 0) {
-                form.timing.parent.current.classList.add('error');
-                form.timing.set({
-                    error: 'Пустое поле'
-                })
-            } else if (form.timing.value.length < 8) {
-                form.timing.parent.current.classList.add('error');
-                form.timing.set({
-                    error: 'Поле не заполнено до конца'
-                })
-            } else {
-                let timingArr = form.timing.value.split(':');
-                console.log(timingArr);
-                if (Number(timingArr[1]) > 59) {
-                    form.timing.parent.current.classList.add('error');
-                    form.timing.set({
-                        error: 'Кол-во минут превышает 59'
-                    })
-                } else if (Number(timingArr[2]) > 59) {
-                    form.timing.parent.current.classList.add('error');
-                    form.timing.set({
-                        error: 'Кол-во секунд превышает 59'
-                    })
-                } else {
-                    form.timing.parent.current.classList.remove('error');
-                    form.timing.set({
-                        error: '',
-                    })
-                }
-            }
-            
-            // textFieldIsValid(form.route);
+            timeFieldIsValid(form.timing);
         }
-    }, [name.value, filmName.value, address.value, route.value, timing.value])
+        if (form.filmsPhoto.isTouched) {
+            photosFieldIsValid(form.filmsPhoto);
+        }
+        if (form.usersPhoto.isTouched) {
+            photosFieldIsValid(form.usersPhoto);
+        }
+    }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения
         let formIsValid = true;
-        // for (const key in form.filmsPhoto){
-        //     console.log(key);
-        //     console.log(form.filmsPhoto[key]);
-        // }
-        console.log(form);
-
         for (const key in form) {
             // если значение поля формы пустое, то вывести сообщение об ошибке
             if (form[key].value.length === 0) {
@@ -281,7 +255,68 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
         }
     }
 
-    
+    function timeFieldIsValid(formItem, max = undefined) { // ф-ия для валидации временных полей
+        if (formItem.value.length === 0) {
+            formItem.parent.current.classList.add('error');
+            formItem.set({
+                error: 'Пустое поле'
+            })
+        } else if (formItem.value.length < 8) {
+            formItem.parent.current.classList.add('error');
+            formItem.set({
+                error: 'Поле не заполнено до конца'
+            })
+        } else {
+            let timingArr = formItem.value.split(':');
+            if (Number(timingArr[1]) > 59) {
+                formItem.parent.current.classList.add('error');
+                formItem.set({
+                    error: 'Кол-во минут превышает 59'
+                })
+            } else if (Number(timingArr[2]) > 59) {
+                formItem.parent.current.classList.add('error');
+                formItem.set({
+                    error: 'Кол-во секунд превышает 59'
+                })
+            } else {
+                formItem.parent.current.classList.remove('error');
+                formItem.set({
+                    error: '',
+                })
+            }
+        }
+    }
+
+    function photosFieldIsValid(formItem) { // ф-ия для валидации временных полей
+        let fieldIsValid = true;
+        if (formItem.value.length === 0) {
+            formItem.parent.current.classList.add('error');
+            formItem.set({
+                error: 'Пустое поле'
+            })
+            fieldIsValid = false;
+        } else {
+            const extentions = ['jpg', 'jpeg', 'png', 'svg', 'webp']
+            formItem.value.forEach(file => {
+                if (!extentions.includes(file.name.split('.').pop().toLowerCase())) {
+                    formItem.parent.current.classList.add('error');
+                    formItem.set({
+                        error: 'Разрешены только файлы с расширениеми: jpg, jpeg, png, svg, webp'
+                    })
+                    fieldIsValid = false;
+                }                    
+            });
+        }
+        
+        if (fieldIsValid) {
+            formItem.parent.current.classList.remove('error');
+            formItem.set({
+                error: '',
+            })
+        }
+    }
+
+
     return (
         <div className="location-form-container">
             <div className="location-form">
@@ -296,7 +331,6 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
                     </div>
                 </header>
                 <div className="location-form__main">
-                    {/* <form ref={formRef}> */}
                     <form>
                         <div className="field-block" ref={namesParentRef}>
                             <label htmlFor="location-name">
@@ -338,7 +372,6 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
                             <label htmlFor="location-address">
                                 Адрес:
                             </label>
-                            {/* <AddressSuggestions token="c2e5ee63d9065eed0e5d62a51054901ddd64c398" value={address} onChange={setAddress} /> */}
                             <input value={address.value} 
                                     onChange={(e) => onAddressChange({
                                         value: e.target.value,
@@ -395,16 +428,16 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
                             }
                         </div>
 
-                        <div className="field-block">
+                        <div className="field-block" ref={usersParentRef}>
                             <label>
                                 Ваши фото локации:                               
                             </label>
-                            <DragAndDropFiles photoList={usersPhoto} onDropFiles={onDropUsersPhoto} />
-                            {/* { form.usersPhoto.error && 
+                            <DragAndDropFiles photoList={usersPhoto.value} onDropFiles={onDropUsersPhoto} />
+                            { usersPhoto.error && 
                                 <p>
-                                    { form.usersPhoto.error }
+                                    { usersPhoto.error }
                                 </p>
-                            } */}
+                            }
                         </div>
                     </form>
                 </div>
