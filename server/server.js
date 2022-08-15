@@ -71,12 +71,24 @@ app.post('/locations', function(req, res){ // обработка POST запро
 });
 
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
+    removeDir(`./img/photo/locationphoto/${req.query.location_id}`);
     connection.query(
-        `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`,
+        `DELETE FROM locations_photos WHERE (location_id = '${req.query.location_id}');`,
         function(err, results, fields) {
-            res.send(err); // отправка ошибок в ответ на запрос
+            if (err) res.status(500).send(err);
+            // console.log('нет ошибок');
+            connection.query(
+                `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`,
+                function(err, results, fields) {
+                    if (err) {
+                        res.status(500).send(err);
+                        return
+                    }
+                    res.send(err); // отправка ошибок в ответ на запрос
+                }
+            ); 
         }
-    ); 
+    );
 });
 
 
@@ -121,7 +133,6 @@ app.listen(8000, () => { // запус и прослушка сервера на
 });
 
 
-
 function addPhotos(photos, path, status, locationId) { // ф-ия добавления фото
     let photoPath;
     if (Array.isArray(photos)) {
@@ -149,4 +160,20 @@ function addPhotos(photos, path, status, locationId) { // ф-ия добавле
             }
         );
     }
+}
+
+function removeDir(dir) { // ф-ия удалеения файлов 
+    let files = fs.readdirSync(dir)
+    for(var i=0;i<files.length;i++){
+      let newPath = path.join(dir,files[i]);
+      let stat = fs.statSync(newPath)
+      if(stat.isDirectory()){
+        // Если это папка, рекурсивно вниз
+        removeDir(newPath);
+      }else {
+       //Удалить файлы
+        fs.unlinkSync(newPath);
+      }
+    }
+    fs.rmdirSync(dir)// Если папка пуста, удаляем себя
 }

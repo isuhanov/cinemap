@@ -192,14 +192,34 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
         }
         if (!formIsValid) return
         console.log('выборка');
+
+        let queryLocationObj = {
+            name: name.value,
+            filmName: filmName.value,
+            route: route.value,
+            timing: timing.value,
+        }
+        
+        //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
+        let osmQuery =  address.value.replace(/[^\w][а-я][.]/i, ' ').replace(/^[а-я][.]/i, ' ')
+        //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
+
+        // получение координат и адреса от OSM 
+        axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {  
+            queryLocationObj['address'] = res.data[0].display_name;
+            queryLocationObj['latitude'] = res.data[0].lat;
+            queryLocationObj['longitude'] = res.data[0].lon;
+        }).then(res => {
+            postLocation(queryLocationObj); // добавление локации в БД
+        }).catch(err => console.log(err));
     }
 
     function postLocation(data) { //  post-запрос на добавление локации в БД 
         const formData = new FormData(); // объект для хранения данных отправляемой формы
-        usersPhoto.forEach(element => {
+        usersPhoto.value.forEach(element => {
             formData.append('usersPhoto', element);
         });        
-        filmsPhoto.forEach(element => {
+        filmsPhoto.value.forEach(element => {
             formData.append('filmsPhoto', element);
         });    
         for (const key in data) {
