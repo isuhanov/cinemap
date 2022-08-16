@@ -49,29 +49,6 @@
   font-size: 14px;
 }
 
-.photo-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  overflow: scroll;
-  padding-bottom: 5px;
-}
-
-.photo-item {
-  min-width: 85px;
-  max-width: 85px;
-  height: 85px;
-  overflow: hidden;
-  border-radius: 7px;
-}
-
-.photo-item img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  cursor: pointer;
-}
-
 .container .profile-block,
 .container .search-input-block,
 .container .side-bar-block {

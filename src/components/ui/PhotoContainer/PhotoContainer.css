@@ -1,0 +1,42 @@
+.photo-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    overflow: scroll;
+    padding-bottom: 5px;
+}
+
+.photo-item {
+    position: relative;
+    min-width: 85px;
+    max-width: 85px;
+    height: 85px;
+    overflow: hidden;
+    border-radius: 7px;
+}
+
+.photo-item img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.photo-remove-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: white;
+    width: 25px;
+    height: 25px;
+    background-color: rgba(0, 0, 0, 0.523);
+    border-radius: 7px;
+}
+
+.photo-remove-btn:hover {
+    color: #FC3C75;
+}
+
+.photo-remove-btn:active {
+    color: #fdabc5;
+}

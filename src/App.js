@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap';
 import LocationForm from './components/LocationForm';
@@ -15,15 +15,21 @@ function App() {
   function onReload() { // ф-ия для обновления
     setIsReload(prev => !prev);
   }
+  // function openLocationForm() { // ф-ия для откытия формы локации
+  //   setIsOpenLocationForm(true);
+  // }
 
-  function openLocationForm() { // ф-ия для откытия формы локации
+  // function closeLocationForm() { // ф-ия для закрытия формы локации
+  //   setIsOpenLocationForm(false);
+  // }  
+  const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
     setIsOpenLocationForm(true);
-  }
+  });
 
-  function closeLocationForm() { // ф-ия для закрытия формы локации
+  const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
     setIsOpenLocationForm(false);
-  }  
-
+  });
+  
   return (
     // <ReloadContext.Provider value={onReload}>
       <div className="App">

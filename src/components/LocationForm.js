@@ -4,8 +4,9 @@ import DragAndDropFiles from "./ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "./ui/TimingInput/TimingInput";
 // import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
+import PhotoContainer from "./ui/PhotoContainer/PhotoContainer";
 
-const LocationForm = memo(({ onClickClose, onReload }) => {
+const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
     const namesParentRef = useRef();
     const filmNamesParentRef = useRef();
@@ -15,6 +16,13 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     const filmsPhotoParentRef = useRef();
     const usersParentRef = useRef();
     // -------------------- ссылка на родительские блоки полей -------------------
+
+    const [locationPhotos, setLocationPhoto] = useState(location ? location.photos : undefined );
+
+    const onRemovePhotos = useCallback((photoId) => {
+        const photos = locationPhotos.filter(photo => photo.locations_photo_id !== photoId);
+        setLocationPhoto([...photos]);
+    })
 
     const onNameChange = (name) => { // обработка значения поля названия локации
         setName(prev => ({
@@ -81,7 +89,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
 
     // стейт для названия локации
     const [name, setName] = useState({
-        value: '',
+        value: location ? location.location_name : '',
         error: '',
         parent: namesParentRef,
         isTouched: false,
@@ -89,7 +97,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     }); 
     // стейт для названия фильма
     const [filmName, setFilmName] = useState({
-        value: '',
+        value: location ? location.location_film : '',
         error: '',
         parent: filmNamesParentRef,
         isTouched: false,
@@ -97,7 +105,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     });  
     // стейт для адреса локации
     const [address, setAddress] = useState({
-        value: '',
+        value: location ? location.location_address : '',
         error: '',
         parent: addressParentRef,
         isTouched: false,
@@ -105,7 +113,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     });  
     // стейт для пути
     const [route, setRoute] = useState({
-        value: '',
+        value: location ? location.location_route : '',
         error: '',
         parent: routeParentRef,
         isTouched: false,
@@ -113,7 +121,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
     });  
     // стейт для тайминга
     const [timing, setTiming] = useState({
-        value: '',
+        value: location ? location.location_timing : '',
         error: '',
         parent: timingParentRef,
         isTouched: false,
@@ -175,6 +183,14 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
 
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения
+        isUpdate ? update() : save();
+    }
+
+    function update() {
+        console.log('лан обновлю');
+    }
+
+    function save() { // обработчик нажатия на кнопку сохранения
         let formIsValid = true;
         for (const key in form) {
             // если значение поля формы пустое, то вывести сообщение об ошибке
@@ -342,7 +358,7 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
             <div className="location-form">
                 <header className="location-card__header">
                     <p className="location-title title">
-                        Добавление локации:
+                        { isUpdate ?  'Редактирование локации:' : 'Добавление локации:'}
                     </p>
                     <div className="location-card__btn-container">
                         <button className="location-card__btn" onClick={ onClickClose }>
@@ -440,6 +456,9 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
                             <label>
                                 Фото из фильма:                              
                             </label>
+                            { isUpdate &&
+                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} photos={locationPhotos.filter(photo => photo.locations_photo_status === 'film')} />
+                            }
                             <DragAndDropFiles photoList={filmsPhoto.value} onDropFiles={onDropFilmsPhoto} />
                             { filmsPhoto.error && 
                                 <p>
@@ -452,6 +471,9 @@ const LocationForm = memo(({ onClickClose, onReload }) => {
                             <label>
                                 Ваши фото локации:                               
                             </label>
+                            { isUpdate &&
+                                <PhotoContainer isUpdate={isUpdate}  onRemovePhotos={onRemovePhotos} photos={locationPhotos.filter(photo => photo.locations_photo_status === 'user')} />
+                            }
                             <DragAndDropFiles photoList={usersPhoto.value} onDropFiles={onDropUsersPhoto} />
                             { usersPhoto.error && 
                                 <p>

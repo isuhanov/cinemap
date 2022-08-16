@@ -1,11 +1,22 @@
 import axios from "axios";
-import { memo, useContext, useEffect, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useState } from "react";
+import LocationForm from "./LocationForm";
+import PhotoContainer from "./ui/PhotoContainer/PhotoContainer";
 // import { ReloadContext } from "../App";
 import ProfileAvatar from "./ui/ProfileAvatar/ProfileAvatar";
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     const [user, setUser] = useState(null);
     const [locationPhoto, setLocationPhoto] = useState([]);
+    const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
+
+    const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
+        setIsOpenLocationForm(true);
+    });
+    
+    const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
+        setIsOpenLocationForm(false);
+    });
 
     // const reloadContext = useContext(ReloadContext);
 
@@ -33,7 +44,9 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
         }).catch(err => console.log(err));
     }
 
+
     return (
+        <>
         <div className={`location-card ${otherClassName}`}>
             <header className="location-card__header">
                 <p className="location-title title">
@@ -84,18 +97,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                         Фото из фильма:
                     </p>
                     { locationPhoto &&
-                        <div className="location-films-photo__container photo-container">
-                            { locationPhoto.map(photo => {
-                                if (photo.locations_photo_status === 'film') {
-                                    return (
-                                        <div className="photo-item" key={photo.locations_photo_id}>
-                                            <img src={photo.locations_photo_path} alt={location.location_name}/>
-                                        </div>
-                                    )
-                                }
-                                return null;
-                            })}
-                        </div>
+                        <PhotoContainer photos={locationPhoto.filter(photo => photo.locations_photo_status === 'film')}/>
                     }
                 </div>     
 
@@ -111,18 +113,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                         Фото пользователя:
                     </p>
                     { locationPhoto &&
-                        <div className="location-users-films-photo__container photo-container">
-                            { locationPhoto.map(photo => {
-                                if (photo.locations_photo_status === 'user') {
-                                    return (
-                                        <div className="photo-item" key={photo.locations_photo_id}>
-                                            <img src={photo.locations_photo_path} alt={location.location_name}/>
-                                        </div>
-                                    )
-                                }
-                                return null;
-                            })}
-                        </div>
+                        <PhotoContainer photos={locationPhoto.filter(photo => photo.locations_photo_status === 'user')}/>
                     }
                 </div>            
 
@@ -131,7 +122,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
             { 
                 <footer>
                     <div className="location-card-btn-container">
-                        <button className="location-card-btn location-card-btn-edit">
+                        <button onClick={openLocationForm} className="location-card-btn location-card-btn-edit">
                             Редактировать
                         </button>
                         <button onClick={onDelete} className="location-card-btn location-card-btn-delete">
@@ -141,6 +132,15 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                 </footer>
             }
         </div>
+        {/* <LocationForm /> */}
+        { isOpenLocationForm && <LocationForm isUpdate={true} 
+                                                location={({
+                                                    ...location,
+                                                    photos: [...locationPhoto]
+                                                })} 
+                                                onReload={onReload} 
+                                                onClickClose={closeLocationForm}/>}
+        </>
     )
 });
 
