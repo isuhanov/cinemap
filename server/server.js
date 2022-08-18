@@ -70,6 +70,55 @@ app.post('/locations', function(req, res){ // обработка POST запро
     ); 
 });
 
+app.put('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+    connection.query(  // обновляю данные текстовых полей
+        `UPDATE locations SET location_name = '${req.body.name}', 
+                                 location_film = '${req.body.filmName}', 
+                                 location_address = '${req.body.address}', 
+                                 location_latitude = '${req.body.latitude}', location_longitude = '${req.body.longitude}', 
+                                 location_route = '${req.body.route}', 
+                                 location_timing = '${req.body.timing}'
+                 WHERE (location_id = '${req.query.location_id}');`,
+        function(err, results, fields) {
+            if (err) {
+                console.log(err);
+                res.status(500).send(err) // выбрасываю ошибку сервера при наличии ошибок
+            } else {
+                // удаляю все выбранные фотографии из БД и с сервера
+                for (const photo of JSON.parse(req.body.deletePhotos)) {
+                    connection.query(
+                        `DELETE FROM locations_photos WHERE (locations_photo_id = '${photo.locations_photo_id}');`,
+                        function(err, results, fields) {
+                            if (err) {
+                                res.status(500).send(err);
+                            }
+                        }
+                    );
+                    fs.unlinkSync(`./img/${photo.locations_photo_path.slice(22)}`);
+                }
+                
+                // добавляю новые фотографии, если они имеются
+                if (req.files) {
+                    let fail;
+                    if (req.files.usersPhoto) {
+                        fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${req.query.location_id}/user/`, 'user', req.query.location_id); 
+                    }
+                    if (req.files.filmsPhoto) {
+                        fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${req.query.location_id}/film/`, 'film', req.query.location_id);
+                    }
+
+                    if (fail) {
+                        res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
+                    } else {
+                        res.send(results); // отправка результата в ответ на запрос
+                    }
+                }
+
+            }
+        }
+    );
+});
+
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
     removeDir(`./img/photo/locationphoto/${req.query.location_id}`);
     connection.query(

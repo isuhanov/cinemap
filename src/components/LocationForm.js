@@ -17,11 +17,26 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     const usersParentRef = useRef();
     // -------------------- ссылка на родительские блоки полей -------------------
 
-    const [locationPhotos, setLocationPhoto] = useState(location ? location.photos : undefined );
+    // стейт для хранения данных фотографий из карточки локации (при открытии формы изменения)
+    const [locationPhotos, setLocationPhoto] = useState(location ? 
+                                                        location.photos.map(photo => ({
+                                                            photo,
+                                                            status: true
+                                                        }))
+                                                        : undefined );
 
-    const onRemovePhotos = useCallback((photoId) => {
-        const photos = locationPhotos.filter(photo => photo.locations_photo_id !== photoId);
-        setLocationPhoto([...photos]);
+    const onRemovePhotos = useCallback((photoId) => { // обработка значения из контейнера фотографи
+        const photos = locationPhotos.map(photo => {  // меняю статус фотографии
+            if (photo.photo.locations_photo_id == photoId) {
+                photo.status = !photo.status;
+            }
+            return photo;
+        });
+        setLocationPhoto(photos);
+        // провожу валидацию полей фотографий
+        const typePhoto = locationPhotos.find(photo => photo.photo.locations_photo_id == photoId).photo.locations_photo_status;
+        const photoFiled = typePhoto === 'user' ? usersPhoto : filmsPhoto;
+        photosFieldIsValid(photoFiled, typePhoto);
     })
 
     const onNameChange = (name) => { // обработка значения поля названия локации
@@ -174,10 +189,10 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
             timeFieldIsValid(form.timing);
         }
         if (form.filmsPhoto.isTouched) {
-            photosFieldIsValid(form.filmsPhoto);
+            photosFieldIsValid(form.filmsPhoto, 'film');
         }
         if (form.usersPhoto.isTouched) {
-            photosFieldIsValid(form.usersPhoto);
+            photosFieldIsValid(form.usersPhoto, 'user');
         }
     }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
@@ -187,7 +202,19 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     }
 
     function update() {
-        console.log('лан обновлю');
+        let formIsValid = true;
+        for (const key in form) {
+            // если имеется ошибка, то форма не валидна
+            if (form[key].error !== '') {
+                formIsValid = false;
+            }
+        }
+
+        if (!formIsValid) return
+        console.log('выборка');
+        console.log(locationPhotos);
+
+        generationData(putLocation);
     }
 
     function save() { // обработчик нажатия на кнопку сохранения
@@ -209,6 +236,10 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
         if (!formIsValid) return
         console.log('выборка');
 
+        generationData(postLocation);
+    }
+
+    function generationData(queryFunc) {
         let queryLocationObj = {
             name: name.value,
             filmName: filmName.value,
@@ -226,7 +257,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
             queryLocationObj['latitude'] = res.data[0].lat;
             queryLocationObj['longitude'] = res.data[0].lon;
         }).then(res => {
-            postLocation(queryLocationObj); // добавление локации в БД
+            queryFunc(queryLocationObj); // добавление локации в БД
         }).catch(err => console.log(err));
     }
 
@@ -246,6 +277,35 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
             console.log(response);
             onClickClose(); // закрытие формы при удачном добавлении
             onReload(); // обновляю карту
+        }).catch(err => console.log(err));
+    }
+
+    function putLocation(data) { //  put-запрос на изменение локации в БД 
+        const formData = new FormData(); // объект для хранения данных отправляемой формы
+        usersPhoto.value.forEach(element => {
+            formData.append('usersPhoto', element);
+        });        
+        filmsPhoto.value.forEach(element => {
+            formData.append('filmsPhoto', element);
+        });    
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        // for (const photo of locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)) {
+        //     formData.append('deletePhotos', JSON.stringify(photo));
+        // }
+        const deletePhotos = locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
+            formData.append('deletePhotos', JSON.stringify(deletePhotos));
+
+        // formData.append('deletePhotos', JSON.stringify(locationPhotos.filter(photo => !photo.status)
+        //                                                 .map(photo => photo.photo)));
+
+        axios.put(`http://localhost:8000/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
+            console.log(response);
+            // console.log(formData);
+            // onClickClose(); // закрытие формы при удачном добавлении
+            // onReload(); // обновляю карту
         }).catch(err => console.log(err));
     }
 
@@ -323,9 +383,9 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
         }
     }
 
-    function photosFieldIsValid(formItem) { // ф-ия для валидации временных полей
+    function photosFieldIsValid(formItem, typePhoto = undefined) { // ф-ия для валидации полей фотографий
         let fieldIsValid = true;
-        if (formItem.value.length === 0) {
+        if (formItem.value.length === 0 && !isUpdate) {
             formItem.parent.current.classList.add('error');
             formItem.set({
                 error: 'Пустое поле'
@@ -342,6 +402,19 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
                     fieldIsValid = false;
                 }                    
             });
+        }
+
+        if (isUpdate) {
+            const countPhoto = locationPhotos.filter(photo => photo.photo.locations_photo_status === typePhoto).length;
+            const countRemovedPhoto = locationPhotos.filter(photo => (photo.photo.locations_photo_status === typePhoto && photo.status === false)).length;
+    
+            if (formItem.value.length === 0 && countPhoto === countRemovedPhoto) {
+                formItem.parent.current.classList.add('error');
+                formItem.set({
+                    error: 'Должна иметься хотя бы одна фотография'
+                });
+                fieldIsValid = false;
+            } 
         }
         
         if (fieldIsValid) {
@@ -457,7 +530,10 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
                                 Фото из фильма:                              
                             </label>
                             { isUpdate &&
-                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} photos={locationPhotos.filter(photo => photo.locations_photo_status === 'film')} />
+                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} 
+                                photos={locationPhotos.filter(photo => photo.photo.locations_photo_status === 'film')
+                                                    .map(photo => photo.photo)} 
+                                />
                             }
                             <DragAndDropFiles photoList={filmsPhoto.value} onDropFiles={onDropFilmsPhoto} />
                             { filmsPhoto.error && 
@@ -472,7 +548,10 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
                                 Ваши фото локации:                               
                             </label>
                             { isUpdate &&
-                                <PhotoContainer isUpdate={isUpdate}  onRemovePhotos={onRemovePhotos} photos={locationPhotos.filter(photo => photo.locations_photo_status === 'user')} />
+                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} 
+                                photos={locationPhotos.filter(photo => photo.photo.locations_photo_status === 'user')
+                                                    .map(photo => photo.photo)} 
+                                />
                             }
                             <DragAndDropFiles photoList={usersPhoto.value} onDropFiles={onDropUsersPhoto} />
                             { usersPhoto.error && 
