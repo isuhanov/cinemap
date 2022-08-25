@@ -132,7 +132,6 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                 </footer>
             }
         </div>
-        {/* <LocationForm /> */}
         { isOpenLocationForm && <LocationForm isUpdate={true} 
                                                 location={({
                                                     ...location,

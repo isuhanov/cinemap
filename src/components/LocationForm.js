@@ -212,7 +212,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
 
         if (!formIsValid) return
         console.log('выборка');
-        console.log(locationPhotos);
+        // console.log(locationPhotos);
 
         generationData(putLocation);
     }
@@ -239,7 +239,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
         generationData(postLocation);
     }
 
-    function generationData(queryFunc) {
+    function generationData(queryFunc) { // ф-ия формирует объект с данными из формы и вызывает ф-ию для соответсвующего запроса (POST/PUT)
         let queryLocationObj = {
             name: name.value,
             filmName: filmName.value,
@@ -292,20 +292,13 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
             formData.append(key, data[key]);
         }
 
-        // for (const photo of locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)) {
-        //     formData.append('deletePhotos', JSON.stringify(photo));
-        // }
         const deletePhotos = locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
             formData.append('deletePhotos', JSON.stringify(deletePhotos));
 
-        // formData.append('deletePhotos', JSON.stringify(locationPhotos.filter(photo => !photo.status)
-        //                                                 .map(photo => photo.photo)));
-
         axios.put(`http://localhost:8000/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
             console.log(response);
-            // console.log(formData);
-            // onClickClose(); // закрытие формы при удачном добавлении
-            // onReload(); // обновляю карту
+            onClickClose(); // закрытие формы при удачном добавлении
+            onReload(); // обновляю карту
         }).catch(err => console.log(err));
     }
 

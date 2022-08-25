@@ -98,8 +98,8 @@ app.put('/locations', function(req, res){ // обработка GET запрос
                 }
                 
                 // добавляю новые фотографии, если они имеются
+                let fail;
                 if (req.files) {
-                    let fail;
                     if (req.files.usersPhoto) {
                         fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${req.query.location_id}/user/`, 'user', req.query.location_id); 
                     }
@@ -107,11 +107,11 @@ app.put('/locations', function(req, res){ // обработка GET запрос
                         fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${req.query.location_id}/film/`, 'film', req.query.location_id);
                     }
 
-                    if (fail) {
-                        res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
-                    } else {
-                        res.send(results); // отправка результата в ответ на запрос
-                    }
+                }
+                if (fail) {
+                    res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
+                } else {
+                    res.send(results); // отправка результата в ответ на запрос
                 }
 
             }
