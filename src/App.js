@@ -12,9 +12,10 @@ function App() {
 
   // const ReloadContext = createContext("without provider");
 
-  function onReload() { // ф-ия для обновления
+  const onReload = useCallback(() => { // ф-ия для обновления
     setIsReload(prev => !prev);
-  }
+    console.log('reload');
+  });
   // function openLocationForm() { // ф-ия для откытия формы локации
   //   setIsOpenLocationForm(true);
   // }

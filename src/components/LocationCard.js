@@ -1,5 +1,5 @@
 import axios from "axios";
-import { memo, useCallback, useContext, useEffect, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import LocationForm from "./LocationForm";
 import PhotoContainer from "./ui/PhotoContainer/PhotoContainer";
 // import { ReloadContext } from "../App";
@@ -9,6 +9,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     const [user, setUser] = useState(null);
     const [locationPhoto, setLocationPhoto] = useState([]);
     const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
+    const [localReload, setLocalReload] = useState(false);
 
     const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
         setIsOpenLocationForm(true);
@@ -19,7 +20,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     });
 
     // const reloadContext = useContext(ReloadContext);
-
+    
     useEffect(() => {
         // async function fetchData() {
         setUser(null);
@@ -33,7 +34,8 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
         }).catch(err => console.log(err));
         // }
         // fetchData();
-    }, [location])
+    }, [JSON.stringify(location), localReload])
+    
 
     function onDelete() {
         onClose();
@@ -65,9 +67,15 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                 <p className="location-card__film">
                     { location.location_film }
                 </p>
-                <p className="location-card__address">
-                    { location.location_address }
-                </p>
+                <div className="location-route">
+                    <p className="location-route__subtitle subtitle">
+                        Адрес:
+                    </p>
+                    <p className="location-card__address">
+                        { location.location_address }
+                    </p>
+                </div>
+                
 
                 <div className="location-route">
                     <p className="location-route__subtitle subtitle">
@@ -137,7 +145,10 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                                                     ...location,
                                                     photos: [...locationPhoto]
                                                 })} 
-                                                onReload={onReload} 
+                                                onReload={() => {
+                                                    onReload();
+                                                    setLocalReload(prev => !prev);
+                                                }} 
                                                 onClickClose={closeLocationForm}/>}
         </>
     )

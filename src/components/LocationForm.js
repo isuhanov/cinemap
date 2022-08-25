@@ -212,7 +212,6 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
 
         if (!formIsValid) return
         console.log('выборка');
-        // console.log(locationPhotos);
 
         generationData(putLocation);
     }
@@ -299,6 +298,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
             console.log(response);
             onClickClose(); // закрытие формы при удачном добавлении
             onReload(); // обновляю карту
+            
         }).catch(err => console.log(err));
     }
 

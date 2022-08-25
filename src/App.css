@@ -44,6 +44,11 @@
   background-color: rgba(172, 172, 172, 0.637);
 }
 
+.title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
 .subtitle {
   font-weight: 700;
   font-size: 14px;
@@ -217,11 +222,6 @@
   align-items: flex-start;
 }
 
-.title {
-  font-size: 22px;
-  font-weight: 700;
-}
-
 .location-card__btn-container {
   display: flex;
   flex-direction: row;
@@ -253,7 +253,7 @@
   padding-right: 10px;
 }
 .location-card__main {
-  height: 490px;
+  height: 510px;
 }
 .location-form__main {
   height: 600px;
@@ -271,6 +271,11 @@
 
 .location-card__film {
   color: #4E4E4E;
+  font-size: 15px;
+  border-bottom: 1px solid #4E4E4E;
+}
+
+.location-card__address {
   font-size: 13px;
 }
 
