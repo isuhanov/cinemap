@@ -1,0 +1,43 @@
+.search {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
+}
+
+.search__input {
+    width: 350px;
+    height: 40px;
+    padding: 0 50px 0 10px;
+    font-size: 16px;
+}
+
+.search__btn {
+    position: absolute;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: inherit;
+    transition: all .15s ease-out;
+}
+
+.loupe-btn:hover {
+    background-color: #3C89FC;
+    color: white;
+}
+
+.loupe-btn:active {
+    background-color: #1658ba;
+    color: white;
+}
+
+.clean-btn:hover {
+    background-color: #FC3C75;
+    color: white;
+}
+
+.clean-btn:active {
+    background-color: #9f2549;
+    color: white;
+}

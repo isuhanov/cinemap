@@ -1,6 +1,8 @@
 import { memo, useState } from 'react';
 
 import '../../App.css';
+import './SearchInput.css';
+
 
 const SearchInput = memo(({}) => {
     const [searchValue, setSearchValue] = useState('');

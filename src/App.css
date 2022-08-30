@@ -1,12 +1,4 @@
-#map-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
+/* ------------------------------ menu --------------------------------------- */
 
 .menu {
   margin-top: 10px;
@@ -16,7 +8,6 @@
   overflow: hidden;
   position: relative;
   z-index: 100;
-
   box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
 }
 
@@ -44,6 +35,7 @@
   background-color: rgba(172, 172, 172, 0.637);
 }
 
+
 .title {
   font-size: 22px;
   font-weight: 700;
@@ -53,6 +45,9 @@
   font-weight: 700;
   font-size: 14px;
 }
+
+
+/* ------------------------------ main layout --------------------------------------- */
 
 .container .profile-block,
 .container .search-input-block,
@@ -80,6 +75,9 @@
 .shadow-block {
   box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
 }
+
+
+/* ------------------------------ error form --------------------------------------- */
 
 .error p{
   color: red;
@@ -109,127 +107,52 @@
 }
 
 
-/* ------------------------------ SearchInput --------------------------------------- */
+/* ------------------------------ main block card/form --------------------------------------- */
 
-.search {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
+.location-card__main,
+.location-form__main {
+    overflow: scroll;
+    padding-right: 10px;
 }
-
-.search__input {
-  width: 350px;
-  height: 40px;
-  padding: 0 50px 0 10px;
-  font-size: 16px;
+.location-card__main {
+    height: 510px;
 }
-
-.search__btn {
-  position: absolute;
-  right: 0px;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background-color: inherit;
-  transition: all .15s ease-out;
-}
-
-.loupe-btn:hover {
-  background-color: #3C89FC;
-  color: white;
-}
-
-.loupe-btn:active {
-  background-color: #1658ba;
-  color: white;
-}
-
-.clean-btn:hover {
-  background-color: #FC3C75;
-  color: white;
-}
-
-.clean-btn:active {
-  background-color: #9f2549;
-  color: white;
+.location-form__main {
+    height: 600px;
 }
 
 
-/* ------------------------------ SideBar --------------------------------------- */
+/* ------------------------------ btn-container in footer --------------------------------------- */
 
-
-
-
-/* ------------------------------ Profile --------------------------------------- */
-
-.profile__avatar-btn {
-  position: relative;
-  border-radius: 50%;
-  overflow: hidden;  
-  box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
+.btn-container, 
+.btn-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-.profile__avatar-circle {
-  width: 60px;
-  height: 60px; 
-  background-color: white;
-}
-
-.profile__avatar__plane {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 250;
-  width: 100%;
-  height: 100%;
-  transition: all .15s ease-out;
-}
-
-.profile__avatar__plane:hover {
-  background-color: rgba(0, 0, 0, 0.218);
-}
-
-.profile__avatar__plane:active {
-  background-color: rgba(0, 0, 0, 0.421);
+.form-btn-container {
+  justify-content: center;
 }
 
 
+/* ------------------------------ header in card --------------------------------------- */
 
-/* ------------------------------ LocationCard --------------------------------------- */
-
-.location-card {
-  position: absolute;
-  bottom: 0;
-  margin: 20px;
-  z-index: 100;
-  /* bottom: 20px; */
-  background-color: white;
-  width: 340px;
-  border-radius: 10px;
-  padding: 13px;
-}
-
-.location-card div,
-.location-card p {
-  cursor: default;
-}
-
-.location-card__header {
+.header-card {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.location-card__btn-container {
+.header-btn-container {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 25px;
 }
 
-.location-card__btn {
+.header-btn {
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -238,171 +161,30 @@
   transition: all .2s ease-out;
 }
 
-.location-card__btn:hover {
+.header-btn:hover {
   color: #5c9dff;
 }
 
-.location-card__btn:active{
+.header-btn:active{
   background-color: rgba(201, 201, 201, 0.756);
   color: white;
 }
 
-.location-card__main,
-.location-form__main {
-  overflow: scroll;
-  padding-right: 10px;
-}
-.location-card__main {
-  height: 510px;
-}
-.location-form__main {
-  height: 600px;
-}
 
+/* ------------------------------ form --------------------------------------- */
 
-.location-card__main > p,
-.location-card__main > div {
-  margin: 8px 0;
-}
-
-.location-card__main .subtitle {
-  margin-bottom: 5px;
-}
-
-.location-card__film {
-  color: #4E4E4E;
-  font-size: 15px;
-  border-bottom: 1px solid #4E4E4E;
-}
-
-.location-card__address {
-  font-size: 13px;
-}
-
-.location-route__text {
-  width: 100%;
-  min-height: 70px;
-  background-color: rgba(221, 235, 255, 1);
-  border-radius: 7px;
-  padding: 6px;
-  font-size: 12px;
-}
-
-.location-creator__profile {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px 15px;
-  border-bottom: 1px solid rgb(143, 143, 143);
-}
-
-.location-creator__profile:hover,
-.location-creator__profile p,
-.location-creator__profile div {
-  cursor: pointer;
-} 
-
-.location-creator__profile:hover {
-  background-color: rgba(227, 227, 227, 0.586);
-}
-
-.location-creator__profile:active {
-  background-color: rgba(172, 172, 172, 0.637);
-}
-
-.creator__profile-username {
-  font-size: 15px;
-}
-
-.creator__profile-userimg {
-  border-radius: 50%;
-  border: 1px solid black;
-  width: 32px;
-  height: 32px;
-  background-color: rgba(221, 235, 255, 1);
-  overflow: hidden;
-}
-
-.location-films-timing span{
-  margin-right: 5px;
-}
-
-.location-films-timing__text {
-  font-weight: 700;
-  color: #3C4FFC;
-  font-size: 13px;
-  cursor: text;
-}
-
-.location-card-btn-container, 
-.location-form-btn-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-.location-card-btn-container {
-  justify-content: space-between;
-}
-.location-form-btn-container {
-  justify-content: center;
-}
-
-
-.location-card-btn {
-  min-width: 150px;
-  padding: 10px;
-  border-radius: 7px;
-  font-weight: 700;
-  /* transition: all .2s ; */
-  transition: all .2s ease-out;
-}
-
-.location-card-btn-edit {
-  background-color: #3C89FC;
-  color: white;
-}
-
-.location-card-btn-delete {
-  background-color: #FC3C75;
-  color: white;
-}
-
-.location-card-btn-edit:hover {
-  background-color: #2b76e5;
-  color: white;
-}
-
-.location-card-btn-delete:hover {
-  background-color: #c92c5b;
-  color: white;
-}
-
-.location-card-btn-edit:active {
-  background-color: #1a59b6;
-  color: white;
-}
-
-.location-card-btn-delete:active {
-  background-color: #a31641;
-  color: white;
-}
-
-
-/* ------------------------------ LocationForm --------------------------------------- */
-
-.location-form-container {
+.form-conrainer {
   position: absolute;
   z-index: 150;
-  background-color: rgba(0, 0, 0, 0.79);
   width: 100%;
   height: 100%;
+  background-color: rgba(0, 0, 0, 0.79); 
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.location-form {
+.form {
   background-color: white;
   width: 450px;
   padding: 13px;
@@ -417,14 +199,6 @@
   width: 95%;
 }
 
-.timing-block {
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 70px;
-  padding: 10px 30px;
-}
-
 .field {
   border: 1px solid black;
   border-radius: 5px;
@@ -433,7 +207,7 @@
   font-size: 13px;
 }
 
-.field-route {
+.field-textarea {
   border: 1px solid black;
   border-radius: 5px;
   height: 70px;
@@ -441,27 +215,4 @@
   font-size: 13px;
   background-color: rgba(221, 235, 255, 1);
   resize: none;
-}
-
-
-/* ------------------------------ SideBar --------------------------------------- */
-
-.login-form-conrainer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 150;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.79); 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-form {
-  background-color: white;
-  width: 450px;
-  padding: 13px;
-  border-radius: 10px;
 }

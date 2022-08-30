@@ -6,6 +6,8 @@ import TimingInput from "../ui/TimingInput/TimingInput";
 import 'react-dadata/dist/react-dadata.css';
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
+import './LocationForm.css';
+
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
     const namesParentRef = useRef();
@@ -420,14 +422,14 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
 
 
     return (
-        <div className="location-form-container">
-            <div className="location-form">
-                <header className="location-card__header">
-                    <p className="location-title title">
+        <div className="location-form-container form-conrainer">
+            <div className="location-form form">
+                <header className="location-form__header header-card">
+                    <p className="location-form-title title">
                         { isUpdate ?  'Редактирование локации:' : 'Добавление локации:'}
                     </p>
-                    <div className="location-card__btn-container">
-                        <button className="location-card__btn" onClick={ onClickClose }>
+                    <div className="header-btn-container">
+                        <button className="header-btn" onClick={ onClickClose }>
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>
@@ -497,7 +499,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
                                             value: e.target.value,
                                             isTouched: true
                                         })} 
-                                        id="location-route" className="field-route"
+                                        id="location-route" className="field-textarea"
                             ></textarea>
                             { route.error && 
                                 <p>
@@ -556,7 +558,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
                     </form>
                 </div>
                 <footer>
-                    <div className="location-form-btn-container">
+                    <div className="btn-container form-btn-container">
                         <button type="button" onClick={onClickSave} className="location-card-btn location-card-btn-edit">
                             Сохранить
                         </button>

@@ -1,0 +1,11 @@
+.location-form-container {
+    
+}
+
+.timing-block {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 70px;
+    padding: 10px 30px;
+}

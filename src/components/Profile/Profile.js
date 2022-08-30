@@ -2,6 +2,8 @@ import { ClickAwayListener } from '@mui/material';
 import { memo, useState } from 'react';
 import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 
+import './Profile.css'
+
 const Profile = memo(({ user, onClickOpenLoginForm }) => {
     const [menuIsVisible, setMenuVisible] = useState(false);
     // const [isOpenLoginForm, setIsOpenLoginForm] = useState(false);

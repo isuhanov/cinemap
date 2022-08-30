@@ -4,6 +4,8 @@ import { memo, useEffect, useState } from 'react';
 import LocationIcon from '../../assets/place-marker.svg';
 
 import '../../App.css';
+import './BGMap.css';
+
 import LocationCard from '../LocationCard/LocationCard';
 
 const BGMap = memo(({ reload, onReload }) => {

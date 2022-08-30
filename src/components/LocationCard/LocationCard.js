@@ -5,6 +5,8 @@ import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 // import { ReloadContext } from "../App";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
+import './LocationCard.css'
+
 const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     const [user, setUser] = useState(null);
     const [locationPhoto, setLocationPhoto] = useState([]);
@@ -50,15 +52,15 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     return (
         <>
         <div className={`location-card ${otherClassName}`}>
-            <header className="location-card__header">
-                <p className="location-title title">
+            <header className="location-card__header header-card">
+                <p className="location-card-title title">
                     { location.location_name }
                 </p>
-                <div className="location-card__btn-container">
-                    <button className="location-card__btn">
+                <div className="header-btn-container">
+                    <button className="header-btn">
                         <span className="material-symbols-outlined">bookmark</span>
                     </button>
-                    <button className="location-card__btn" onClick={() => onClose() }>
+                    <button className="header-btn" onClick={() => onClose() }>
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
@@ -129,7 +131,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
 
             { 
                 <footer>
-                    <div className="location-card-btn-container">
+                    <div className="location-card-btn-container btn-container">
                         <button onClick={openLocationForm} className="location-card-btn location-card-btn-edit">
                             Редактировать
                         </button>
