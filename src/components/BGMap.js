@@ -18,8 +18,8 @@ const BGMap = memo(({ reload, onReload }) => {
     const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
       onReload();
       // setIsMapReload(prev => !prev);
-    // }, 60000);
-    }, 10000);
+    }, 60000);
+    // }, 10000);
     return () => clearInterval(id);
   }, [])
 
