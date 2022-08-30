@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { Icon, LatLng, Map, Marker, TileLayer } from 'leaflet';
 import { memo, useEffect, useState } from 'react';
-import LocationIcon from '../assets/place-marker.svg';
+import LocationIcon from '../../assets/place-marker.svg';
 
-import '../App.css';
-import LocationCard from './LocationCard';
+import '../../App.css';
+import LocationCard from '../LocationCard/LocationCard';
 
 const BGMap = memo(({ reload, onReload }) => {
   const [map, setMap] = useState(null);  // стейт карты

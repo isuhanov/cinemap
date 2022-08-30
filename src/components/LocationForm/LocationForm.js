@@ -1,10 +1,10 @@
 import axios from "axios";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import DragAndDropFiles from "./ui/DragAndDropFiles/DragAndDropFiles";
-import TimingInput from "./ui/TimingInput/TimingInput";
+import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
+import TimingInput from "../ui/TimingInput/TimingInput";
 // import { AddressSuggestions } from 'react-dadata';
 import 'react-dadata/dist/react-dadata.css';
-import PhotoContainer from "./ui/PhotoContainer/PhotoContainer";
+import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
@@ -27,14 +27,14 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
 
     const onRemovePhotos = useCallback((photoId) => { // обработка значения из контейнера фотографи
         const photos = locationPhotos.map(photo => {  // меняю статус фотографии
-            if (photo.photo.locations_photo_id == photoId) {
+            if (photo.photo.locations_photo_id === photoId) {
                 photo.status = !photo.status;
             }
             return photo;
         });
         setLocationPhoto(photos);
         // провожу валидацию полей фотографий
-        const typePhoto = locationPhotos.find(photo => photo.photo.locations_photo_id == photoId).photo.locations_photo_status;
+        const typePhoto = locationPhotos.find(photo => photo.photo.locations_photo_id === photoId).photo.locations_photo_status;
         const photoFiled = typePhoto === 'user' ? usersPhoto : filmsPhoto;
         photosFieldIsValid(photoFiled, typePhoto);
     })
@@ -144,7 +144,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     }); 
     // стейт для фото из фильма
     const [filmsPhoto, setFilmsPhoto] = useState({
-        value: new Array(),
+        value: [],
         error: '',
         parent: filmsPhotoParentRef,
         isTouched: false,
@@ -152,7 +152,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
     }); 
     // стейт для фото пользователя
     const [usersPhoto, setUsersPhoto] = useState({
-        value: new Array(),
+        value: [],
         error: '',
         parent: usersParentRef,
         isTouched: false,

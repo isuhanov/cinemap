@@ -1,9 +1,9 @@
 import axios from "axios";
-import { memo, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import LocationForm from "./LocationForm";
-import PhotoContainer from "./ui/PhotoContainer/PhotoContainer";
+import { memo, useCallback, useEffect, useState } from "react";
+import LocationForm from "../LocationForm/LocationForm";
+import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 // import { ReloadContext } from "../App";
-import ProfileAvatar from "./ui/ProfileAvatar/ProfileAvatar";
+import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     const [user, setUser] = useState(null);

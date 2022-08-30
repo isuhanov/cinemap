@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 import './App.css';
-import BGMap from './components/BGMap';
-import LocationForm from './components/LocationForm';
-import LoginForm from './components/LoginForm';
-import Profile from './components/Profile';
-import SearchInput from './components/SearchInput';
-import SideBar from './components/SideBar';
+import BGMap from './components/BGMap/BGMap';
+import LocationForm from './components/LocationForm/LocationForm';
+import LoginForm from './components/LoginForm/LoginForm';
+import Profile from './components/Profile/Profile';
+import SearchInput from './components/SearchInput/SearchInput';
+import SideBar from './components/SideBar/SideBar';
 
 function App() {
   const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
