@@ -12,7 +12,7 @@ const Profile = memo(({ user, onClickOpenLoginForm }) => {
         <>
         <div className="profile">
             <button className="profile__avatar-btn" onClick={() => setMenuVisible(true)}>
-                <ProfileAvatar otherClassName="profile__avatar-circle"/>
+                <ProfileAvatar imgSrc={user ? user.user_img_path : null} otherClassName="profile__avatar-circle"/>
                 <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
             </button>
             { menuIsVisible && (

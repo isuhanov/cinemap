@@ -132,10 +132,10 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
             { 
                 <footer>
                     <div className="location-card-btn-container btn-container">
-                        <button onClick={openLocationForm} className="location-card-btn location-card-btn-edit">
+                        <button onClick={openLocationForm} className="location-card-btn-edit btn btn-blue">
                             Редактировать
                         </button>
-                        <button onClick={onDelete} className="location-card-btn location-card-btn-delete">
+                        <button onClick={onDelete} className="location-card-btn-delete btn btn-red">
                             Удалить
                         </button>
                     </div>

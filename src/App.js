@@ -14,8 +14,9 @@ function App() {
   const [isOpenLoginForm, setIsOpenLoginForm] = useState(false);
   const [authUser, setAuthUser] = useState(null);
 
-  const logIn = useCallback(() => {
-    
+  const logIn = useCallback((user) => {
+    setAuthUser(user);
+    // console.log(user);
   }) 
 
   // const ReloadContext = createContext("without provider");
@@ -49,7 +50,7 @@ function App() {
       <div className="App">
         <BGMap reload={isReload} onReload={onReload}/>
         { isOpenLocationForm && <LocationForm onReload={onReload} onClickClose={closeLocationForm}/>}
-        { isOpenLoginForm && <LoginForm onClickClose={closeLoginForm} /> }
+        { isOpenLoginForm && <LoginForm onLogin={logIn} onClickClose={closeLoginForm} /> }
         <div className="container">
           <div className="profile-block">
             <Profile user={authUser} onClickOpenLoginForm={openLoginForm}/>

@@ -1,8 +1,57 @@
-import { memo } from "react";
+import { memo, useRef, useState } from "react";
+import axios from "axios";
+
 
 import './LoginForm.css';
 
-const LoginForm = memo(({ onClickClose }) => {
+const LoginForm = memo(({ onClickClose, onLogin }) => {
+    // -------------------- ссылка на родительские блоки полей -------------------
+    const loginParentRef = useRef();
+    const passwordParentRef = useRef();
+    // -------------------- ссылка на родительские блоки полей -------------------
+
+    const onLoginChange = (login) => { // обработка значения поля login
+        setLogin(prev => ({
+            ...prev,
+            ...login
+        }))
+    }
+
+    const onPasswordChange = (password) => { // обработка значения поля password
+        setPassword(prev => ({
+            ...prev,
+            ...password
+        }))
+    }
+
+    // стейт для логина
+    const [login, setLogin] = useState({
+        value: '',
+        error: '',
+        parent: loginParentRef,
+        isTouched: false,
+        set: onLoginChange
+    }); 
+    // стейт для пароля
+    const [password, setPassword] = useState({
+        value: '',
+        error: '',
+        parent: passwordParentRef,
+        isTouched: false,
+        set: onPasswordChange
+    });
+
+
+    function onClickAuth() {
+        console.log(login);
+        console.log(password);
+        axios.get(`http://localhost:8000/users?user_login=${login.value}&user_pass=${password.value}`).then(res => {
+            onLogin(res.data[0]);
+            onClickClose();
+        })
+        .catch(err => console.log(err));
+    }
+    
     return (
         <div className="login-form-conrainer form-conrainer">
             <div className="login-form  form">
@@ -22,20 +71,33 @@ const LoginForm = memo(({ onClickClose }) => {
                             <label htmlFor="loginform-login">
                                 Логин:
                             </label>
-                            <input className="field"/>
+                            <input value={login.value} 
+                                    onChange={(e) => onLoginChange({
+                                        value: e.target.value,
+                                        isTouched: true
+                                    })}
+                                    className="field"
+                            />
                         </div>
                         <div className="field-block">
                             <label htmlFor="location-name">
                                 Пароль:
                             </label>
-                            <input type="password" className="field"/>
+                            <input type="password" 
+                                    value={password.value} 
+                                    onChange={(e) => onPasswordChange({
+                                        value: e.target.value,
+                                        isTouched: true
+                                    })}
+                                    className="field"
+                            />
                         </div>
                     </form>
                 </div>
                 <footer>
                     <div className="form-btn-container btn-container">
-                        <button type="button" className="location-card-btn location-card-btn-edit">
-                            Сохранить
+                        <button type="button" onClick={onClickAuth} className="login-form-btn-auth btn btn-blue">
+                            Войти
                         </button>
                     </div>
                 </footer>

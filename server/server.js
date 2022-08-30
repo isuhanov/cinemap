@@ -160,6 +160,17 @@ app.get('/users', function(req, res){ // обработка GET запроса �
                 }
             }
         );
+    } else if (req.query.user_login && req.query.user_pass) {
+        connection.query(  // получение id пользователя 
+            `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
+            function(err, results, fields) {
+                if (results.length === 0) {
+                    res.status(404).send('Not found');
+                } else {
+                    res.send(results);
+                }
+            }
+        );
     }
 });
 

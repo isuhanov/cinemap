@@ -1,4 +1,9 @@
 .login-form-conrainer {
-    
+    align-items: unset;
+    padding-top: 120px;    
+}
+
+.login-form {
+    height: 215px;
 }
 

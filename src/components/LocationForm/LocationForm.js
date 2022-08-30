@@ -559,7 +559,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
                 </div>
                 <footer>
                     <div className="btn-container form-btn-container">
-                        <button type="button" onClick={onClickSave} className="location-card-btn location-card-btn-edit">
+                        <button type="button" onClick={onClickSave} className="location-form-btn-edit btn btn-blue">
                             Сохранить
                         </button>
                     </div>
