@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import axios from 'axios';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
 import LocationForm from './components/LocationForm/LocationForm';
@@ -14,11 +15,31 @@ function App() {
   const [isOpenLoginForm, setIsOpenLoginForm] = useState(false);
   const [authUser, setAuthUser] = useState(null);
 
-  const logIn = useCallback((user) => {
-    setAuthUser(user);
-    // console.log(user);
-  }) 
+  // useEffect(() => {
+  //   // debugger
+  //   const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
+  //     if (localStorage.getItem('token')) {
+  //       loginUser();
+  //     }
+  //     // setIsMapReload(prev => !prev);
+  //   }, 60000);
+  //   // }, 10000);
+  //   return () => clearInterval(id);
+  // }, [])
 
+  function loginUser() {
+    console.log(localStorage.getItem('token'));
+    const token = JSON.parse(localStorage.getItem('token')).token;
+    axios.get(`http://localhost:8000/users?login=true`, { headers: {'Authorization' : `Bearer ${token}`} }).then(res => {
+        console.log(res);
+    }).catch(err => console.log(err)); 
+    // setAuthUser(user);
+  }
+
+  const logIn = useCallback((user) => {
+    localStorage.setItem('token', JSON.stringify(user));
+    loginUser();
+  }) 
   // const ReloadContext = createContext("without provider");
 
   const onReload = useCallback(() => { // ф-ия для обновления

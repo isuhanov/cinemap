@@ -4,8 +4,10 @@ const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
 
-const path = require('path');
+const jwt = require('jsonwebtoken');
+const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 
+const path = require('path');
 const fs = require('fs');
 
 const app = express();
@@ -17,6 +19,37 @@ app.use(cors());
 app.use(fileUpload());
 
 app.use(express.static('img'));
+
+app.use(express.json())
+app.use((req, res, next) => {
+    if (req.headers.authorization) {
+    // console.log(req.headers);
+    jwt.verify(
+        req.headers.authorization.split(' ')[1],
+        tokenKey,
+        (err, payload) => {
+            if (err) next()
+            else if (payload) {
+                connection.query(  // получение id пользователя 
+                    `SELECT * FROM users WHERE user_id = '${payload.id}';`,
+                    function(err, results, fields) {
+                        const user = results[0];
+                        if (results.length === 0) {
+                            next();
+                        } else {
+                            req.user = user;
+                            console.log('3');
+                            next();
+                        }
+                    }
+                );
+            }
+        }
+    )
+}
+
+  next()
+})
 
 const connection = mysql.createConnection({ // подключение к БД
     host: 'localhost',
@@ -167,10 +200,35 @@ app.get('/users', function(req, res){ // обработка GET запроса �
                 if (results.length === 0) {
                     res.status(404).send('Not found');
                 } else {
-                    res.send(results);
+                    console.log('2');
+                    // res.send(results);
+                    return res.status(200).json({
+                        id: results[0].user_id,
+                        login: results[0].user_login,
+                        token: jwt.sign({ id: results[0].user_id }, tokenKey),
+                      })
                 }
             }
         );
+    } else if (req.query.login) {
+        console.log('1');
+        // console.log(req.user);
+        if (req.user) {
+            // console.log(req.user);
+            res.send(req.user);
+        } else {
+            res.status(404).send('Not found');
+        }
+        // connection.query(  // получение id пользователя 
+        //     `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
+        //     function(err, results, fields) {
+        //         if (results.length === 0) {
+        //             res.status(404).send('Not found');
+        //         } else {
+                    
+        //         }
+        //     }
+        // );
     }
 });
 

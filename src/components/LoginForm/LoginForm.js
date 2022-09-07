@@ -43,10 +43,11 @@ const LoginForm = memo(({ onClickClose, onLogin }) => {
 
 
     function onClickAuth() {
-        console.log(login);
-        console.log(password);
+        // console.log(login);
+        // console.log(password);
         axios.get(`http://localhost:8000/users?user_login=${login.value}&user_pass=${password.value}`).then(res => {
-            onLogin(res.data[0]);
+            onLogin(res.data);
+            console.log(res);
             onClickClose();
         })
         .catch(err => console.log(err));
