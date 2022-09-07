@@ -8,7 +8,7 @@ import './BGMap.css';
 
 import LocationCard from '../LocationCard/LocationCard';
 
-const BGMap = memo(({ reload, onReload }) => {
+const BGMap = memo(({ reload, onReload, markerPos }) => {
   const [map, setMap] = useState(null);  // стейт карты
   const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
@@ -24,6 +24,16 @@ const BGMap = memo(({ reload, onReload }) => {
     // }, 10000);
     return () => clearInterval(id);
   }, [])
+
+
+  useEffect(() => { // плавный переход к маркеру при добавлении точки
+    if (map) {
+      map.flyTo(markerPos, 15, {
+        animate: true,
+        duration: 1
+      });
+    }
+  }, [markerPos])
 
   
   useEffect(() => {

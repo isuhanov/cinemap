@@ -8,7 +8,7 @@ import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
 import './LocationForm.css';
 
-const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
+const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
     const namesParentRef = useRef();
     const filmNamesParentRef = useRef();
@@ -276,6 +276,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location }) => {
 
         axios.post(`http://localhost:8000/locations`, formData).then(response => {
             console.log(response);
+            moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
             onClickClose(); // закрытие формы при удачном добавлении
             onReload(); // обновляю карту
         }).catch(err => console.log(err));

@@ -15,6 +15,8 @@ function App() {
   const [isOpenLoginForm, setIsOpenLoginForm] = useState(false);
   const [authUser, setAuthUser] = useState(null);
 
+  const [markerPos, setMarkerPos] = useState(undefined);
+
   // useEffect(() => {
   //   // debugger
   //   const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
@@ -26,6 +28,10 @@ function App() {
   //   // }, 10000);
   //   return () => clearInterval(id);
   // }, [])
+
+  const moveToMarker = useCallback((newMarkerPos) => { // ф-ия установки координт нового маркера для плавного перехода
+    setMarkerPos(newMarkerPos);
+  })
 
   function loginUser() {
     console.log(localStorage.getItem('token'));
@@ -69,8 +75,8 @@ function App() {
   return (
     // <ReloadContext.Provider value={onReload}>
       <div className="App">
-        <BGMap reload={isReload} onReload={onReload}/>
-        { isOpenLocationForm && <LocationForm onReload={onReload} onClickClose={closeLocationForm}/>}
+        <BGMap reload={isReload} markerPos={markerPos} onReload={onReload}/>
+        { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
         { isOpenLoginForm && <LoginForm onLogin={logIn} onClickClose={closeLoginForm} /> }
         <div className="container">
           <div className="profile-block">
