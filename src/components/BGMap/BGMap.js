@@ -41,17 +41,25 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
     async function fetchLocation() { // ф-ия выборки данных из БД
       axios.get('http://localhost:8000/locations').then(res => {  // запрос на сервер для получения данных
         setLocations(res.data); // сохраняю данные
-        for (const location of res.data) {
-          // ----------- очищаю маркеры ------------------      
-          for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
-            const latlng = marker.getLatLng();
-            if (!(latlng.lat === location.location_latitude &&  latlng.lng === location.location_longitude)) {
-              map.removeLayer(marker);
-            } 
+        // ----------- очищаю маркеры ------------------      
+        for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
+          const latlng = marker.getLatLng();
+          if (!(res.data.find(location => latlng.lat === location.location_latitude && latlng.lng === location.location_longitude))) {
+            map.removeLayer(marker);
+            //   setMarkers(prevMarkers => {
+            //   return prevMarkers.filter(prevMarker => prevMarker !== marker)
+            // })
           }
-          setMarkers([]);
-          // ----------- очищаю маркеры ------------------
-
+        }
+        setMarkers([]);
+        // ----------- очищаю маркеры ------------------
+        for (const location of res.data) {
+          // map.eachLayer(function(layer) {
+          //   if (layer instanceof Marker) {
+          //       map.removeLayer(layer)
+          //   }
+          // })
+          
           const marker = new Marker( // создаю маркер
             [location.location_latitude, location.location_longitude],
             {
@@ -61,11 +69,17 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
               })
             }
           )
-          setMarkers(prevMarkers => [...prevMarkers, marker]); // добавляю маркер в стейт массив
+          
+          setMarkers(prevMarkers => {
+            console.log(prevMarkers);
+            return [...prevMarkers, marker]
+          }); // добавляю маркер в стейт массив
 
           // ------ прикрепления маркера к карте ------
           map.addLayer(marker); 
+
           marker.addEventListener('click', () => {
+            console.log(currentLocationId);
             setCurrentLocationId(location.location_id);
             setIsCardVisible(true);
           })
