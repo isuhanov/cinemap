@@ -1,11 +1,25 @@
-const { memo } = require("react");
+import { memo } from 'react';
 
-const LocationList = memo(() => {
+import './LocationList.css';
+
+const LocationList = memo(({ locations, onClose, onReload, openLocationCard }) => {
     return (
         <div className="location-list menu">
-            <nav>
+            <header className="location-list__header header-card">
+                <p className="location-list-title">
+                    Локации:
+                </p>
+                <div className="header-btn-container">
+                    <button className="header-btn" onClick={onClose}>
+                        <span className="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+            </header>
+            <nav className="location-list__nav">
                 <ul>
-                    <li className="location-list__item menu-item">Добавить</li>
+                { locations.map(location => {
+                        return <li onClick={() => openLocationCard(location.location_id)} key={location.location_id} className="location-list__item menu-item">{ location.location_name }</li>
+                    }) }
                 </ul>
             </nav>
         </div>

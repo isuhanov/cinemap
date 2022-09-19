@@ -1,29 +1,34 @@
 import axios from 'axios';
 import { Icon, LatLng, Map, Marker, TileLayer } from 'leaflet';
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import LocationIcon from '../../assets/place-marker.svg';
 
 import '../../App.css';
 import './BGMap.css';
 
 import LocationCard from '../LocationCard/LocationCard';
+import LocationList from '../LocationList/LocationList';
 
 const BGMap = memo(({ reload, onReload, markerPos }) => {
   const [map, setMap] = useState(null);  // стейт карты
   const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
+
   const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
   const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
-  // const [isMapReload, setIsMapReload] = useState(false);  // стейт для локальной переменной обновления
+
+  const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
+  const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
 
   useEffect(() => {
     const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
       onReload();
-      // setIsMapReload(prev => !prev);
-    }, 60000);
-    // }, 10000);
+    // }, 60000);
+    }, 10000);
     return () => clearInterval(id);
   }, [])
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! РЕШИТЬ БАГ С УДАЛЕНИЕМ ИЗ СПИСКА 
 
 
   useEffect(() => { // плавный переход к маркеру при добавлении точки
@@ -41,27 +46,22 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
     async function fetchLocation() { // ф-ия выборки данных из БД
       axios.get('http://localhost:8000/locations').then(res => {  // запрос на сервер для получения данных
         setLocations(res.data); // сохраняю данные
+        // debugger
         // ----------- очищаю маркеры ------------------      
         for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
-          const latlng = marker.getLatLng();
-          if (!(res.data.find(location => latlng.lat === location.location_latitude && latlng.lng === location.location_longitude))) {
+          // const latlng = marker.getLatLng();
+          // if (!(res.data.find(location => latlng.lat === location.location_latitude && latlng.lng === location.location_longitude))) {
             map.removeLayer(marker);
-            //   setMarkers(prevMarkers => {
-            //   return prevMarkers.filter(prevMarker => prevMarker !== marker)
-            // })
-          }
+          // }
         }
         setMarkers([]);
         // ----------- очищаю маркеры ------------------
         for (const location of res.data) {
-          // map.eachLayer(function(layer) {
-          //   if (layer instanceof Marker) {
-          //       map.removeLayer(layer)
-          //   }
-          // })
-          
+          const lat = location.location_latitude; 
+          const lng = location.location_longitude; 
+
           const marker = new Marker( // создаю маркер
-            [location.location_latitude, location.location_longitude],
+            [lat, lng],
             {
               icon: new Icon({
                 iconUrl: LocationIcon,
@@ -70,20 +70,51 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
             }
           )
           
-          setMarkers(prevMarkers => {
-            console.log(prevMarkers);
-            return [...prevMarkers, marker]
-          }); // добавляю маркер в стейт массив
+          const filterLocations = res.data.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
+          if (filterLocations.length > 1) {
+            setMarkers(prevMarkers => { // добавляю маркера
+              if (prevMarkers.find(prevMarker => (
+                    prevMarker.getLatLng().lat === marker.getLatLng().lat 
+                    && 
+                    prevMarker.getLatLng().lng === marker.getLatLng().lng
+                  ))
+              ) {
+                return prevMarkers;
+              } else {
+              // debugger
 
-          // ------ прикрепления маркера к карте ------
-          map.addLayer(marker); 
+                // console.log('зашел');
+                map.addLayer(marker); 
+                marker.addEventListener('click', () => {
+                  // console.log('меня 2');ы
+                  setCurrentLocationList(filterLocations);
+                  setIsCardVisible(false);
+                  setIsLocationListVisible(true);
+                })
+                // ------ прикрепления маркера к карте ------
+                return [...prevMarkers, marker] // добавляю маркер в стейт массив
+              }
+              // ------ прикрепления маркера к карте -----
+            });
+            // return 
+            continue;
+          }
 
-          marker.addEventListener('click', () => {
-            console.log(currentLocationId);
-            setCurrentLocationId(location.location_id);
-            setIsCardVisible(true);
-          })
-          // ------ прикрепления маркера к карте ------
+          setMarkers(prevMarkers => { // добавляю маркера
+            console.log('зашел');
+            // ------ прикрепления маркера к карте ------
+            map.addLayer(marker); 
+            marker.addEventListener('click', () => {
+              console.log(currentLocationId);
+              setCurrentLocationId(location.location_id);
+              setIsLocationListVisible(false);
+              setIsCardVisible(true);
+            })
+            // ------ прикрепления маркера к карте ------
+            return [...prevMarkers, marker] // добавляю маркер в стейт массив
+          });
+
+          
         }
       }).catch(err => {
         console.log(err);
@@ -108,14 +139,35 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
   }, [map, reload]);
   // }, [map, reload, isMapReload]);
 
+  const openLocationCard = useCallback((location) => {
+    console.log('open');
+    return (
+      <LocationCard  
+            otherClassName="shadow-block"
+            location={location}
+            onClose={() => setIsCardVisible(false)}
+            onReload={() => {
+              setIsLocationListVisible(false); // закрываем список (если он есть)              
+              onReload(); // обновляем данные
+            }}
+          />
+    )
+  })
+
   return (
     <>
       <div id="map-container"></div>
       { isCardVisible &&
-        <LocationCard  
-            otherClassName="shadow-block"
-            location={locations.find(location => location.location_id === currentLocationId)}
-            onClose={() => setIsCardVisible(false)}
+        openLocationCard(locations.find(location => location.location_id === currentLocationId))
+      } 
+      { isLocationListVisible &&
+        <LocationList 
+            openLocationCard={(locationId) => {
+              setCurrentLocationId(locationId);
+              setIsCardVisible(true);
+            }}
+            locations={currentLocationsList}
+            onClose={() => setIsLocationListVisible(false)}
             onReload={onReload}
           />
       } 

@@ -42,6 +42,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
     function onDelete() {
         onClose();
         axios.delete(`http://localhost:8000/locations?location_id=${location.location_id}`).then(res => {
+            // debugger
             console.log(res);
             onReload();
             console.log('delete');
