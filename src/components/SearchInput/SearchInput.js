@@ -1,5 +1,3 @@
-import axios from 'axios';
-// import { request } from 'express';
 import { memo, useState } from 'react';
 
 import '../../App.css';

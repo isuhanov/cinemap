@@ -28,9 +28,6 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
     return () => clearInterval(id);
   }, [])
 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! РЕШИТЬ БАГ С УДАЛЕНИЕМ ИЗ СПИСКА 
-
-
   useEffect(() => { // плавный переход к маркеру при добавлении точки
     if (map) {
       map.flyTo(markerPos, 15, {
@@ -46,10 +43,9 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
     async function fetchLocation() { // ф-ия выборки данных из БД
       axios.get('http://localhost:8000/locations').then(res => {  // запрос на сервер для получения данных
         setLocations(res.data); // сохраняю данные
-        // debugger
         // ----------- очищаю маркеры ------------------      
         for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
-          // const latlng = marker.getLatLng();
+          // const latlng = marker.getLatLng()
           // if (!(res.data.find(location => latlng.lat === location.location_latitude && latlng.lng === location.location_longitude))) {
             map.removeLayer(marker);
           // }
@@ -71,6 +67,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
           )
           
           const filterLocations = res.data.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
+          // console.log("filter " +  filterLocations);
           if (filterLocations.length > 1) {
             setMarkers(prevMarkers => { // добавляю маркера
               if (prevMarkers.find(prevMarker => (
@@ -81,12 +78,8 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
               ) {
                 return prevMarkers;
               } else {
-              // debugger
-
-                // console.log('зашел');
                 map.addLayer(marker); 
                 marker.addEventListener('click', () => {
-                  // console.log('меня 2');ы
                   setCurrentLocationList(filterLocations);
                   setIsCardVisible(false);
                   setIsLocationListVisible(true);
@@ -96,12 +89,10 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
               }
               // ------ прикрепления маркера к карте -----
             });
-            // return 
             continue;
           }
 
           setMarkers(prevMarkers => { // добавляю маркера
-            console.log('зашел');
             // ------ прикрепления маркера к карте ------
             map.addLayer(marker); 
             marker.addEventListener('click', () => {
@@ -139,18 +130,30 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
   }, [map, reload]);
   // }, [map, reload, isMapReload]);
 
-  const openLocationCard = useCallback((location) => {
-    console.log('open');
+  function deleteLocation(locationId) { // ф-ия удаления 
+    // ----------------- закрываю все открытые карточки и списки -------------------------
+    setCurrentLocationId(0);
+    setCurrentLocationList([]);
+    setIsCardVisible(false);
+    setIsLocationListVisible(false);         
+    // ----------------- закрываю все открытые карточки и списки -------------------------
+
+    // удаление карточки
+    axios.delete(`http://localhost:8000/locations?location_id=${locationId}`).then(res => {
+        console.log(res);
+        onReload();
+        console.log('delete');
+    }).catch(err => console.log(err));
+}
+
+  const openLocationCard = useCallback((location) => { // ф-ия открытия карточки локации
     return (
       <LocationCard  
             otherClassName="shadow-block"
             location={location}
             onClose={() => setIsCardVisible(false)}
-            onReload={() => {
-              console.log(currentLocationsList);
-              setIsLocationListVisible(false); // закрываем список (если он есть)              
-              onReload(); // обновляем данные
-            }}
+            onReload={() => onReload()}
+            onDelete={deleteLocation}
           />
     )
   })

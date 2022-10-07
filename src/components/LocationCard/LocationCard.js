@@ -2,12 +2,11 @@ import axios from "axios";
 import { memo, useCallback, useEffect, useState } from "react";
 import LocationForm from "../LocationForm/LocationForm";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
-// import { ReloadContext } from "../App";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './LocationCard.css'
 
-const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
+const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete }) => {
     const [user, setUser] = useState(null);
     const [locationPhoto, setLocationPhoto] = useState([]);
     const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
@@ -21,10 +20,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
         setIsOpenLocationForm(false);
     });
 
-    // const reloadContext = useContext(ReloadContext);
-    
     useEffect(() => {
-        // async function fetchData() {
         setUser(null);
         axios.get(`http://localhost:8000/users?location_id=${location.location_id}`).then(res => {
             setUser(u => res.data);
@@ -34,20 +30,11 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
         axios.get(`http://localhost:8000/photos?location_id=${location.location_id}`).then(res => {
             setLocationPhoto(res.data);
         }).catch(err => console.log(err));
-        // }
-        // fetchData();
     }, [JSON.stringify(location), localReload])
-    
 
-    function onDelete() {
-        debugger;
+    function onDeleteClick() {
         onClose();
-        axios.delete(`http://localhost:8000/locations?location_id=${location.location_id}`).then(res => {
-            // debugger
-            console.log(res);
-            onReload();
-            console.log('delete');
-        }).catch(err => console.log(err));
+        onDelete(location.location_id)
     }
 
 
@@ -137,7 +124,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload }) => {
                         <button onClick={openLocationForm} className="location-card-btn-edit btn btn-blue">
                             Редактировать
                         </button>
-                        <button onClick={onDelete} className="location-card-btn-delete btn btn-red">
+                        <button onClick={onDeleteClick} className="location-card-btn-delete btn btn-red">
                             Удалить
                         </button>
                     </div>
