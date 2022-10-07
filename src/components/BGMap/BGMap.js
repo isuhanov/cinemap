@@ -147,6 +147,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
             location={location}
             onClose={() => setIsCardVisible(false)}
             onReload={() => {
+              console.log(currentLocationsList);
               setIsLocationListVisible(false); // закрываем список (если он есть)              
               onReload(); // обновляем данные
             }}

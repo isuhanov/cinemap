@@ -6,7 +6,6 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
     const [drag, setDrag] = useState(false);
     const [fileList, setFileList] = useState(photoList);
 
-    let dragCounter;
     function handleDrag(e) {
         e.preventDefault()
         e.stopPropagation()
@@ -14,18 +13,14 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
     function handleDragIn(e) {
         e.preventDefault()
         e.stopPropagation()
-        dragCounter++
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setDrag(true)
         }
     }
     function handleDragOut(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        dragCounter--
-        if (dragCounter === 0) {
-            setDrag(false);
-        }
+        e.preventDefault();
+        e.stopPropagation();
+        setDrag(false);
     }
     function handleDrop(e) {
         e.preventDefault()
@@ -38,7 +33,6 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
             }
             setFileList(files);
             onDropFiles(files);
-            dragCounter = 0    
         }
     }
    
@@ -50,7 +44,7 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
     }
 
     return (
-        <div onDragEnter={handleDragIn} onDragLeave={handleDragOut} onDragOver={handleDrag} onDrop={handleDrop} 
+        <div onDragEnter={handleDragIn} onDragOver={handleDrag} onDrop={handleDrop} 
             className="drag-and-drop-container">
             <div className="drag-and-drop-filelist-container">
                 { photoList.length > 0 ?
@@ -79,7 +73,7 @@ const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
                 </span>
             </div>
             { drag && 
-                <div className="on-draging-block">
+                <div onDragLeave={handleDragOut} className="on-draging-block">
                     <p className="on-draging-text">
                         Файл
                     </p>

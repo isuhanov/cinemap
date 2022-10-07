@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import './LocationList.css';
 
-const LocationList = memo(({ locations, onClose, onReload, openLocationCard }) => {
+const LocationList = memo(({ locations, onClose, openLocationCard }) => {
     return (
         <div className="location-list menu">
             <header className="location-list__header header-card">
