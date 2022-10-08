@@ -4,9 +4,8 @@ import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 
 import './Profile.css'
 
-const Profile = memo(({ user, onClickOpenLoginForm }) => {
+const Profile = memo(({ user, onClickOpenLoginForm, onLogoutClick }) => {
     const [menuIsVisible, setMenuVisible] = useState(false);
-    // const [isOpenLoginForm, setIsOpenLoginForm] = useState(false);
     
     return (
         <>
@@ -23,7 +22,7 @@ const Profile = memo(({ user, onClickOpenLoginForm }) => {
                                 { user ? 
                                     <>
                                         <li className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
-                                        <li className="profile__menu__item menu-item">Выйти <span className="material-symbols-outlined">logout</span></li>
+                                        <li onClick={onLogoutClick} className="profile__menu__item menu-item">Выйти <span className="material-symbols-outlined">logout</span></li>
                                     </>
                                     :
                                     <li onClick={onClickOpenLoginForm} className="profile__menu__item menu-item">Войти<span className="material-symbols-outlined">login</span></li>

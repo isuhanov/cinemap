@@ -20,6 +20,10 @@ function App() {
     localStorage.setItem('user', JSON.stringify(userData));
   });
 
+  const logoutUser = useCallback(() => { // ф-ия сохранения пользвателя при авторизации
+    localStorage.removeItem('user');
+  });
+
   const moveToMarker = useCallback((newMarkerPos) => { // ф-ия установки координт нового маркера для плавного перехода
     setMarkerPos(newMarkerPos);
   })
@@ -54,7 +58,7 @@ function App() {
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
         <div className="container">
           <div className="profile-block">
-            <Profile user={JSON.parse(localStorage.getItem('user'))} onClickOpenLoginForm={openLoginForm}/>
+            <Profile user={JSON.parse(localStorage.getItem('user'))} onLogoutClick={logoutUser} onClickOpenLoginForm={openLoginForm}/>
           </div>
           <div className="search-input-block">
             <SearchInput />  
