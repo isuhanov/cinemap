@@ -234,7 +234,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                 formIsValid = false;
             }
         }
-        if (!formIsValid) return
+        // if (!formIsValid) return
         console.log('выборка');
 
         generationData(postLocation);
@@ -304,29 +304,6 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
             
         }).catch(err => console.log(err));
     }
-
-    // function onClickSave() { // обработчик нажатия на кнопку сохранения
-    //     let queryLocationObj = {
-    //         name,
-    //         filmName,
-    //         route,
-    //         timing,
-    //     }
-        
-    //     //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
-    //     let osmQuery =  address.replace(/[^\w][а-я][.]/i, ' ').replace(/^[а-я][.]/i, ' ')
-    //     //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
-
-    //     // получение координат и адреса от OSM 
-    //     axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {  
-    //         queryLocationObj['address'] = res.data[0].display_name;
-    //         queryLocationObj['latitude'] = res.data[0].lat;
-    //         queryLocationObj['longitude'] = res.data[0].lon;
-    //     }).then(res => {
-    //         postLocation(queryLocationObj); // добавление локации в БД
-    //     }).catch(err => console.log(err));
-    // }
-
 
     function textFieldIsValid(formItem, max = undefined) { // ф-ия для валидации текстовых полей
         if (formItem.value.length === 0) {

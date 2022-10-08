@@ -1,16 +1,27 @@
-const mysql = require("mysql2");
-const express = require("express");
-const bodyParser = require('body-parser')
-const fileUpload = require('express-fileupload');
-const cors = require('cors');
+// const mysql = require("mysql2");
+import mysql from 'mysql2'
+// const express = require("express");
+import express from 'express'
+// const bodyParser = require('body-parser')
+import bodyParser from 'body-parser'
+// const fileUpload = require('express-fileupload');
+import fileUpload from 'express-fileupload'
+// const cors = require('cors');
+import cors from 'cors'
 
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
+import jwt from'jsonwebtoken'
 const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 
-const path = require('path');
-const fs = require('fs');
+// const path = require('path');
+import path from 'path'
+// const fs = require('fs');
+import fs from 'fs'
+// const nanoid = require('nanoid')
+import { nanoid } from "nanoid";
 
 const app = express();
+// const app = 
 
 // настрока парсера сервера для запросов
 app.use(bodyParser.urlencoded({ extended: true })); 
@@ -219,16 +230,6 @@ app.get('/users', function(req, res){ // обработка GET запроса �
         } else {
             res.status(404).send('Not found');
         }
-        // connection.query(  // получение id пользователя 
-        //     `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
-        //     function(err, results, fields) {
-        //         if (results.length === 0) {
-        //             res.status(404).send('Not found');
-        //         } else {
-                    
-        //         }
-        //     }
-        // );
     }
 });
 
@@ -253,10 +254,12 @@ app.listen(8000, () => { // запус и прослушка сервера на
 
 function addPhotos(photos, path, status, locationId) { // ф-ия добавления фото
     let photoPath;
+    let photoName;
     if (Array.isArray(photos)) {
         for (const photo of photos) {
-            photo.mv(path + photo.name);
-            photoPath = `http://localhost:8000${path.slice(5)}${photo.name}`;
+            photoName = nanoid(10) + '.' + photo.name.split('.').pop();
+            photo.mv(path + photoName);
+            photoPath = `http://localhost:8000${path.slice(5)}${photoName}`;
             connection.query(
                 `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
                 function(err, results, fields) {
@@ -267,8 +270,10 @@ function addPhotos(photos, path, status, locationId) { // ф-ия добавле
             ); 
         }
     } else {
-        photos.mv(path + photos.name);
-        photoPath = `http://localhost:8000${path.slice(5)}${photos.name}`;
+        // console.log(photos.name.split('.').pop());
+        photoName = nanoid(10) + '.' + photos.name.split('.').pop();        
+        photos.mv(path + photoName);
+        photoPath = `http://localhost:8000${path.slice(5)}${photoName}`;
         connection.query(
             `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
             function(err, results, fields) {
