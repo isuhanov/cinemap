@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
 import LocationForm from './components/LocationForm/LocationForm';
@@ -9,50 +8,26 @@ import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
 
 function App() {
-  const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
-  const [isReload, setIsReload] = useState(false);
+  const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы авторизации
+  const [isReload, setIsReload] = useState(false); // стейт для обновления приложения
 
-  const [isOpenLoginForm, setIsOpenLoginForm] = useState(false);
-  const [authUser, setAuthUser] = useState(null);
+  const [isOpenLoginForm, setIsOpenLoginForm] = useState(false); // стейт состояния формы авторизации
 
-  const [markerPos, setMarkerPos] = useState(undefined);
+  const [markerPos, setMarkerPos] = useState(undefined); // стейт для позиции маркера при добавлении
 
-  // useEffect(() => {
-  //   // debugger
-  //   const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
-  //     if (localStorage.getItem('token')) {
-  //       loginUser();
-  //     }
-  //     // setIsMapReload(prev => !prev);
-  //   }, 60000);
-  //   // }, 10000);
-  //   return () => clearInterval(id);
-  // }, [])
+
+  const loginUser = useCallback((userData) => { // ф-ия сохранения пользвателя при авторизации
+    localStorage.setItem('user', JSON.stringify(userData));
+  });
 
   const moveToMarker = useCallback((newMarkerPos) => { // ф-ия установки координт нового маркера для плавного перехода
     setMarkerPos(newMarkerPos);
   })
 
-  function loginUser() {
-    console.log(localStorage.getItem('token'));
-    const token = JSON.parse(localStorage.getItem('token')).token;
-    axios.get(`http://localhost:8000/users?login=true`, { headers: {'Authorization' : `Bearer ${token}`} }).then(res => {
-        console.log(res);
-    }).catch(err => console.log(err)); 
-    // setAuthUser(user);
-  }
-
-  const logIn = useCallback((user) => {
-    localStorage.setItem('token', JSON.stringify(user));
-    loginUser();
-  }) 
-  // const ReloadContext = createContext("without provider");
-
   const onReload = useCallback(() => { // ф-ия для обновления
     setIsReload(prev => !prev);
     console.log('reload');
   });
-  
   
   const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
     setIsOpenLocationForm(true);
@@ -73,14 +48,13 @@ function App() {
   });
   
   return (
-    // <ReloadContext.Provider value={onReload}>
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} onReload={onReload}/>
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
-        { isOpenLoginForm && <LoginForm onLogin={logIn} onClickClose={closeLoginForm} /> }
+        { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
         <div className="container">
           <div className="profile-block">
-            <Profile user={authUser} onClickOpenLoginForm={openLoginForm}/>
+            <Profile user={JSON.parse(localStorage.getItem('user'))} onClickOpenLoginForm={openLoginForm}/>
           </div>
           <div className="search-input-block">
             <SearchInput />  
@@ -90,9 +64,7 @@ function App() {
           </div>
         </div>
       </div>
-    // </ReloadContext.Provider>
   );
 }
 
-// export {App, ReloadContext};
 export default App;

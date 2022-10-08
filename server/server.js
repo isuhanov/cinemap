@@ -204,32 +204,52 @@ app.get('/users', function(req, res){ // обработка GET запроса �
                 }
             }
         );
-    } else if (req.query.user_login && req.query.user_pass) {
+    } 
+    // else if (req.query.user_login && req.query.user_pass) {
+    //     connection.query(  // получение id пользователя 
+    //         `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
+    //         function(err, results, fields) {
+    //             if (results.length === 0) {
+    //                 res.status(404).send('Not found');
+    //             } else {
+    //                 console.log('2');
+    //                 // res.send(results);
+    //                 return res.status(200).json({
+    //                     id: results[0].user_id,
+    //                     login: results[0].user_login,
+    //                     token: jwt.sign({ id: results[0].user_id }, tokenKey),
+    //                   })
+    //             }
+    //         }
+    //     );
+    // } else if (req.query.login) {
+    //     console.log('1');
+    //     // console.log(req.user);
+    //     if (req.user) {
+    //         // console.log(req.user);
+    //         res.send(req.user);
+    //     } else {
+    //         res.status(404).send('Not found');
+    //     }
+    // }
+});
+
+app.post('/users/login', function(req, res) { // обработка запроса на авторизацию
+    if (req.query.user_login && req.query.user_pass) {
         connection.query(  // получение id пользователя 
             `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
             function(err, results, fields) {
-                if (results.length === 0) {
+                if (results.length === 0) { // если пользователя нет, то 404
                     res.status(404).send('Not found');
-                } else {
-                    console.log('2');
-                    // res.send(results);
-                    return res.status(200).json({
-                        id: results[0].user_id,
-                        login: results[0].user_login,
-                        token: jwt.sign({ id: results[0].user_id }, tokenKey),
-                      })
+                } else { // иначе отправка токена и инф-ции о пользователе на клиент
+                    let data = {
+                        ...results[0],
+                        accessToken:  jwt.sign({ id: results[0].user_id }, tokenKey), // формирование токена
+                    }
+                    res.send(data);
                 }
             }
         );
-    } else if (req.query.login) {
-        console.log('1');
-        // console.log(req.user);
-        if (req.user) {
-            // console.log(req.user);
-            res.send(req.user);
-        } else {
-            res.status(404).send('Not found');
-        }
     }
 });
 

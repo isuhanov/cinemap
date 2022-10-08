@@ -42,13 +42,10 @@ const LoginForm = memo(({ onClickClose, onLogin }) => {
     });
 
 
-    function onClickAuth() {
-        // console.log(login);
-        // console.log(password);
-        axios.get(`http://localhost:8000/users?user_login=${login.value}&user_pass=${password.value}`).then(res => {
-            onLogin(res.data);
-            console.log(res);
-            onClickClose();
+    function onClickAuth() { // ф-ия авторизации
+        axios.post(`http://localhost:8000/users/login?user_login=${login.value}&user_pass=${password.value}`).then(res => {
+            onLogin(res.data); // сохранение данных пользователя
+            onClickClose(); // закрытие формы
         })
         .catch(err => console.log(err));
     }
