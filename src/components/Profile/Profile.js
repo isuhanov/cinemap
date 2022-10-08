@@ -22,10 +22,13 @@ const Profile = memo(({ user, onClickOpenLoginForm, onLogoutClick }) => {
                                 { user ? 
                                     <>
                                         <li className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
-                                        <li onClick={onLogoutClick} className="profile__menu__item menu-item">Выйти <span className="material-symbols-outlined">logout</span></li>
+                                        <li onClick={onLogoutClick} className="profile__menu__item menu-item">Выход<span className="material-symbols-outlined">logout</span></li>
                                     </>
                                     :
-                                    <li onClick={onClickOpenLoginForm} className="profile__menu__item menu-item">Войти<span className="material-symbols-outlined">login</span></li>
+                                    <>
+                                        <li onClick={onClickOpenLoginForm} className="profile__menu__item menu-item">Вход<span className="material-symbols-outlined">login</span></li>
+                                        <li className="profile__menu__item menu-item">Регистрация<span class="material-symbols-outlined">person_add</span></li>
+                                    </>
                                 }
                             </ul>
                         </nav>

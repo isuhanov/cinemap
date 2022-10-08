@@ -46,9 +46,11 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                     { location.location_name }
                 </p>
                 <div className="header-btn-container">
+                { localStorage.getItem('user') &&
                     <button className="header-btn">
                         <span className="material-symbols-outlined">bookmark</span>
                     </button>
+                }
                     <button className="header-btn" onClick={() => onClose() }>
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -118,7 +120,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
 
             </div>
 
-            { 
+            { JSON.parse(localStorage.getItem('user')) && JSON.parse(localStorage.getItem('user')).user_id === user?.user_id &&
                 <footer>
                     <div className="location-card-btn-container btn-container">
                         <button onClick={openLocationForm} className="location-card-btn-edit btn btn-blue">
