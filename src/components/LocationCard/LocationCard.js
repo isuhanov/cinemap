@@ -7,10 +7,11 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 import './LocationCard.css'
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete }) => {
-    const [user, setUser] = useState(null);
-    const [locationPhoto, setLocationPhoto] = useState([]);
-    const [isOpenLocationForm, setIsOpenLocationForm] = useState(false);
-    const [localReload, setLocalReload] = useState(false);
+    const [user, setUser] = useState(null); // стейт для создателя карточки
+    const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
+    const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
+    const [localReload, setLocalReload] = useState(false); // стейт для локальной перезагрузки карточки
+    const [isFavorite, setIsFavorite] = useState(false); // стейт для состояния избранного
 
     const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
         setIsOpenLocationForm(true);
@@ -20,31 +21,47 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
         setIsOpenLocationForm(false);
     });
 
-    useEffect(() => {
+    useEffect(() => { // заполняю необходимые стейты при загрузке
+        const userId = JSON.parse(localStorage.getItem('user')).user_id;
+        const locationId =  location.location_id;
+
         setUser(null);
-        axios.get(`http://localhost:8000/users?location_id=${location.location_id}`).then(res => {
+        axios.get(`http://localhost:8000/users?location_id=${locationId}`).then(res => {
             setUser(u => res.data);
         })
         .catch(err => console.log(err));
 
-        axios.get(`http://localhost:8000/photos?location_id=${location.location_id}`).then(res => {
+        axios.get(`http://localhost:8000/photos?location_id=${locationId}`).then(res => {
             setLocationPhoto(res.data);
+        }).catch(err => console.log(err));
+
+        axios.get(`http://localhost:8000/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
+            setIsFavorite(res.data);            
         }).catch(err => console.log(err));
     }, [JSON.stringify(location), localReload])
 
-    function onDeleteClick() {
+    function onDeleteClick() { // ф-ия удаления локации
         onClose();
         onDelete(location.location_id)
     }
 
-    function onFavoritesBtnClick() {
+    function onFavoritesBtnClick() { // ф-ия обработки нажатия флажка избранного
         const data = {
             userId: JSON.parse(localStorage.getItem('user')).user_id,
             locationId: location.location_id
         };
-        console.log(data);
+        isFavorite ? removeFromFavorites(data) : addToFavorites(data);        
+    }
+
+    function addToFavorites(data) { // ф-ия добавления в "Избранное"
         axios.post(`http://localhost:8000/locations/favorites`, data).then(res => {
-            console.log(res);
+            setLocalReload(prev => !prev); // перезагрузка карточки
+        }).catch(err => console.log(err));
+    }
+
+    function removeFromFavorites(data) { // ф-ия удаления из "Избранное"
+        axios.delete(`http://localhost:8000/locations/favorites?user_id=${data.userId}&location_id=${data.locationId}`).then(res => {
+            setLocalReload(prev => !prev); // перезагрузка карточки
         }).catch(err => console.log(err));
     }
 
@@ -58,8 +75,10 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                 </p>
                 <div className="header-btn-container">
                 { localStorage.getItem('user') &&
-                    <button className="header-btn" onClick={onFavoritesBtnClick}>
-                        <span className="material-symbols-outlined">bookmark</span>
+                    <button className={`header-btn ${isFavorite && 'btn-is-favorite'}`} onClick={onFavoritesBtnClick}>
+                        <span className="material-symbols-outlined">
+                            { isFavorite ? 'bookmark_added' : 'bookmark'}
+                        </span>
                     </button>
                 }
                     <button className="header-btn" onClick={onClose}>
