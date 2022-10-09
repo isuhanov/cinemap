@@ -61,7 +61,7 @@ function App() {
         <BGMap reload={isReload} markerPos={markerPos} onReload={onReload}/>
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
-        { isOpenFavoritesList && <FavoritesList /> }
+        { isOpenFavoritesList && <FavoritesList reload={isReload} onReload={onReload} onClickClose={closeFavoritesList}/> }
         <div className="container">
           <div className="profile-block">
             <Profile user={JSON.parse(localStorage.getItem('user'))} onLogoutClick={logoutUser} onClickOpenLoginForm={openLoginForm}/>

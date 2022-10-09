@@ -199,14 +199,18 @@ app.delete("/locations", function(req, res){  // обработка DELETE за�
 
 //---------------------------------------------- favorites locations ---------------------------------------------- 
 
-// app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-//     connection.query(
-//         `SELECT * FROM locations WHERE;`,
-//         function(err, results, fields) {
-//             res.send(results);  // отправка результата в ответ на запрос
-//         }
-//     );
-// });
+app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы favorites locations
+    connection.query(
+        `select l.* from locations l inner join users_favourites_locations lf on l.location_id = lf.location_id inner join users u on u.user_id = lf.user_id where u.user_id = ${req.query.user_id};`,
+        function(err, results, fields) {
+            if (err) {
+                res.status(500).send(err);
+                return;
+            }
+            res.send(results);  // отправка результата в ответ на запрос
+        }
+    );
+});
 
 app.get('/locations/favorites/isexist', function(req, res) { // проверка наличия карточки в избранном у пользователя
     connection.query(

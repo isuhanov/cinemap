@@ -22,7 +22,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     });
 
     useEffect(() => { // заполняю необходимые стейты при загрузке
-        const userId = JSON.parse(localStorage.getItem('user')).user_id;
+        const userId = JSON.parse(localStorage.getItem('user'))?.user_id;
         const locationId =  location.location_id;
 
         setUser(null);
@@ -35,9 +35,11 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
             setLocationPhoto(res.data);
         }).catch(err => console.log(err));
 
-        axios.get(`http://localhost:8000/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
-            setIsFavorite(res.data);            
-        }).catch(err => console.log(err));
+        // if (user){
+            axios.get(`http://localhost:8000/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
+                setIsFavorite(res.data);            
+            }).catch(err => console.log(err));
+        // }
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
@@ -47,7 +49,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
 
     function onFavoritesBtnClick() { // ф-ия обработки нажатия флажка избранного
         const data = {
-            userId: JSON.parse(localStorage.getItem('user')).user_id,
+            userId: JSON.parse(localStorage.getItem('user'))?.user_id,
             locationId: location.location_id
         };
         isFavorite ? removeFromFavorites(data) : addToFavorites(data);        
