@@ -234,18 +234,20 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                 formIsValid = false;
             }
         }
-        // if (!formIsValid) return
+        if (!formIsValid) return
         console.log('выборка');
 
         generationData(postLocation);
     }
 
     function generationData(queryFunc) { // ф-ия формирует объект с данными из формы и вызывает ф-ию для соответсвующего запроса (POST/PUT)
+        const user = JSON.parse(localStorage.getItem('user'));
         let queryLocationObj = {
             name: name.value,
             filmName: filmName.value,
             route: route.value,
             timing: timing.value,
+            userId: user.user_id
         }
         
         //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
