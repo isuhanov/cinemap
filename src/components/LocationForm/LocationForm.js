@@ -1,9 +1,8 @@
 import axios from "axios";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
+
 import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "../ui/TimingInput/TimingInput";
-// import { AddressSuggestions } from 'react-dadata';
-import 'react-dadata/dist/react-dadata.css';
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
 import './LocationForm.css';

@@ -37,6 +37,17 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
         onDelete(location.location_id)
     }
 
+    function onFavoritesBtnClick() {
+        const data = {
+            userId: JSON.parse(localStorage.getItem('user')).user_id,
+            locationId: location.location_id
+        };
+        console.log(data);
+        axios.post(`http://localhost:8000/locations/favorites`, data).then(res => {
+            console.log(res);
+        }).catch(err => console.log(err));
+    }
+
 
     return (
         <>
@@ -47,11 +58,11 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                 </p>
                 <div className="header-btn-container">
                 { localStorage.getItem('user') &&
-                    <button className="header-btn">
+                    <button className="header-btn" onClick={onFavoritesBtnClick}>
                         <span className="material-symbols-outlined">bookmark</span>
                     </button>
                 }
-                    <button className="header-btn" onClick={() => onClose() }>
+                    <button className="header-btn" onClick={onClose}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>

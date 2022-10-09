@@ -196,6 +196,33 @@ app.delete("/locations", function(req, res){  // обработка DELETE за�
 });
 
 
+
+//---------------------------------------------- favorites locations ---------------------------------------------- 
+
+// app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+//     connection.query(
+//         `SELECT * FROM locations WHERE;`,
+//         function(err, results, fields) {
+//             res.send(results);  // отправка результата в ответ на запрос
+//         }
+//     );
+// });
+
+app.post('/locations/favorites', function(req, res){ // добавление локации в избранное
+    connection.query(
+        `INSERT INTO users_favourites_locations (user_id, location_id) VALUES ('${req.body.userId}', '${req.body.locationId}');`,
+        function(err, results, fields) {
+            if (err) {
+                res.send(err);
+                return;
+            }
+            res.send(results);
+        }
+    )
+});
+
+
+
 //---------------------------------------------- users ---------------------------------------------- 
 
 app.get('/users', function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
@@ -246,6 +273,7 @@ app.post('/users/login', function(req, res) { // обработка запрос
         );
     }
 });
+
 
 
 //---------------------------------------------- photos ---------------------------------------------- 
