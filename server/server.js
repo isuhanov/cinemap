@@ -34,7 +34,6 @@ app.use(express.static('img'));
 app.use(express.json())
 app.use((req, res, next) => {
     if (req.headers.authorization) {
-    // console.log(req.headers);
     jwt.verify(
         req.headers.authorization.split(' ')[1],
         tokenKey,
@@ -49,7 +48,6 @@ app.use((req, res, next) => {
                             next();
                         } else {
                             req.user = user;
-                            console.log('3');
                             next();
                         }
                     }
@@ -98,18 +96,25 @@ app.post('/locations', function(req, res){ // обработка POST запро
                 return
             } 
 
+            // --------------- добавление фото -----------------------
             fs.mkdir(`./img/photo/locationphoto/${results.insertId}`, (err) => console.log(err));
             fs.mkdir(`./img/photo/locationphoto/${results.insertId}/film`, (err) => console.log(err));
             fs.mkdir(`./img/photo/locationphoto/${results.insertId}/user`, (err) => console.log(err));
             
             let fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${results.insertId}/user/`, 'user', results.insertId); 
             fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${results.insertId}/film/`, 'film', results.insertId);
+            // --------------- добавление фото -----------------------
+
+
+            // создание связи между пользователем и локацией
+            fail= insertUserLocation(req.body.userId, results.insertId);
 
             if (fail) {
-                res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
+                res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении 
             } else {
                 res.send(results); // отправка результата в ответ на запрос
             }
+
         }
     ); 
 });
@@ -166,23 +171,56 @@ app.put('/locations', function(req, res){ // обработка GET запрос
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
     removeDir(`./img/photo/locationphoto/${req.query.location_id}`);
     connection.query(
-        `DELETE FROM locations_photos WHERE (location_id = '${req.query.location_id}');`,
+        `DELETE FROM locations_photos WHERE (location_id = '${req.query.location_id}');`, // удаление фотографии из БД
         function(err, results, fields) {
-            if (err) res.status(500).send(err);
-            // console.log('нет ошибок');
+            if (err) res.status(500).send(err); // отправка ошибки, если она есть
             connection.query(
-                `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`,
+                `DELETE FROM users_locations WHERE (location_id = '${req.query.location_id}');`, // удаление связи между пользователем и локацией из БД
                 function(err, results, fields) {
-                    if (err) {
-                        res.status(500).send(err);
-                        return
-                    }
-                    res.send(err); // отправка ошибок в ответ на запрос
+                    if (err) res.status(500).send(err); // отправка ошибки, если она есть
+                    connection.query(
+                        `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`, // удаление локации из БД
+                        function(err, results, fields) {
+                            if (err) {
+                                res.status(500).send(err); // отправка ошибки, если она есть
+                                return
+                            }
+                            res.send(err); // отправка пустого обхекта ошибок в ответ на запрос
+                        }
+                    ); 
                 }
-            ); 
+            );
+            
         }
     );
 });
+
+
+
+//---------------------------------------------- favorites locations ---------------------------------------------- 
+
+// app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+//     connection.query(
+//         `SELECT * FROM locations WHERE;`,
+//         function(err, results, fields) {
+//             res.send(results);  // отправка результата в ответ на запрос
+//         }
+//     );
+// });
+
+app.post('/locations/favorites', function(req, res){ // добавление локации в избранное
+    connection.query(
+        `INSERT INTO users_favourites_locations (user_id, location_id) VALUES ('${req.body.userId}', '${req.body.locationId}');`,
+        function(err, results, fields) {
+            if (err) {
+                res.send(err);
+                return;
+            }
+            res.send(results);
+        }
+    )
+});
+
 
 
 //---------------------------------------------- users ---------------------------------------------- 
@@ -205,24 +243,7 @@ app.get('/users', function(req, res){ // обработка GET запроса �
             }
         );
     } 
-    // else if (req.query.user_login && req.query.user_pass) {
-    //     connection.query(  // получение id пользователя 
-    //         `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
-    //         function(err, results, fields) {
-    //             if (results.length === 0) {
-    //                 res.status(404).send('Not found');
-    //             } else {
-    //                 console.log('2');
-    //                 // res.send(results);
-    //                 return res.status(200).json({
-    //                     id: results[0].user_id,
-    //                     login: results[0].user_login,
-    //                     token: jwt.sign({ id: results[0].user_id }, tokenKey),
-    //                   })
-    //             }
-    //         }
-    //     );
-    // } else if (req.query.login) {
+    // else if (req.query.login) {
     //     console.log('1');
     //     // console.log(req.user);
     //     if (req.user) {
@@ -254,6 +275,7 @@ app.post('/users/login', function(req, res) { // обработка запрос
 });
 
 
+
 //---------------------------------------------- photos ---------------------------------------------- 
 
 app.get('/photos', function(req, res){ // обработка GET запроса на выборку из таблицы locations_photo
@@ -271,6 +293,9 @@ app.listen(8000, () => { // запус и прослушка сервера на
     console.log("Сервер запущен на 8000 порту");
 });
 
+
+
+// ------------------------------- functions ---------------------------------
 
 function addPhotos(photos, path, status, locationId) { // ф-ия добавления фото
     let photoPath;
@@ -290,7 +315,6 @@ function addPhotos(photos, path, status, locationId) { // ф-ия добавле
             ); 
         }
     } else {
-        // console.log(photos.name.split('.').pop());
         photoName = nanoid(10) + '.' + photos.name.split('.').pop();        
         photos.mv(path + photoName);
         photoPath = `http://localhost:8000${path.slice(5)}${photoName}`;
@@ -319,4 +343,16 @@ function removeDir(dir) { // ф-ия удалеения файлов
       }
     }
     fs.rmdirSync(dir)// Если папка пуста, удаляем себя
+}
+
+
+function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
+    connection.query(
+        `INSERT INTO users_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
+        function(err, results, fields) {
+            if (err) {
+                return err;
+            }
+        }
+    )
 }

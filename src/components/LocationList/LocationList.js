@@ -17,7 +17,7 @@ const LocationList = memo(({ locations, onClose, openLocationCard }) => {
             </header>
             <nav className="location-list__nav">
                 <ul>
-                { locations.map(location => {
+                { locations?.map(location => {
                         return <li onClick={() => openLocationCard(location.location_id)} key={location.location_id} className="location-list__item menu-item">{ location.location_name }</li>
                     }) }
                 </ul>

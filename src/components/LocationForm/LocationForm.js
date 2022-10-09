@@ -1,9 +1,8 @@
 import axios from "axios";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
+
 import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "../ui/TimingInput/TimingInput";
-// import { AddressSuggestions } from 'react-dadata';
-import 'react-dadata/dist/react-dadata.css';
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
 import './LocationForm.css';
@@ -234,18 +233,20 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                 formIsValid = false;
             }
         }
-        // if (!formIsValid) return
+        if (!formIsValid) return
         console.log('выборка');
 
         generationData(postLocation);
     }
 
     function generationData(queryFunc) { // ф-ия формирует объект с данными из формы и вызывает ф-ию для соответсвующего запроса (POST/PUT)
+        const user = JSON.parse(localStorage.getItem('user'));
         let queryLocationObj = {
             name: name.value,
             filmName: filmName.value,
             route: route.value,
             timing: timing.value,
+            userId: user.user_id
         }
         
         //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
