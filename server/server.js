@@ -19,6 +19,8 @@ import path from 'path'
 import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
+import { deleteLocation, selectAllLocations } from './services/locations/location-service.js'
+import { removeDir } from './services/files/file-service.js'
 
 const app = express();
 // const app = 
@@ -78,12 +80,9 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 //---------------------------------------------- locations ---------------------------------------------- 
 
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-    connection.query(
-        `SELECT * FROM locations;`,
-        function(err, results, fields) {
-            res.send(results);  // отправка результата в ответ на запрос
-        }
-    );
+    selectAllLocations().then(response => {
+        res.send(response);  // отправка результата в ответ на запрос
+    });
 });
 
 app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
@@ -169,30 +168,11 @@ app.put('/locations', function(req, res){ // обработка GET запрос
 });
 
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
-    removeDir(`./img/photo/locationphoto/${req.query.location_id}`);
-    connection.query(
-        `DELETE FROM locations_photos WHERE (location_id = '${req.query.location_id}');`, // удаление фотографии из БД
-        function(err, results, fields) {
-            if (err) res.status(500).send(err); // отправка ошибки, если она есть
-            connection.query(
-                `DELETE FROM users_locations WHERE (location_id = '${req.query.location_id}');`, // удаление связи между пользователем и локацией из БД
-                function(err, results, fields) {
-                    if (err) res.status(500).send(err); // отправка ошибки, если она есть
-                    connection.query(
-                        `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`, // удаление локации из БД
-                        function(err, results, fields) {
-                            if (err) {
-                                res.status(500).send(err); // отправка ошибки, если она есть
-                                return
-                            }
-                            res.send(err); // отправка пустого обхекта ошибок в ответ на запрос
-                        }
-                    ); 
-                }
-            );
-            
-        }
-    );
+    deleteLocation(req.query.location_id).then(response => {
+        // отправка результата в ответ на запрос
+        if (response.serverStatus === 2) res.send(response)
+        else res.status(500).send(response)
+    });
 });
 
 
@@ -358,23 +338,6 @@ function addPhotos(photos, path, status, locationId) { // ф-ия добавле
         );
     }
 }
-
-function removeDir(dir) { // ф-ия удалеения файлов 
-    let files = fs.readdirSync(dir)
-    for(var i=0;i<files.length;i++){
-      let newPath = path.join(dir,files[i]);
-      let stat = fs.statSync(newPath)
-      if(stat.isDirectory()){
-        // Если это папка, рекурсивно вниз
-        removeDir(newPath);
-      }else {
-       //Удалить файлы
-        fs.unlinkSync(newPath);
-      }
-    }
-    fs.rmdirSync(dir)// Если папка пуста, удаляем себя
-}
-
 
 function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
     connection.query(
