@@ -13,14 +13,11 @@ import cors from 'cors'
 import jwt from'jsonwebtoken'
 const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 
-// const path = require('path');
-import path from 'path'
-// const fs = require('fs');
 import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
 import { deleteLocation, selectAllLocations } from './services/locations/location-service.js'
-import { removeDir } from './services/files/file-service.js'
+import { selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 
 const app = express();
 // const app = 
@@ -82,7 +79,7 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
     selectAllLocations().then(response => {
         res.send(response);  // отправка результата в ответ на запрос
-    });
+    }).catch(err => res.status(500).send(err));
 });
 
 app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
@@ -169,10 +166,8 @@ app.put('/locations', function(req, res){ // обработка GET запрос
 
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
     deleteLocation(req.query.location_id).then(response => {
-        // отправка результата в ответ на запрос
-        if (response.serverStatus === 2) res.send(response)
-        else res.status(500).send(response)
-    });
+        res.send(response) // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 
@@ -180,16 +175,9 @@ app.delete("/locations", function(req, res){  // обработка DELETE за�
 //---------------------------------------------- favorites locations ---------------------------------------------- 
 
 app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы favorites locations
-    connection.query(
-        `select l.* from locations l inner join users_favourites_locations lf on l.location_id = lf.location_id inner join users u on u.user_id = lf.user_id where u.user_id = ${req.query.user_id};`,
-        function(err, results, fields) {
-            if (err) {
-                res.status(500).send(err);
-                return;
-            }
-            res.send(results);  // отправка результата в ответ на запрос
-        }
-    );
+    selectFavourites(req.query.user_id).then(response => {
+        res.send(response);  // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 app.get('/locations/favorites/isexist', function(req, res) { // проверка наличия карточки в избранном у пользователя

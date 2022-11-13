@@ -14,7 +14,11 @@ async function selectAllLocations() {
         connection.query(
             `SELECT * FROM locations;`,
             function(err, results, fields) {
-                resolve(results);
+                if (err) {
+                    reject(err); // отправка ошибки, если она есть
+                } else {
+                    resolve(results); // отправка результата
+                }
             }
         )   
     });
@@ -28,20 +32,20 @@ async function deleteLocation(locationId) {
         connection.query(
             `DELETE FROM locations_photos WHERE (location_id = '${locationId}');`, // удаление фотографии из БД
             function(err, results, fields) {
-                if (err) resolve(err); // отправка ошибки, если она есть
+                if (err) reject(err); // отправка ошибки, если она есть
                 else {
                     connection.query(
                         `DELETE FROM users_locations WHERE (location_id = '${locationId}');`, // удаление связи между пользователем и локацией из БД
                         function(err, results, fields) {
-                            if (err) resolve(err); // отправка ошибки, если она есть
+                            if (err) reject(err); // отправка ошибки, если она есть
                             else {
                                 connection.query(
                                     `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
                                     function(err, results, fields) {
                                         if (err) {
-                                            resolve(err); // отправка ошибки, если она есть
+                                            reject(err); // отправка ошибки, если она есть
                                         } else {
-                                            resolve(results); // отправка пустого обхекта ошибок в ответ на запрос
+                                            resolve(results); // отправка резульата
                                         }
                                     }
                                 ); 
