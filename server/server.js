@@ -17,7 +17,7 @@ import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
 import { deleteLocation, selectAllLocations } from './services/locations/location-service.js'
-import { selectFavourites } from './services/favourites-locations/favourites-location-service.js'
+import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 
 const app = express();
 // const app = 
@@ -181,42 +181,21 @@ app.get('/locations/favorites', function(req, res){ // обработка GET з
 });
 
 app.get('/locations/favorites/isexist', function(req, res) { // проверка наличия карточки в избранном у пользователя
-    connection.query(
-        `SELECT * FROM users_favourites_locations WHERE user_id = ${req.query.user_id} and location_id = ${req.query.location_id};`,
-        function(err, results, fields) {
-            if (err) {
-                res.status(500).send(err);
-                return;
-            }
-            results.length === 0 ? res.send(false) : res.send(true); // отправка результата в ответ на запрос
-        }
-    ); 
+    favouriteIsExist(req.query.user_id, req.query.location_id).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 app.post('/locations/favorites', function(req, res){ // добавление локации в избранное
-    connection.query(
-        `INSERT INTO users_favourites_locations (user_id, location_id) VALUES ('${req.body.userId}', '${req.body.locationId}');`,
-        function(err, results, fields) {
-            if (err) {
-                res.send(err);
-                return;
-            }
-            res.send(results);
-        }
-    )
+    addFavourite(req.body.userId, req.body.locationId).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 app.delete('/locations/favorites', function(req, res){ // удаление локации из избранного
-    connection.query(
-        `DELETE FROM users_favourites_locations WHERE user_id = ${req.query.user_id} and location_id = ${req.query.location_id};`,
-        function(err, results, fields) {
-            if (err) {
-                res.status(500).send(err);
-                return
-            }
-            res.send(results);
-        }
-    )
+    deleteFavourite(req.query.user_id, req.query.location_id).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 

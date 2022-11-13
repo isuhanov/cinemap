@@ -14,11 +14,8 @@ async function selectAllLocations() {
         connection.query(
             `SELECT * FROM locations;`,
             function(err, results, fields) {
-                if (err) {
-                    reject(err); // отправка ошибки, если она есть
-                } else {
-                    resolve(results); // отправка результата
-                }
+                if (err) reject(err);
+                else resolve(results); // отправка результата в ответ на запрос
             }
         )   
     });
@@ -42,11 +39,8 @@ async function deleteLocation(locationId) {
                                 connection.query(
                                     `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
                                     function(err, results, fields) {
-                                        if (err) {
-                                            reject(err); // отправка ошибки, если она есть
-                                        } else {
-                                            resolve(results); // отправка резульата
-                                        }
+                                        if (err) reject(err); // отправка ошибки, если она есть
+                                        else resolve(results); // отправка результата в ответ на запрос
                                     }
                                 ); 
                             }
