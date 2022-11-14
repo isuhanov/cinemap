@@ -1,5 +1,6 @@
 // const mysql = require("mysql2");
 import mysql from 'mysql2'
+import { deleteAllFavourites } from '../favourites-locations/favourites-location-service.js';
 import { removeDir } from '../files/file-service.js';
 
 const connection = mysql.createConnection({ // подключение к БД
@@ -36,13 +37,15 @@ async function deleteLocation(locationId) {
                         function(err, results, fields) {
                             if (err) reject(err); // отправка ошибки, если она есть
                             else {
-                                connection.query(
-                                    `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
-                                    function(err, results, fields) {
-                                        if (err) reject(err); // отправка ошибки, если она есть
-                                        else resolve(results); // отправка результата в ответ на запрос
-                                    }
-                                ); 
+                                deleteAllFavourites(locationId).then(response => { // удаление из избранного
+                                    connection.query(
+                                        `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
+                                        function(err, results, fields) {
+                                            if (err) reject(err); // отправка ошибки, если она есть
+                                            else resolve(results); // отправка результата в ответ на запрос
+                                        }
+                                    ); 
+                                }).catch(err => reject(err));
                             }
                         }
                     );

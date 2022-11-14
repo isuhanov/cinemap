@@ -60,4 +60,18 @@ async function deleteFavourite(userId, locationId) {
     return response;
 }
 
-export { selectFavourites, favouriteIsExist, addFavourite, deleteFavourite };
+async function deleteAllFavourites(locationId) {
+    let response = await new Promise((resolve, reject) => {
+        connection.query(
+            `DELETE FROM users_favourites_locations 
+                WHERE (location_id = '${locationId}');`,
+                function(err, results, fields) {
+                    if (err) reject(err); // отправка ошибки, если она есть
+                    else resolve(results); // отправка результата в ответ на запрос
+                }
+        )
+    });
+    return response;
+}
+
+export { selectFavourites, favouriteIsExist, addFavourite, deleteFavourite, deleteAllFavourites };
