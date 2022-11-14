@@ -144,7 +144,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
         onReload();
         console.log('delete');
     }).catch(err => console.log(err));
-}
+  }
 
   const openLocationCard = useCallback((location) => { // ф-ия открытия карточки локации
     return (
@@ -152,7 +152,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
             otherClassName="shadow-block"
             location={location}
             onClose={() => setIsCardVisible(false)}
-            onReload={() => onReload()}
+            onReload={onReload}
             onDelete={deleteLocation}
           />
     )
@@ -170,6 +170,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
               setCurrentLocationId(locationId);
               setIsCardVisible(true);
             }}
+            title="Локации"
             locations={currentLocationsList}
             onClose={() => setIsLocationListVisible(false)}
             onReload={onReload}

@@ -13,12 +13,11 @@ import cors from 'cors'
 import jwt from'jsonwebtoken'
 const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 
-// const path = require('path');
-import path from 'path'
-// const fs = require('fs');
 import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
+import { deleteLocation, selectAllLocations } from './services/locations/location-service.js'
+import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 
 const app = express();
 // const app = 
@@ -78,12 +77,9 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 //---------------------------------------------- locations ---------------------------------------------- 
 
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-    connection.query(
-        `SELECT * FROM locations;`,
-        function(err, results, fields) {
-            res.send(results);  // отправка результата в ответ на запрос
-        }
-    );
+    selectAllLocations().then(response => {
+        res.send(response);  // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
@@ -169,56 +165,37 @@ app.put('/locations', function(req, res){ // обработка GET запрос
 });
 
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
-    removeDir(`./img/photo/locationphoto/${req.query.location_id}`);
-    connection.query(
-        `DELETE FROM locations_photos WHERE (location_id = '${req.query.location_id}');`, // удаление фотографии из БД
-        function(err, results, fields) {
-            if (err) res.status(500).send(err); // отправка ошибки, если она есть
-            connection.query(
-                `DELETE FROM users_locations WHERE (location_id = '${req.query.location_id}');`, // удаление связи между пользователем и локацией из БД
-                function(err, results, fields) {
-                    if (err) res.status(500).send(err); // отправка ошибки, если она есть
-                    connection.query(
-                        `DELETE FROM locations WHERE (location_id = '${req.query.location_id}');`, // удаление локации из БД
-                        function(err, results, fields) {
-                            if (err) {
-                                res.status(500).send(err); // отправка ошибки, если она есть
-                                return
-                            }
-                            res.send(err); // отправка пустого обхекта ошибок в ответ на запрос
-                        }
-                    ); 
-                }
-            );
-            
-        }
-    );
+    deleteLocation(req.query.location_id).then(response => {
+        res.send(response) // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 
 
 //---------------------------------------------- favorites locations ---------------------------------------------- 
 
-// app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-//     connection.query(
-//         `SELECT * FROM locations WHERE;`,
-//         function(err, results, fields) {
-//             res.send(results);  // отправка результата в ответ на запрос
-//         }
-//     );
-// });
+app.get('/locations/favorites', function(req, res){ // обработка GET запроса на выборку из таблицы favorites locations
+    selectFavourites(req.query.user_id).then(response => {
+        res.send(response);  // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
+});
+
+app.get('/locations/favorites/isexist', function(req, res) { // проверка наличия карточки в избранном у пользователя
+    favouriteIsExist(req.query.user_id, req.query.location_id).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
+});
 
 app.post('/locations/favorites', function(req, res){ // добавление локации в избранное
-    connection.query(
-        `INSERT INTO users_favourites_locations (user_id, location_id) VALUES ('${req.body.userId}', '${req.body.locationId}');`,
-        function(err, results, fields) {
-            if (err) {
-                res.send(err);
-                return;
-            }
-            res.send(results);
-        }
-    )
+    addFavourite(req.body.userId, req.body.locationId).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
+});
+
+app.delete('/locations/favorites', function(req, res){ // удаление локации из избранного
+    deleteFavourite(req.query.user_id, req.query.location_id).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 
@@ -328,23 +305,6 @@ function addPhotos(photos, path, status, locationId) { // ф-ия добавле
         );
     }
 }
-
-function removeDir(dir) { // ф-ия удалеения файлов 
-    let files = fs.readdirSync(dir)
-    for(var i=0;i<files.length;i++){
-      let newPath = path.join(dir,files[i]);
-      let stat = fs.statSync(newPath)
-      if(stat.isDirectory()){
-        // Если это папка, рекурсивно вниз
-        removeDir(newPath);
-      }else {
-       //Удалить файлы
-        fs.unlinkSync(newPath);
-      }
-    }
-    fs.rmdirSync(dir)// Если папка пуста, удаляем себя
-}
-
 
 function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
     connection.query(
