@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useCallback, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
-import FavoritesList from './components/FavoritesList/FavoritesList';
 import LocationCard from './components/LocationCard/LocationCard';
 import LocationForm from './components/LocationForm/LocationForm';
 import LocationList from './components/LocationList/LocationList';
@@ -71,31 +70,36 @@ function App() {
         console.log('delete');
     }).catch(err => console.log(err));
   });
-  const openLocationCard = useCallback((locationId) => {
+  const openLocationCard = useCallback((locationId) => { // ф-ия открытия карточки локации
     setCurrentLocationId(locationId);
     setIsLocationListVisible(false);
     setIsCardVisible(true);
   });
 
-
   const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
   const [locationListTitle, setLocationListTitle] = useState('Локации');  // стейт для заголовка списка локаций
   const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
-  const openLocationList = useCallback((filterLocations) => {
+  const openLocationList = useCallback((filterLocations) => { // ф-ия открытия списка
     setLocationListTitle('Локации');
     setCurrentLocationList(filterLocations);
     setIsCardVisible(false);
     setIsLocationListVisible(true);
   })
-  
-  const openFavoritesList = useCallback(() => { // ф-ия для откытия формы авторизации
+
+  const setFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
     const user = JSON.parse(localStorage.getItem('user'));
-    axios.get(`http://localhost:8000/locations/favorites?user_id=${user.user_id}`).then(res => {
-        console.log(res);
-        setLocationListTitle('Избранное');
-        setCurrentLocationList(res.data);
-        setIsCardVisible(false);
-        setIsLocationListVisible(true);
+    let response = await axios.get(`http://localhost:8000/locations/favorites?user_id=${user.user_id}`).then(res => {
+      console.log(res);
+      setCurrentLocationList(res.data);
+    }).catch(err => console.log(err));
+    return response;
+  })
+  
+  const openFavoritesList = useCallback(() => { // ф-ия открытия списка избранного
+    setFavoriteList().then(res => {
+      setLocationListTitle('Избранное');
+      setIsCardVisible(false);
+      setIsLocationListVisible(true);
     }).catch(err => console.log(err));
   });
 
@@ -107,7 +111,6 @@ function App() {
                 openLocationCard={openLocationCard} openLocationList={openLocationList} />
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
-        {/* { isOpenFavoritesList && <FavoritesList reload={isReload} onReload={onReload} onClickClose={closeFavoritesList}/> } */}
 
         { isCardVisible &&
           <LocationCard  
@@ -116,6 +119,7 @@ function App() {
             onClose={() => setIsCardVisible(false)}
             onReload={onReload}
             onDelete={deleteLocation}
+            setFavoriteList={(isLocationListVisible && locationListTitle === "Избранное")? setFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
           />
         } 
         { isLocationListVisible &&
