@@ -6,7 +6,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './LocationCard.css'
 
-const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete }) => {
+const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
     const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
@@ -58,14 +58,14 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     function addToFavorites(data) { // ф-ия добавления в "Избранное"
         axios.post(`http://localhost:8000/locations/favorites`, data).then(res => {
             setLocalReload(prev => !prev); // перезагрузка карточки
-            onReload();
+            if (setFavoriteList) setFavoriteList();  // обновление списка избранного, если он открыт
         }).catch(err => console.log(err));
     }
 
     function removeFromFavorites(data) { // ф-ия удаления из "Избранное"
         axios.delete(`http://localhost:8000/locations/favorites?user_id=${data.userId}&location_id=${data.locationId}`).then(res => {
             setLocalReload(prev => !prev); // перезагрузка карточки
-            onReload();
+            if (setFavoriteList) setFavoriteList();  // обновление списка избранного, если он открыт
         }).catch(err => console.log(err));
     }
 

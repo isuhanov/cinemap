@@ -9,16 +9,9 @@ import './BGMap.css';
 import LocationCard from '../LocationCard/LocationCard';
 import LocationList from '../LocationList/LocationList';
 
-const BGMap = memo(({ reload, onReload, markerPos }) => {
+const BGMap = memo(({ reload, onReload, markerPos, setLocations, openLocationCard, openLocationList }) => {
   const [map, setMap] = useState(null);  // стейт карты
   const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте
-  const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
-
-  const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
-  const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
-
-  const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
-  const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
 
   useEffect(() => {
     const id = setInterval(() => {  // интервал для регулярного обновления данных из БД (каждую минуту)
@@ -45,10 +38,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
         setLocations(res.data); // сохраняю данные
         // ----------- очищаю маркеры ------------------      
         for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
-          // const latlng = marker.getLatLng()
-          // if (!(res.data.find(location => latlng.lat === location.location_latitude && latlng.lng === location.location_longitude))) {
             map.removeLayer(marker);
-          // }
         }
         setMarkers([]);
         // ----------- очищаю маркеры ------------------
@@ -67,7 +57,6 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
           )
           
           const filterLocations = res.data.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
-          // console.log("filter " +  filterLocations);
           if (filterLocations.length > 1) {
             setMarkers(prevMarkers => { // добавляю маркера
               if (prevMarkers.find(prevMarker => (
@@ -80,14 +69,11 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
               } else {
                 map.addLayer(marker); 
                 marker.addEventListener('click', () => {
-                  setCurrentLocationList(filterLocations);
-                  setIsCardVisible(false);
-                  setIsLocationListVisible(true);
+                  openLocationList(filterLocations)
                 })
                 // ------ прикрепления маркера к карте ------
                 return [...prevMarkers, marker] // добавляю маркер в стейт массив
               }
-              // ------ прикрепления маркера к карте -----
             });
             continue;
           }
@@ -96,10 +82,7 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
             // ------ прикрепления маркера к карте ------
             map.addLayer(marker); 
             marker.addEventListener('click', () => {
-              console.log(currentLocationId);
-              setCurrentLocationId(location.location_id);
-              setIsLocationListVisible(false);
-              setIsCardVisible(true);
+              openLocationCard(location.location_id)
             })
             // ------ прикрепления маркера к карте ------
             return [...prevMarkers, marker] // добавляю маркер в стейт массив
@@ -130,52 +113,10 @@ const BGMap = memo(({ reload, onReload, markerPos }) => {
   }, [map, reload]);
   // }, [map, reload, isMapReload]);
 
-  function deleteLocation(locationId) { // ф-ия удаления 
-    // ----------------- закрываю все открытые карточки и списки -------------------------
-    setCurrentLocationId(0);
-    setCurrentLocationList([]);
-    setIsCardVisible(false);
-    setIsLocationListVisible(false);         
-    // ----------------- закрываю все открытые карточки и списки -------------------------
-
-    // удаление карточки
-    axios.delete(`http://localhost:8000/locations?location_id=${locationId}`).then(res => {
-        console.log(res);
-        onReload();
-        console.log('delete');
-    }).catch(err => console.log(err));
-  }
-
-  const openLocationCard = useCallback((location) => { // ф-ия открытия карточки локации
-    return (
-      <LocationCard  
-            otherClassName="shadow-block"
-            location={location}
-            onClose={() => setIsCardVisible(false)}
-            onReload={onReload}
-            onDelete={deleteLocation}
-          />
-    )
-  })
 
   return (
     <>
       <div id="map-container"></div>
-      { isCardVisible &&
-        openLocationCard(locations.find(location => location.location_id === currentLocationId))
-      } 
-      { isLocationListVisible &&
-        <LocationList 
-            openLocationCard={(locationId) => {
-              setCurrentLocationId(locationId);
-              setIsCardVisible(true);
-            }}
-            title="Локации"
-            locations={currentLocationsList}
-            onClose={() => setIsLocationListVisible(false)}
-            onReload={onReload}
-          />
-      } 
     </>
   );
 })
