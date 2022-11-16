@@ -1,12 +1,4 @@
-// const mysql = require("mysql2");
-import mysql from 'mysql2'
-
-const connection = mysql.createConnection({ // подключение к БД
-    host: 'localhost',
-    user: 'root',
-    password: 'mysqlTucNado21041911im',
-    database: 'cinemap'
-});
+import connection from "../db/db-service.js";
 
 async function selectFavourites(userId) {
     let response = await new Promise((resolve, reject) => {

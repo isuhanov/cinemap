@@ -16,7 +16,7 @@ const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
-import { deleteLocation, selectAllLocations } from './services/locations/location-service.js'
+import { addLocations, deleteLocation, selectAllLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 
 const app = express();
@@ -83,36 +83,9 @@ app.get('/locations', function(req, res){ // обработка GET запрос
 });
 
 app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
-    connection.query(
-        `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
-        VALUES ('${req.body.name}', '${req.body.filmName}', '${req.body.address}', '${req.body.latitude}', '${req.body.longitude}', '${req.body.route}', '${req.body.timing}');`,
-        function(err, results, fields) {
-            if (err) {
-                res.status(500).send(err); // отправка ошибки в ответ на запрос при неудачном добавлении локации
-                return
-            } 
-
-            // --------------- добавление фото -----------------------
-            fs.mkdir(`./img/photo/locationphoto/${results.insertId}`, (err) => console.log(err));
-            fs.mkdir(`./img/photo/locationphoto/${results.insertId}/film`, (err) => console.log(err));
-            fs.mkdir(`./img/photo/locationphoto/${results.insertId}/user`, (err) => console.log(err));
-            
-            let fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${results.insertId}/user/`, 'user', results.insertId); 
-            fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${results.insertId}/film/`, 'film', results.insertId);
-            // --------------- добавление фото -----------------------
-
-
-            // создание связи между пользователем и локацией
-            fail= insertUserLocation(req.body.userId, results.insertId);
-
-            if (fail) {
-                res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении 
-            } else {
-                res.send(results); // отправка результата в ответ на запрос
-            }
-
-        }
-    ); 
+    addLocations(req.body, req.files).then(response => {
+        res.send(response);  // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err));
 });
 
 app.put('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
@@ -269,50 +242,3 @@ app.get('/photos', function(req, res){ // обработка GET запроса 
 app.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
     console.log("Сервер запущен на 8000 порту");
 });
-
-
-
-// ------------------------------- functions ---------------------------------
-
-function addPhotos(photos, path, status, locationId) { // ф-ия добавления фото
-    let photoPath;
-    let photoName;
-    if (Array.isArray(photos)) {
-        for (const photo of photos) {
-            photoName = nanoid(10) + '.' + photo.name.split('.').pop();
-            photo.mv(path + photoName);
-            photoPath = `http://localhost:8000${path.slice(5)}${photoName}`;
-            connection.query(
-                `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
-                function(err, results, fields) {
-                    if (err) {
-                        return err;
-                    }
-                }
-            ); 
-        }
-    } else {
-        photoName = nanoid(10) + '.' + photos.name.split('.').pop();        
-        photos.mv(path + photoName);
-        photoPath = `http://localhost:8000${path.slice(5)}${photoName}`;
-        connection.query(
-            `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
-            function(err, results, fields) {
-                if (err) {
-                    return err;
-                }
-            }
-        );
-    }
-}
-
-function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
-    connection.query(
-        `INSERT INTO users_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
-        function(err, results, fields) {
-            if (err) {
-                return err;
-            }
-        }
-    )
-}

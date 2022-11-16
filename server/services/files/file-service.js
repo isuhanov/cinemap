@@ -2,7 +2,11 @@
 import path from 'path'
 // const fs = require('fs');
 import fs from 'fs'
+// const nanoid = require('nanoid')
+import { nanoid } from "nanoid";
+import connection from '../db/db-service.js';
 
+const API_PATH = 'http://localhost:8000';
 
 function removeDir(dir) { // ф-ия удалеения файлов 
     let files = fs.readdirSync(dir)
@@ -20,4 +24,47 @@ function removeDir(dir) { // ф-ия удалеения файлов
     fs.rmdirSync(dir)// Если папка пуста, удаляем себя
 }
 
-export { removeDir };
+function addPhotos(id, usersPhoto, filmsPhoto) {  // функция добавления фото
+  fs.mkdir(`./img/photo/locationphoto/${id}`, (err) => console.log(err));
+  fs.mkdir(`./img/photo/locationphoto/${id}/film`, (err) => console.log(err));
+  fs.mkdir(`./img/photo/locationphoto/${id}/user`, (err) => console.log(err));
+  
+  let fail = addPhotosToDir(usersPhoto, `./img/photo/locationphoto/${id}/user/`, 'user', id); 
+  fail = addPhotosToDir(filmsPhoto, `./img/photo/locationphoto/${id}/film/`, 'film', id);
+
+  return fail;
+}
+
+function addPhotosToDir(photos, path, status, locationId) { // ф-ия добавления фото в папку сервера
+  let photoPath;
+  let photoName;
+  if (Array.isArray(photos)) {
+      for (const photo of photos) {
+          photoName = nanoid(10) + '.' + photo.name.split('.').pop();
+          photo.mv(path + photoName);
+          photoPath = `${API_PATH}${path.slice(5)}${photoName}`;
+          connection.query(
+              `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
+              function(err, results, fields) {
+                  if (err) {
+                      return err;
+                  }
+              }
+          ); 
+      }
+  } else {
+      photoName = nanoid(10) + '.' + photos.name.split('.').pop();        
+      photos.mv(path + photoName);
+      photoPath = `${API_PATH}${path.slice(5)}${photoName}`;
+      connection.query(
+          `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
+          function(err, results, fields) {
+              if (err) {
+                  return err;
+              }
+          }
+      );
+  }
+}
+
+export { removeDir, addPhotos };
