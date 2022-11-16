@@ -5,9 +5,7 @@ import LocationIcon from '../../assets/place-marker.svg';
 
 import '../../App.css';
 import './BGMap.css';
-
-import LocationCard from '../LocationCard/LocationCard';
-import LocationList from '../LocationList/LocationList';
+import API_SERVER_PATH from '../../lib/api/api-path';
 
 const BGMap = memo(({ reload, onReload, markerPos, setLocations, openLocationCard, openLocationList }) => {
   const [map, setMap] = useState(null);  // стейт карты
@@ -34,7 +32,7 @@ const BGMap = memo(({ reload, onReload, markerPos, setLocations, openLocationCar
   useEffect(() => {
 
     async function fetchLocation() { // ф-ия выборки данных из БД
-      axios.get('http://localhost:8000/locations').then(res => {  // запрос на сервер для получения данных
+      axios.get(`${API_SERVER_PATH}/locations`).then(res => {  // запрос на сервер для получения данных
         setLocations(res.data); // сохраняю данные
         // ----------- очищаю маркеры ------------------      
         for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю

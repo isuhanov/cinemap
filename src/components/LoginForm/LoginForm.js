@@ -3,6 +3,7 @@ import axios from "axios";
 
 
 import './LoginForm.css';
+import API_SERVER_PATH from "../../lib/api/api-path";
 
 const LoginForm = memo(({ onClickClose, onLogin }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
@@ -43,7 +44,7 @@ const LoginForm = memo(({ onClickClose, onLogin }) => {
 
 
     function onClickAuth() { // ф-ия авторизации
-        axios.post(`http://localhost:8000/users/login?user_login=${login.value}&user_pass=${password.value}`).then(res => {
+        axios.post(`${API_SERVER_PATH}/users/login?user_login=${login.value}&user_pass=${password.value}`).then(res => {
             onLogin(res.data); // сохранение данных пользователя
             onClickClose(); // закрытие формы
         })

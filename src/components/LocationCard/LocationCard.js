@@ -4,6 +4,7 @@ import LocationForm from "../LocationForm/LocationForm";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
+import API_SERVER_PATH from "../../lib/api/api-path";
 import './LocationCard.css'
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList }) => {
@@ -26,17 +27,17 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
         const locationId =  location.location_id;
 
         setUser(null);
-        axios.get(`http://localhost:8000/users?location_id=${locationId}`).then(res => {
+        axios.get(`${API_SERVER_PATH}/users?location_id=${locationId}`).then(res => {
             setUser(u => res.data);
         })
         .catch(err => console.log(err));
 
-        axios.get(`http://localhost:8000/photos?location_id=${locationId}`).then(res => {
+        axios.get(`${API_SERVER_PATH}/photos?location_id=${locationId}`).then(res => {
             setLocationPhoto(res.data);
         }).catch(err => console.log(err));
 
         // if (user){
-            axios.get(`http://localhost:8000/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
+            axios.get(`${API_SERVER_PATH}/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
                 setIsFavorite(res.data);            
             }).catch(err => console.log(err));
         // }
@@ -56,14 +57,14 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     }
 
     function addToFavorites(data) { // ф-ия добавления в "Избранное"
-        axios.post(`http://localhost:8000/locations/favorites`, data).then(res => {
+        axios.post(`${API_SERVER_PATH}/locations/favorites`, data).then(res => {
             setLocalReload(prev => !prev); // перезагрузка карточки
             if (setFavoriteList) setFavoriteList();  // обновление списка избранного, если он открыт
         }).catch(err => console.log(err));
     }
 
     function removeFromFavorites(data) { // ф-ия удаления из "Избранное"
-        axios.delete(`http://localhost:8000/locations/favorites?user_id=${data.userId}&location_id=${data.locationId}`).then(res => {
+        axios.delete(`${API_SERVER_PATH}/locations/favorites?user_id=${data.userId}&location_id=${data.locationId}`).then(res => {
             setLocalReload(prev => !prev); // перезагрузка карточки
             if (setFavoriteList) setFavoriteList();  // обновление списка избранного, если он открыт
         }).catch(err => console.log(err));

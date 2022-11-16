@@ -6,6 +6,7 @@ import TimingInput from "../ui/TimingInput/TimingInput";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
 import './LocationForm.css';
+import API_SERVER_PATH from "../../lib/api/api-path";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
@@ -275,7 +276,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
             formData.append(key, data[key]);
         }
 
-        axios.post(`http://localhost:8000/locations`, formData).then(response => {
+        axios.post(`${API_SERVER_PATH}/locations`, formData).then(response => {
             console.log(response);
             moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
             onClickClose(); // закрытие формы при удачном добавлении
@@ -298,7 +299,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         const deletePhotos = locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
             formData.append('deletePhotos', JSON.stringify(deletePhotos));
 
-        axios.put(`http://localhost:8000/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
+        axios.put(`${API_SERVER_PATH}/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
             console.log(response);
             onClickClose(); // закрытие формы при удачном добавлении
             onReload(); // обновляю карту

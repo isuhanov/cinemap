@@ -9,6 +9,7 @@ import LoginForm from './components/LoginForm/LoginForm';
 import Profile from './components/Profile/Profile';
 import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
+import API_SERVER_PATH from './lib/api/api-path';
 
 function App() {
   const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы авторизации
@@ -64,7 +65,7 @@ function App() {
     // ------------------------------------------------------------------------------------
 
     // удаление карточки
-    axios.delete(`http://localhost:8000/locations?location_id=${locationId}`).then(res => {
+    axios.delete(`${API_SERVER_PATH}/locations?location_id=${locationId}`).then(res => {
         console.log(res);
         onReload();
         console.log('delete');
@@ -88,7 +89,7 @@ function App() {
 
   const setFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
     const user = JSON.parse(localStorage.getItem('user'));
-    let response = await axios.get(`http://localhost:8000/locations/favorites?user_id=${user.user_id}`).then(res => {
+    let response = await axios.get(`${API_SERVER_PATH}/locations/favorites?user_id=${user.user_id}`).then(res => {
       console.log(res);
       setCurrentLocationList(res.data);
     }).catch(err => console.log(err));
