@@ -228,6 +228,7 @@ body {
   color: white;
 }
 
+
 /* ------------------------------ form --------------------------------------- */
 
 .form-conrainer {
@@ -272,4 +273,85 @@ body {
   font-size: 13px;
   background-color: rgba(221, 235, 255, 1);
   resize: none;
+}
+
+
+/* ------------------------------ show/hide animations --------------------------------------- */
+
+.showed-card {
+  animation:  show-card .6s ease-in-out;
+}
+
+.hided-card {
+  animation: hide-card .6s ease-in-out normal;
+}
+
+@keyframes show-card {
+  from {
+      transform: translateY(100%);
+      opacity: 0;
+  }
+  to {
+      transform: translateY(0);
+      opacity: 1;
+  }
+}
+
+@keyframes hide-card {
+  from {transform: translateY(0px);}
+  to {
+      transform: translateY(100%);
+      opacity: 0;
+  }
+}
+
+
+.showed-form {
+  perspective-origin: center;
+  perspective: 900px; 
+  animation: show-form-fon .9s ease-in-out;
+}
+
+.showed-form .form {
+  animation: show-form .9s ease-in-out;
+}
+
+.hided-form {
+  animation: hide-form-fon .6s ease-in-out;
+}
+
+.hided-form .form {
+  animation: hide-form .6s ease-in-out;
+}
+
+@keyframes show-form {
+  from {
+      transform: rotateX(90deg) translateZ(150px);
+      opacity: 0;
+  }
+  to {
+      transform: rotateX(0deg);
+      opacity: 1;
+  }
+}
+
+@keyframes show-form-fon {
+  from {background-color: rgba(0, 0, 0, 0); }
+  to {background-color: rgba(0, 0, 0, 0.79); }
+}
+
+@keyframes hide-form {
+  from {
+      transform: translateY(0);
+      opacity: 1;
+  }
+  to {
+      transform: translateY(100%);
+      opacity: 0;
+  }
+}
+
+@keyframes hide-form-fon {
+  from {background-color: rgba(0, 0, 0, 0.79); }
+  to {background-color: rgba(0, 0, 0, 0); }
 }

@@ -8,6 +8,8 @@ import API_SERVER_PATH from "../../lib/api/api-path";
 import './LocationCard.css'
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList }) => {
+    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
+
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
     const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
@@ -73,7 +75,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
 
     return (
         <>
-        <div className={`location-card ${otherClassName}`}>
+        <div className={`location-card ${otherClassName} ${isHide ? 'hided-card' : 'showed-card'}`}>
             <header className="location-card__header header-card">
                 <p className="location-card-title title">
                     { location.location_name }
@@ -86,7 +88,12 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                         </span>
                     </button>
                 }
-                    <button className="header-btn" onClick={onClose}>
+                    <button className="header-btn" onClick={() => {
+                        setIsHide(true);
+                        setTimeout(() => {
+                            onClose();
+                        }, 600);
+                    }}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>

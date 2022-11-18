@@ -9,6 +9,8 @@ import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker }) => {
+    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
+    
     // -------------------- ссылка на родительские блоки полей -------------------
     const namesParentRef = useRef();
     const filmNamesParentRef = useRef();
@@ -17,7 +19,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
     const timingParentRef = useRef();
     const filmsPhotoParentRef = useRef();
     const usersParentRef = useRef();
-    // -------------------- ссылка на родительские блоки полей -------------------
+    // ----------------------------------------------------------------------------
 
     // стейт для хранения данных фотографий из карточки локации (при открытии формы изменения)
     const [locationPhotos, setLocationPhoto] = useState(location ? 
@@ -402,14 +404,19 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
 
     return (
-        <div className="location-form-container form-conrainer">
+        <div className={`location-form-container form-conrainer ${isHide ? 'hided-form' : 'showed-form'}`}>
             <div className="location-form form">
                 <header className="location-form__header header-card">
                     <p className="location-form-title title">
                         { isUpdate ?  'Редактирование локации:' : 'Добавление локации:'}
                     </p>
                     <div className="header-btn-container">
-                        <button className="header-btn" onClick={ onClickClose }>
+                        <button className="header-btn" onClick={() => {
+                            setIsHide(true);
+                            setTimeout(() => {
+                                onClickClose();
+                            }, 600);
+                        }}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>

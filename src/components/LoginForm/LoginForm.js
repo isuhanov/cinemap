@@ -6,10 +6,12 @@ import './LoginForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 
 const LoginForm = memo(({ onClickClose, onLogin }) => {
+    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
+
     // -------------------- ссылка на родительские блоки полей -------------------
     const loginParentRef = useRef();
     const passwordParentRef = useRef();
-    // -------------------- ссылка на родительские блоки полей -------------------
+    // ---------------------------------------------------------------------------
 
     const onLoginChange = (login) => { // обработка значения поля login
         setLogin(prev => ({
@@ -52,14 +54,19 @@ const LoginForm = memo(({ onClickClose, onLogin }) => {
     }
     
     return (
-        <div className="login-form-conrainer form-conrainer">
+        <div className={`login-form-conrainer form-conrainer ${isHide ? 'hided-form' : 'showed-form'}`}>
             <div className="login-form  form">
                 <header className="login-form__header header-card">
                     <p className="login-form-title title">
                         Авторизация
                     </p>
                     <div className="header-btn-container">
-                        <button className="header-btn" onClick={ onClickClose }>
+                        <button className="header-btn" onClick={ () => {
+                            setIsHide(true);
+                            setTimeout(() => {
+                                onClickClose();
+                            }, 600);
+                        }}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>
