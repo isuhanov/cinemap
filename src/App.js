@@ -56,6 +56,7 @@ function App() {
 
   const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
   const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
+  const [hideClass, setHideClass] = useState('');
   const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
     // ----------------- закрываю все открытые карточки и списки -------------------------
     setCurrentLocationId(0);
@@ -72,18 +73,38 @@ function App() {
     }).catch(err => console.log(err));
   });
   const openLocationCard = useCallback((locationId) => { // ф-ия открытия карточки локации
-    setCurrentLocationId(locationId);
-    setIsLocationListVisible(false);
-    setIsCardVisible(true);
+    if (currentLocationId === 0) {
+      showCard(locationId);
+      onReload();
+    } else{
+      setHideClass('hided-card');  
+      setTimeout(() => {
+        showCard(locationId);
+      }, 600);
+    }
+    setIsLocationListVisible(false);  
   });
+  const closeLocationCard = useCallback(() => {
+    setHideClass('hided-card');  
+      setTimeout(() => {
+        setIsCardVisible(false);
+        setCurrentLocationId(0);
+      }, 600);
+  });
+
+  function showCard(locationId) {
+    setCurrentLocationId(locationId);
+    setIsCardVisible(true);
+    setHideClass('showed-card');  
+  }
 
   const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
   const [locationListTitle, setLocationListTitle] = useState('Локации');  // стейт для заголовка списка локаций
   const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
   const openLocationList = useCallback((filterLocations) => { // ф-ия открытия списка
+    closeLocationCard();
     setLocationListTitle('Локации');
     setCurrentLocationList(filterLocations);
-    setIsCardVisible(false);
     setIsLocationListVisible(true);
   })
 
@@ -98,8 +119,8 @@ function App() {
   
   const openFavoritesList = useCallback(() => { // ф-ия открытия списка избранного
     setFavoriteList().then(res => {
+      closeLocationCard();
       setLocationListTitle('Избранное');
-      setIsCardVisible(false);
       setIsLocationListVisible(true);
     }).catch(err => console.log(err));
   });
@@ -115,9 +136,11 @@ function App() {
 
         { isCardVisible &&
           <LocationCard  
-            otherClassName="shadow-block"
+            otherClassName={`shadow-block ${hideClass}`}
             location={locations.find(location => location.location_id === currentLocationId)}
-            onClose={() => setIsCardVisible(false)}
+            onClose={() => {
+              closeLocationCard();
+            }}
             onReload={onReload}
             onDelete={deleteLocation}
             setFavoriteList={(isLocationListVisible && locationListTitle === "Избранное")? setFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
@@ -125,10 +148,7 @@ function App() {
         } 
         { isLocationListVisible &&
           <LocationList 
-              openLocationCard={(locationId) => {
-                setCurrentLocationId(locationId);
-                setIsCardVisible(true);
-              }}
+              openLocationCard={showCard}
               title={locationListTitle}
               locations={currentLocationsList}
               onClose={() => setIsLocationListVisible(false)}

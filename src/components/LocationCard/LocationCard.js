@@ -38,11 +38,10 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
             setLocationPhoto(res.data);
         }).catch(err => console.log(err));
 
-        // if (user){
-            axios.get(`${API_SERVER_PATH}/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
-                setIsFavorite(res.data);            
-            }).catch(err => console.log(err));
-        // }
+        axios.get(`${API_SERVER_PATH}/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
+            setIsFavorite(res.data);            
+        }).catch(err => console.log(err));
+
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
@@ -72,10 +71,9 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
         }).catch(err => console.log(err));
     }
 
-
     return (
         <>
-        <div className={`location-card ${otherClassName} ${isHide ? 'hided-card' : 'showed-card'}`}>
+        <div className={`location-card ${otherClassName}`}>
             <header className="location-card__header header-card">
                 <p className="location-card-title title">
                     { location.location_name }
@@ -89,10 +87,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                     </button>
                 }
                     <button className="header-btn" onClick={() => {
-                        setIsHide(true);
-                        setTimeout(() => {
-                            onClose();
-                        }, 600);
+                        onClose();
                     }}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
