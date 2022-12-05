@@ -93,35 +93,58 @@ function App() {
   });
 
   function showCard(locationId) {
+    // debugger;
     setCurrentLocationId(locationId);
-    setIsCardVisible(true);
+    closeLocationList();
     setHideClass('showed-card');  
+    setIsCardVisible(true);
   }
 
   const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
   const [locationListTitle, setLocationListTitle] = useState('Локации');  // стейт для заголовка списка локаций
+  const [hideListClass, setHideListClass] = useState('');
   const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
-  const openLocationList = useCallback((filterLocations) => { // ф-ия открытия списка
-    closeLocationCard();
-    setLocationListTitle('Локации');
-    setCurrentLocationList(filterLocations);
-    setIsLocationListVisible(true);
+  const openLocationList = useCallback((filterLocations, title = 'Локации') => { // ф-ия открытия списка
+    if (currentLocationsList.length === 0) {
+      showList(filterLocations, title);
+      onReload();
+    } else{
+      setHideListClass('hided-card');  
+      setTimeout(() => {
+        showList(filterLocations, title);
+      }, 600);
+    }
   })
 
-  const setFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
+  const closeLocationList = useCallback(() => {
+    setHideListClass('hided-card');  
+      setTimeout(() => {
+        setIsLocationListVisible(false);
+        setCurrentLocationList([]);
+      }, 600);
+  });  
+
+  function showList(filterLocations, title) {
+    setCurrentLocationList(filterLocations);
+    closeLocationCard();
+    setHideListClass('showed-card');  
+    setLocationListTitle(title);
+    setIsLocationListVisible(true);
+  }
+
+  const getFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
     const user = JSON.parse(localStorage.getItem('user'));
-    let response = await axios.get(`${API_SERVER_PATH}/locations/favorites?user_id=${user.user_id}`).then(res => {
-      console.log(res);
-      setCurrentLocationList(res.data);
-    }).catch(err => console.log(err));
+    let response = await axios.get(`${API_SERVER_PATH}/locations/favorites?user_id=${user.user_id}`)
+                              .then(res => {
+                                  setCurrentLocationList(res.data);
+                                  return res.data})
+                              .catch(err => console.log(err));
     return response;
   })
   
   const openFavoritesList = useCallback(() => { // ф-ия открытия списка избранного
-    setFavoriteList().then(res => {
-      closeLocationCard();
-      setLocationListTitle('Избранное');
-      setIsLocationListVisible(true);
+    getFavoriteList().then(res => {
+      openLocationList(res, 'Избранное');
     }).catch(err => console.log(err));
   });
 
@@ -143,15 +166,16 @@ function App() {
             }}
             onReload={onReload}
             onDelete={deleteLocation}
-            setFavoriteList={(isLocationListVisible && locationListTitle === "Избранное")? setFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
+            setFavoriteList={(isLocationListVisible && locationListTitle === "Избранное")? getFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
           />
         } 
         { isLocationListVisible &&
           <LocationList 
               openLocationCard={showCard}
+              otherClassName={hideListClass}
               title={locationListTitle}
               locations={currentLocationsList}
-              onClose={() => setIsLocationListVisible(false)}
+              onClose={() => closeLocationList()}
               onReload={onReload}
             />
         } 
