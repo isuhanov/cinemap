@@ -160,16 +160,27 @@ function App() {
   });
 
 
+
+  const [isOpenProfileCard, setIsOpenProfileCard] = useState(false);// стейт состояния карточки профиля
+  const openProfileCard = useCallback(() => { // ф-ия для откытия карточки профиля
+    setIsOpenProfileCard(true);
+  });
+  const closeProfileCard = useCallback(() => { // ф-ия для закрытия карточки профиля
+    setIsOpenProfileCard(false);
+  });
+  const [profileUser, setProfileUser] = useState(JSON.parse(localStorage.getItem('user')));
+
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
                 onReload={onReload} setLocations={setLocations} 
                 openLocationCard={openLocationCard} openLocationList={openLocationList} />
+                
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
         { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
 
-        {/* <RegisterForm /> */}
+        { isOpenProfileCard && <ProfileCard user={profileUser} onClickClose={closeProfileCard} /> }
 
         { isCardVisible &&
           <LocationCard  
@@ -194,13 +205,12 @@ function App() {
             />
         } 
 
-        <ProfileCard />
-
 
         <div className="container">
           <div className="profile-block">
             <Profile user={JSON.parse(localStorage.getItem('user'))} onLogoutClick={logoutUser} 
-                    onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}/>
+                    onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}
+                    onClickOpenProfileCard={openProfileCard}/>
           </div>
           <div className="search-input-block">
             <SearchInput onReload={onReload}/>  
