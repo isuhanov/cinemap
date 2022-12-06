@@ -180,7 +180,12 @@ function App() {
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
         { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
 
-        { isOpenProfileCard && <ProfileCard user={profileUser} onClickClose={closeProfileCard} /> }
+        { isOpenProfileCard && <ProfileCard user={profileUser} 
+                                            onClickOpenLocation={(locationId, coordMarker) => {
+                                              openLocationCard(locationId);
+                                              moveToMarker(coordMarker);
+                                            }} 
+                                            onClickClose={closeProfileCard} /> }
 
         { isCardVisible &&
           <LocationCard  

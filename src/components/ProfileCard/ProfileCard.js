@@ -6,7 +6,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ProfileCard.css';
 
-const ProfileCard = memo(({ user, onClickClose }) => {
+const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation }) => {
     const [locations, setLocations] = useState([]);
 
     useEffect(() => {
@@ -61,7 +61,10 @@ const ProfileCard = memo(({ user, onClickClose }) => {
                                         <button className="header-btn">
                                             <span className="material-symbols-outlined">bookmark</span>
                                         </button>
-                                        <button className="header-btn">
+                                        <button className="header-btn" onClick={() =>{
+                                                    onClickOpenLocation(location.location_id, [location.location_latitude, location.location_longitude]);
+                                                    onClickClose();
+                                                }}>
                                             <span className="material-symbols-outlined">pin_drop</span>
                                         </button>
                                     </div>
