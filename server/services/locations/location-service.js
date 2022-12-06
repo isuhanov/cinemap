@@ -2,7 +2,7 @@ import connection from '../db/db-service.js';
 import { deleteAllFavourites } from '../favourites-locations/favourites-location-service.js';
 import { addPhotos, removeDir } from '../files/file-service.js';
 
-async function selectAllLocations() {
+async function selectAllLocations() { // ф-ия поиска всех локаций
     let response = await new Promise((resolve, reject) => {
         connection.query(
             `SELECT * FROM locations;`,
@@ -15,7 +15,30 @@ async function selectAllLocations() {
     return response;
 }
 
-async function addLocations(body, files) {
+async function selectSearchLocations(params) { // ф-ия фильтрации локаций
+    let response = await new Promise((resolve, reject) => {
+        let query = 'SELECT * FROM locations WHERE ';
+        for (const key in params) { // составляю запрос, если есть параметры
+            query += query.slice(-6) === 'WHERE ' ? '' : ' AND ';
+            if (key === 'name') query += `LOWER(location_name) LIKE '%${params.name.toLowerCase()}%'`;
+            else if (key === 'film') query += `LOWER(location_film) LIKE '%${params.film.toLowerCase()}%'`;
+            else if (key === 'country') query += (`LOWER(location_address) LIKE '%${params.country.toLowerCase()}%'`);
+            else if (key === 'city') query += (`LOWER(location_address) LIKE '%${params.city.toLowerCase()}%'`);
+        }
+        query += ';';
+
+        connection.query( // получаю данные из БД
+            query,            
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
+
+async function addLocations(body, files) { // ф-ия добавления локации
     let response = await new Promise((resolve, reject) => {
         connection.query(
             `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
@@ -24,7 +47,7 @@ async function addLocations(body, files) {
                 if (err) {
                     reject(err);
                 } else {
-                    let fail = addPhotos(results.insertId, files.usersPhoto, files.filmsPhoto);
+                    let fail = addPhotos(results.insertId, files.usersPhoto, files.filmsPhoto); // добавление картинок
         
                     // создание связи между пользователем и локацией
                     fail = insertUserLocation(body.userId, results.insertId);
@@ -41,8 +64,8 @@ async function addLocations(body, files) {
     return response;
 }
 
-async function deleteLocation(locationId) {
-    removeDir(`./img/photo/locationphoto/${locationId}`);
+async function deleteLocation(locationId) { // ф-ия удаления локации
+    removeDir(`./img/photo/locationphoto/${locationId}`); // удаление папки с фотографиями
     let response = await new Promise((resolve, reject) => {
         connection.query(
             `DELETE FROM locations_photos WHERE (location_id = '${locationId}');`, // удаление фотографии из БД
@@ -84,4 +107,4 @@ function insertUserLocation(userId, locationId) { // ф-ия создания с
 }
 
 
-export { selectAllLocations, addLocations, deleteLocation };
+export { selectAllLocations, selectSearchLocations, addLocations, deleteLocation };

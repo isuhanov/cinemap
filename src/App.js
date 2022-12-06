@@ -7,6 +7,7 @@ import LocationForm from './components/LocationForm/LocationForm';
 import LocationList from './components/LocationList/LocationList';
 import LoginForm from './components/LoginForm/LoginForm';
 import Profile from './components/Profile/Profile';
+import RegisterForm from './components/RegisterForm/RegisterForm';
 import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
 import API_SERVER_PATH from './lib/api/api-path';
@@ -48,6 +49,15 @@ function App() {
   const onReload = useCallback(() => { // ф-ия для обновления
     setIsReload(prev => !prev);
     console.log('reload');
+  });
+
+  
+  const [isOpenRegisterForm, setIsOpenRegisterForm] = useState(false);// стейт состояния формы регистрации
+  const openRegisterForm = useCallback(() => { // ф-ия для откытия формы регистрации
+    setIsOpenRegisterForm(true);
+  });
+  const closeRegisterForm = useCallback(() => { // ф-ия для закрытия формы регистрации
+    setIsOpenRegisterForm(false);
   });
   
 
@@ -156,6 +166,9 @@ function App() {
                 openLocationCard={openLocationCard} openLocationList={openLocationList} />
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
+        { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
+
+        {/* <RegisterForm /> */}
 
         { isCardVisible &&
           <LocationCard  
@@ -183,10 +196,11 @@ function App() {
 
         <div className="container">
           <div className="profile-block">
-            <Profile user={JSON.parse(localStorage.getItem('user'))} onLogoutClick={logoutUser} onClickOpenLoginForm={openLoginForm}/>
+            <Profile user={JSON.parse(localStorage.getItem('user'))} onLogoutClick={logoutUser} 
+                    onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}/>
           </div>
           <div className="search-input-block">
-            <SearchInput />  
+            <SearchInput onReload={onReload}/>  
           </div>
           <div className="side-bar-block">
             <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}/>
