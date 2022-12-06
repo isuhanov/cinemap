@@ -67,4 +67,12 @@ function addPhotosToDir(photos, path, status, locationId) { // ф-ия доба�
   }
 }
 
-export { removeDir, addPhotos };
+function addUserPhoto(photo, path) { // ф-ия добавления фотографий пользователя в папке сервера
+    fs.mkdir(path, (err) => console.log(err)); // создание директории
+    let photoName = nanoid(10) + '.' + photo.name.split('.').pop();        
+    photo.mv(path + photoName); // добавление фото
+    let photoPath = `${API_PATH}${path.slice(1)}${photoName}`; // сохранение ссылки на фото
+    return photoPath;
+}
+
+export { removeDir, addPhotos, addUserPhoto };

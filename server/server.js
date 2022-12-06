@@ -18,6 +18,7 @@ import fs from 'fs'
 import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
+import { addUser } from './services/users/user-service.js'
 
 const app = express();
 // const app = 
@@ -222,6 +223,12 @@ app.post('/users/login', function(req, res) { // обработка запрос
             }
         );
     }
+});
+
+app.post('/users/registration', function(req, res) {
+    addUser(req.body, req.files.photo).then(response => {
+        res.send(response); // отправка результата в ответ на запрос
+    }).catch(err => res.status(500).send(err)); 
 });
 
 
