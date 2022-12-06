@@ -97,8 +97,8 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                 <p className="location-card__film">
                     { location.location_film }
                 </p>
-                <div className="location-route">
-                    <p className="location-route__subtitle subtitle">
+                <div className="location-address">
+                    <p className="location-address__subtitle subtitle">
                         Адрес:
                     </p>
                     <p className="location-card__address">
@@ -111,7 +111,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                     <p className="location-route__subtitle subtitle">
                         Как пройти:
                     </p>
-                    <p className="location-route__text">
+                    <p className="location-route__text blue-fon-text">
                         { location.location_route }                    
                     </p>
                 </div>

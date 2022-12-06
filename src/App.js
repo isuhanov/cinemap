@@ -7,6 +7,7 @@ import LocationForm from './components/LocationForm/LocationForm';
 import LocationList from './components/LocationList/LocationList';
 import LoginForm from './components/LoginForm/LoginForm';
 import Profile from './components/Profile/Profile';
+import ProfileCard from './components/ProfileCard/ProfileCard';
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
@@ -192,6 +193,8 @@ function App() {
               onReload={onReload}
             />
         } 
+
+        <ProfileCard />
 
 
         <div className="container">

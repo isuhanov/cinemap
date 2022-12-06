@@ -33,15 +33,6 @@
     font-size: 13px;
 }
 
-.location-route__text {
-    width: 100%;
-    min-height: 70px;
-    background-color: rgba(221, 235, 255, 1);
-    border-radius: 7px;
-    padding: 6px;
-    font-size: 12px;
-}
-
 .location-creator__profile {
     display: flex;
     flex-direction: row;

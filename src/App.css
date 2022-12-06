@@ -49,6 +49,15 @@ body {
   font-size: 14px;
 }
 
+.blue-fon-text {
+  width: 100%;
+  min-height: 70px;
+  background-color: rgba(221, 235, 255, 1);
+  border-radius: 7px;
+  padding: 10px;
+  font-size: 12px;
+}
+
 
 /* ------------------------------ main layout --------------------------------------- */
 
