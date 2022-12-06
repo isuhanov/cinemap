@@ -32,7 +32,9 @@ const BGMap = memo(({ reload, onReload, markerPos, setLocations, openLocationCar
   useEffect(() => {
 
     async function fetchLocation() { // ф-ия выборки данных из БД
-      axios.get(`${API_SERVER_PATH}/locations`).then(res => {  // запрос на сервер для получения данных
+      axios.get(`${API_SERVER_PATH}/locations?city=Москва`).then(res => {  // запрос на сервер для получения данных
+      // axios.get(`${API_SERVER_PATH}/locations?film=Гарри Поттер и философский камень`).then(res => {  // запрос на сервер для получения данных
+      // axios.get(`${API_SERVER_PATH}/locations`).then(res => {  // запрос на сервер для получения данных
         setLocations(res.data); // сохраняю данные
         // ----------- очищаю маркеры ------------------      
         for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю

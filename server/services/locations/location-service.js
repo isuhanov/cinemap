@@ -15,6 +15,30 @@ async function selectAllLocations() {
     return response;
 }
 
+async function selectSearchLocations(params) {
+    let response = await new Promise((resolve, reject) => {
+        let query = 'SELECT * FROM locations WHERE ';
+        for (const key in params) {
+            query += query.slice(-6) === 'WHERE ' ? '' : ', ';
+            if (key === 'name') query += `LOWER(location_name) = '${params.name.toLowerCase()}'`;
+            else if (key === 'film') query += `LOWER(location_film) = '${params.film.toLowerCase()}'`;
+            else if (key === 'country') query += (`LOWER(location_address) LIKE '%${params.country.toLowerCase()}%'`);
+            else if (key === 'city') query += (`LOWER(location_address) LIKE '%${params.city.toLowerCase()}%'`);
+        }
+        query += ';';
+        console.log(query);
+        connection.query(
+            query,            
+            function(err, results, fields) {
+                console.log(err);
+                if (err) reject(err);
+                else resolve(results); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
+
 async function addLocations(body, files) {
     let response = await new Promise((resolve, reject) => {
         connection.query(
@@ -84,4 +108,4 @@ function insertUserLocation(userId, locationId) { // ф-ия создания с
 }
 
 
-export { selectAllLocations, addLocations, deleteLocation };
+export { selectAllLocations, selectSearchLocations, addLocations, deleteLocation };
