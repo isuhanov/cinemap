@@ -200,7 +200,7 @@ function App() {
                     onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}/>
           </div>
           <div className="search-input-block">
-            <SearchInput />  
+            <SearchInput onReload={onReload}/>  
           </div>
           <div className="side-bar-block">
             <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}/>

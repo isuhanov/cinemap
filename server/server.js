@@ -78,7 +78,7 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 //---------------------------------------------- locations ---------------------------------------------- 
 
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-    if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций
+    if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
         selectAllLocations().then(response => {
             res.send(response);  // отправка результата в ответ на запрос
         }).catch(err => res.status(500).send(err));
