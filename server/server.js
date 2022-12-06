@@ -16,7 +16,7 @@ const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
-import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations } from './services/locations/location-service.js'
+import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 import { addUser } from './services/users/user-service.js'
 
@@ -78,7 +78,11 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 //---------------------------------------------- locations ---------------------------------------------- 
 
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-    if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
+    if (req.query.user_id) {
+        selectUsersLocations(req.query.user_id).then(response => {
+            res.send(response);  // отправка результата в ответ на запрос
+        }).catch(err => res.status(500).send(err));
+    } else if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
         selectAllLocations().then(response => {
             res.send(response);  // отправка результата в ответ на запрос
         }).catch(err => res.status(500).send(err));

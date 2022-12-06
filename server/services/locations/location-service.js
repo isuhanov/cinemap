@@ -97,6 +97,20 @@ async function deleteLocation(locationId) { // ф-ия удаления лока
 }
 
 
+async function selectUsersLocations(userId) {
+    let response = await new Promise((resolve, reject) => {
+        connection.query( // получаю данные из БД
+            `SELECT * FROM locations l INNER JOIN users_locations ul ON l.location_id = ul.location_id INNER JOIN users u ON ul.user_id = u.user_id WHERE u.user_id = ${userId};`,            
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results); // отправка результата в ответ на запрос
+            }
+        ) 
+    });
+    return response
+}
+
+
 function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
     connection.query(
         `INSERT INTO users_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
@@ -107,4 +121,4 @@ function insertUserLocation(userId, locationId) { // ф-ия создания с
 }
 
 
-export { selectAllLocations, selectSearchLocations, addLocations, deleteLocation };
+export { selectAllLocations, selectSearchLocations, addLocations, deleteLocation, selectUsersLocations };
