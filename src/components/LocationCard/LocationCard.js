@@ -7,7 +7,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 import API_SERVER_PATH from "../../lib/api/api-path";
 import './LocationCard.css'
 
-const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList }) => {
+const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
     const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
 
     const [user, setUser] = useState(null); // стейт для создателя карточки
@@ -121,7 +121,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                         Сделано:
                     </p>
                     { user && 
-                        <div className="location-creator__profile">
+                        <div className="location-creator__profile" onClick={() => openUser(user)}>
                             <p className="creator__profile-username">
                                 { `${user.user_surname} ${user.user_name}`  }
                             </p>

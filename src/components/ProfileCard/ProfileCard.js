@@ -47,7 +47,7 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation }) => {
 
                 <div className="profile-card__locations">
                     <div className="profile-card__locations-wrapper">
-                        { locations && locations.map(location => {
+                        { locations.length > 0 ? locations.map(location => {
                             return (
                                 <div key={location.location_id} className="profile-card__location-item blue-fon-text">
                                     <div className="profile-card__location-text">
@@ -70,7 +70,8 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation }) => {
                                     </div>
                                 </div>
                             );
-                        }) }
+                        }) :
+                            'К сожалению здесь пока нет записей :(' }
                     </div>
 
                 </div>

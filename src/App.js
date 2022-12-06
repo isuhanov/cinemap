@@ -161,14 +161,16 @@ function App() {
 
 
 
-  const [isOpenProfileCard, setIsOpenProfileCard] = useState(false);// стейт состояния карточки профиля
-  const openProfileCard = useCallback(() => { // ф-ия для откытия карточки профиля
+  const [isOpenProfileCard, setIsOpenProfileCard] = useState(false); // стейт состояния карточки профиля
+  const [profileUser, setProfileUser] = useState(undefined); // стейт для пользователя профиля
+  const openProfileCard = useCallback((user) => { // ф-ия для откытия карточки профиля
+    setProfileUser(user);
     setIsOpenProfileCard(true);
   });
   const closeProfileCard = useCallback(() => { // ф-ия для закрытия карточки профиля
+    setProfileUser(undefined);
     setIsOpenProfileCard(false);
   });
-  const [profileUser, setProfileUser] = useState(JSON.parse(localStorage.getItem('user')));
 
   return (
       <div className="App">
@@ -179,7 +181,6 @@ function App() {
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
         { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
         { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
-
         { isOpenProfileCard && <ProfileCard user={profileUser} 
                                             onClickOpenLocation={(locationId, coordMarker) => {
                                               openLocationCard(locationId);
@@ -194,6 +195,7 @@ function App() {
             onClose={() => {
               closeLocationCard();
             }}
+            openUser={openProfileCard}
             onReload={onReload}
             onDelete={deleteLocation}
             setFavoriteList={(isLocationListVisible && locationListTitle === "Избранное")? getFavoriteList : undefined} // если открыт список избранного, то передать ф-ия

@@ -21,7 +21,7 @@ const Profile = memo(({ user, onClickOpenLoginForm, onLogoutClick, onClickOpenRe
                             <ul>
                                 { user ? 
                                     <>
-                                        <li onClick={onClickOpenProfileCard} className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
+                                        <li onClick={() => onClickOpenProfileCard(JSON.parse(localStorage.getItem('user')))} className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
                                         <li onClick={onLogoutClick} className="profile__menu__item menu-item">Выход<span className="material-symbols-outlined">logout</span></li>
                                     </>
                                     :
