@@ -1,29 +1,28 @@
 function openCard(data, setClass, showClassName, hideClassName,  setCurrent, setIsVisible, onReload, current=0, hideOtherCard=undefined) { // ф-ия открытия карточки локации
     console.log(`current = ${current}`);
     if (current === 0) {
-      showCard(data, setCurrent, setClass, showClassName, setIsVisible, hideOtherCard);
+      showCard(setClass, showClassName, setIsVisible, data, setCurrent ,hideOtherCard);
       onReload();
     } else {
       setClass(hideClassName);  
       setTimeout(() => {
-        showCard(data, setCurrent, setClass, showClassName, setIsVisible);
+        showCard(setClass, showClassName ,setIsVisible, data, setCurrent);
       }, 500);
     }
 };
 
-const closeCard = (setClass, className, setIsVisible, setCurrent, data, onReload) => {
+const closeCard = (setClass, className, setIsVisible, animationDuration, onReload, data=undefined, setCurrent=undefined) => {
     setClass(className);  
     setTimeout(() => {
         setIsVisible(false);
-        setCurrent(data);
+        data && setCurrent(data);
         onReload();
-    }, 600);
+    }, animationDuration);
 };
 
-function showCard(data, setCurrent, setClass, className, setIsVisible, hideOtherCard=undefined) {
-    // debugger;
+function showCard(setClass, className, setIsVisible, data=undefined, setCurrent=undefined, hideOtherCard=undefined) {
     hideOtherCard && hideOtherCard();
-    setCurrent(data);
+    data && setCurrent(data);
     setClass(className);  
     setIsVisible(true);
 }

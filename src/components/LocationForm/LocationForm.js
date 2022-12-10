@@ -8,9 +8,7 @@ import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 
-const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker }) => {
-    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
-    
+const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker, otherClassName }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
     const namesParentRef = useRef();
     const filmNamesParentRef = useRef();
@@ -404,7 +402,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
 
     return (
-        <div className={`location-form-container form-conrainer ${isHide ? 'hided-form' : 'showed-form'}`}>
+        <div className={`location-form-container form-conrainer ${otherClassName}`}>
             <div className="location-form form">
                 <header className="location-form__header header-card">
                     <p className="location-form-title title">
@@ -412,10 +410,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                     </p>
                     <div className="header-btn-container">
                         <button className="header-btn" onClick={() => {
-                            setIsHide(true);
-                            setTimeout(() => {
-                                onClickClose();
-                            }, 600);
+                            onClickClose();
                         }}>
                             <span className="material-symbols-outlined">close</span>
                         </button>

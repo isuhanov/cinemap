@@ -287,15 +287,15 @@ body {
 
 /* ------------------------------ show/hide animations --------------------------------------- */
 
-.showed-card {
-  animation:  show-card .6s ease-in-out;
+.showed-slide {
+  animation:  show-slide .6s ease-in-out;
 }
 
-.hided-card {
-  animation: hide-card .6s ease-in-out normal;
+.hided-slide {
+  animation: hide-slide .6s ease-in-out normal;
 }
 
-@keyframes show-card {
+@keyframes show-slide {
   from {
       transform: translateY(100%);
       opacity: 0;
@@ -306,7 +306,7 @@ body {
   }
 }
 
-@keyframes hide-card {
+@keyframes hide-slide {
   from {transform: translateY(0px);}
   to {
       transform: translateY(100%);
@@ -315,25 +315,25 @@ body {
 }
 
 
-.showed-form {
+.showed-cover {
   perspective-origin: center;
   perspective: 900px; 
-  animation: show-form-fon .9s ease-in-out;
+  animation: show-cover-fon .9s ease-in-out;
 }
 
-.showed-form .form {
-  animation: show-form .9s ease-in-out;
+.showed-cover .form {
+  animation: show-cover .9s ease-in-out;
 }
 
-.hided-form {
-  animation: hide-form-fon .6s ease-in-out;
+.hided-cover {
+  animation: hide-cover-fon .6s ease-in-out;
 }
 
-.hided-form .form {
-  animation: hide-form .6s ease-in-out;
+.hided-cover .form {
+  animation: hide-cover .6s ease-in-out;
 }
 
-@keyframes show-form {
+@keyframes show-cover {
   from {
       transform: rotateX(90deg) translateZ(150px);
       opacity: 0;
@@ -344,12 +344,12 @@ body {
   }
 }
 
-@keyframes show-form-fon {
+@keyframes show-cover-fon {
   from {background-color: rgba(0, 0, 0, 0); }
   to {background-color: rgba(0, 0, 0, 0.79); }
 }
 
-@keyframes hide-form {
+@keyframes hide-cover {
   from {
       transform: translateY(0);
       opacity: 1;
@@ -360,7 +360,7 @@ body {
   }
 }
 
-@keyframes hide-form-fon {
+@keyframes hide-cover-fon {
   from {background-color: rgba(0, 0, 0, 0.79); }
   to {background-color: rgba(0, 0, 0, 0); }
 }

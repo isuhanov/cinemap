@@ -12,16 +12,16 @@ import RegisterForm from './components/RegisterForm/RegisterForm';
 import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
 import API_SERVER_PATH from './lib/api/api-path';
-import { closeCard, openCard } from './services/open-close-services/open-close-services';
+import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 
 function App() {
   const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы авторизации
-  const [isReload, setIsReload] = useState(false); // стейт для обновления приложения
+  const [hideFormClass, setHideFormClass] = useState('');
   const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
-    setIsOpenLocationForm(true);
+    showCard(setHideFormClass, 'showed-cover', setIsOpenLocationForm);
   });
   const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
-    setIsOpenLocationForm(false);
+    closeCard(setHideFormClass, 'hided-cover', setIsOpenLocationForm, 600, onReload)
   });
 
 
@@ -40,7 +40,7 @@ function App() {
   });
   
 
-
+  const [isReload, setIsReload] = useState(false); // стейт для обновления приложения
   const onReload = useCallback(() => { // ф-ия для обновления
     setIsReload(prev => !prev);
     console.log('reload');
@@ -54,11 +54,13 @@ function App() {
   const closeRegisterForm = useCallback(() => { // ф-ия для закрытия формы регистрации
     setIsOpenRegisterForm(false);
   });
+
+
+  
   
 
 
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
-
   const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
     // ----------------- закрываю все открытые карточки и списки -------------------------
     setCurrentLocationId(0);
@@ -80,12 +82,12 @@ function App() {
   const [hideCardClass, setHideCardClass] = useState('');
   const openLocationCard = useCallback((locationId) => {
     openCard(locationId, setHideCardClass,
-            'showed-card', 'hided-card', 
+            'showed-slide', 'hided-slide', 
             setCurrentLocationId, setIsCardVisible, 
             onReload, currentLocationId, closeLocationList);
   })
   const closeLocationCard = useCallback(() => {
-    closeCard(setHideCardClass, 'hided-card', setIsCardVisible, setCurrentLocationId, 0, onReload);
+    closeCard(setHideCardClass, 'hided-slide', setIsCardVisible, 600, onReload, 0, setCurrentLocationId);
   })
 
 
@@ -95,14 +97,14 @@ function App() {
   const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
   const openLocationList = useCallback((filterLocations, title = 'Локации') => { // ф-ия открытия списка
     openCard(filterLocations, setHideListClass, 
-            'showed-card', 'hided-card', 
+            'showed-slide', 'hided-slide', 
             setCurrentLocationList, setIsLocationListVisible, 
             onReload, currentLocationsList.length, closeLocationCard);
     setLocationListTitle(title);
   })
 
   const closeLocationList = useCallback(() => {
-    closeCard(setHideListClass, 'hided-card', setIsLocationListVisible, setCurrentLocationList, [], onReload);
+    closeCard(setHideListClass, 'hided-slide', setIsLocationListVisible, 600, onReload, [], setCurrentLocationList);
   });  
 
   const getFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
@@ -140,7 +142,10 @@ function App() {
                 onReload={onReload} setLocations={setLocations} 
                 openLocationCard={openLocationCard} openLocationList={openLocationList} />
                 
-        { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
+        { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} 
+                                              onReload={onReload} 
+                                              onClickClose={closeLocationForm}
+                                              otherClassName={hideFormClass}/>}
         { isOpenLoginForm && <LoginForm onClickClose={closeLoginForm} /> }
         { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
         { isOpenProfileCard && <ProfileCard user={profileUser} 
@@ -167,7 +172,7 @@ function App() {
           <LocationList 
               openLocationCard={(locationId) => {
                 openCard(locationId, setHideCardClass,
-                  'showed-card', 'hided-card', 
+                  'showed-slide', 'hided-slide', 
                   setCurrentLocationId, setIsCardVisible, 
                   onReload, currentLocationId);
               }}
