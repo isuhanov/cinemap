@@ -5,6 +5,7 @@ import axios from "axios";
 import './RegisterForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
+import { addUser } from "../../services/user-services/user-service";
 
 
 const RegisterForm = memo(({ onClickClose }) => {
@@ -130,11 +131,7 @@ const RegisterForm = memo(({ onClickClose }) => {
         for (const key in form) {
             formData.append(key, form[key].value);
         }
-
-        axios.post(`${API_SERVER_PATH}/users/registration`, formData).then(response => {
-            console.log(response);
-            onClickClose(); // закрытие формы при удачном добавлении
-        }).catch(err => console.log(err));
+        addUser(formData).then(res => onClickClose())
     }
 
 

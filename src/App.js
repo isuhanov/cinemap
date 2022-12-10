@@ -38,13 +38,13 @@ function App() {
     setIsOpenLoginForm(false);
   });
 
-  const loginUser = useCallback((userData) => { // ф-ия сохранения пользвателя при авторизации
-    localStorage.setItem('user', JSON.stringify(userData));
-  });
+  // const loginUser = useCallback((userData) => { // ф-ия сохранения пользвателя при авторизации
+  //   localStorage.setItem('user', JSON.stringify(userData));
+  // });
 
-  const logoutUser = useCallback(() => { // ф-ия сохранения пользвателя при авторизации
-    localStorage.removeItem('user');
-  });
+  // const logoutUser = useCallback(() => { // ф-ия сохранения пользвателя при авторизации
+  //   localStorage.removeItem('user');
+  // });
 
 
   const onReload = useCallback(() => { // ф-ия для обновления
@@ -179,7 +179,7 @@ function App() {
                 openLocationCard={openLocationCard} openLocationList={openLocationList} />
                 
         { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} onReload={onReload} onClickClose={closeLocationForm}/>}
-        { isOpenLoginForm && <LoginForm onLogin={loginUser} onClickClose={closeLoginForm} /> }
+        { isOpenLoginForm && <LoginForm onClickClose={closeLoginForm} /> }
         { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
         { isOpenProfileCard && <ProfileCard user={profileUser} 
                                             onClickOpenLocation={(locationId, coordMarker) => {
@@ -215,7 +215,7 @@ function App() {
 
         <div className="container">
           <div className="profile-block">
-            <Profile user={JSON.parse(localStorage.getItem('user'))} onLogoutClick={logoutUser} 
+            <Profile user={JSON.parse(localStorage.getItem('user'))}
                     onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}
                     onClickOpenProfileCard={openProfileCard}/>
           </div>

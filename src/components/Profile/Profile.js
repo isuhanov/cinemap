@@ -1,10 +1,11 @@
 import { ClickAwayListener } from '@mui/material';
 import { memo, useState } from 'react';
+import { logoutUser } from '../../services/user-services/user-service';
 import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 
 import './Profile.css'
 
-const Profile = memo(({ user, onClickOpenLoginForm, onLogoutClick, onClickOpenRegisterForm, onClickOpenProfileCard }) => {
+const Profile = memo(({ user, onClickOpenLoginForm, onClickOpenRegisterForm, onClickOpenProfileCard }) => {
     const [menuIsVisible, setMenuVisible] = useState(false);
     
     return (
@@ -22,7 +23,7 @@ const Profile = memo(({ user, onClickOpenLoginForm, onLogoutClick, onClickOpenRe
                                 { user ? 
                                     <>
                                         <li onClick={() => onClickOpenProfileCard(JSON.parse(localStorage.getItem('user')))} className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
-                                        <li onClick={onLogoutClick} className="profile__menu__item menu-item">Выход<span className="material-symbols-outlined">logout</span></li>
+                                        <li onClick={logoutUser} className="profile__menu__item menu-item">Выход<span className="material-symbols-outlined">logout</span></li>
                                     </>
                                     :
                                     <>

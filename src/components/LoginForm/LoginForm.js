@@ -4,8 +4,9 @@ import axios from "axios";
 
 import './LoginForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
+import { loginUser } from "../../services/user-services/user-service";
 
-const LoginForm = memo(({ onClickClose, onLogin }) => {
+const LoginForm = memo(({ onClickClose }) => {
     const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
 
     // -------------------- ссылка на родительские блоки полей -------------------
@@ -47,7 +48,7 @@ const LoginForm = memo(({ onClickClose, onLogin }) => {
 
     function onClickAuth() { // ф-ия авторизации
         axios.post(`${API_SERVER_PATH}/users/login?user_login=${login.value}&user_pass=${password.value}`).then(res => {
-            onLogin(res.data); // сохранение данных пользователя
+            loginUser(res.data) // сохранение данных пользователя
             onClickClose(); // закрытие формы
         })
         .catch(err => console.log(err));
