@@ -13,9 +13,11 @@ const SearchInput = memo(({ onReload }) => {
     }, [])
 
     function onSearchBtnClick() { // ф-ия для кнопки поиска
-        localStorage.setItem('locationFilter', JSON.stringify({'film': searchValue.trim()}));
-        setVisibleBtn(false);
-        onReload();
+        if (searchValue.trim() !== '') {
+            localStorage.setItem('locationFilter', JSON.stringify({'film': searchValue.trim()}));
+            setVisibleBtn(false);
+            onReload();
+        }
     }
 
     function onCloseBtnClick() {  // ф-ия для кнопки очистки
@@ -29,6 +31,7 @@ const SearchInput = memo(({ onReload }) => {
         if (searchValue.trim() === '') { // если фокус потерян и поле поустое, то очищается фильтр
             localStorage.removeItem('locationFilter');
             setSearchValue('');
+            setVisibleBtn(true);
             onReload();
         }
     }
