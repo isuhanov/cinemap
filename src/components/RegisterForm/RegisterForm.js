@@ -8,9 +8,7 @@ import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import { addUser } from "../../services/user-services/user-service";
 
 
-const RegisterForm = memo(({ onClickClose }) => {
-    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
-
+const RegisterForm = memo(({ onClickClose, otherClassName }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
     const loginParentRef = useRef();
     const passwordParentRef = useRef();
@@ -136,7 +134,7 @@ const RegisterForm = memo(({ onClickClose }) => {
 
 
     return (
-        <div className={`register-form-conrainer form-conrainer ${isHide ? 'hided-form' : 'showed-form'}`}>
+        <div className={`register-form-conrainer form-conrainer ${otherClassName}`}>
             <div className="register-form  form">
                 <header className="register-form__header header-card">
                     <p className="register-form-title title">
@@ -144,10 +142,7 @@ const RegisterForm = memo(({ onClickClose }) => {
                     </p>
                     <div className="header-btn-container">
                         <button className="header-btn" onClick={ () => {
-                            setIsHide(true);
-                            setTimeout(() => {
-                                onClickClose();
-                            }, 600);
+                            onClickClose();
                         }}>
                             <span className="material-symbols-outlined">close</span>
                         </button>

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Class } from 'leaflet';
 import { useCallback, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
@@ -16,54 +15,22 @@ import API_SERVER_PATH from './lib/api/api-path';
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 
 function App() {
-  const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы авторизации
-  const [hideFormClass, setHideFormClass] = useState('');
-  const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
-    showCard(setHideFormClass, 'showed-cover', setIsOpenLocationForm);
-  });
-  const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
-    closeCard(setHideFormClass, 'hided-cover', setIsOpenLocationForm, 600, onReload)
-  });
-
-
   const [markerPos, setMarkerPos] = useState(undefined); // стейт для позиции маркера при добавлении
   const moveToMarker = useCallback((newMarkerPos) => { // ф-ия установки координт нового маркера для плавного перехода
     setMarkerPos(newMarkerPos);
   })
-
-
-  const [isOpenLoginForm, setIsOpenLoginForm] = useState(false); // стейт состояния формы авторизации
-  const openLoginForm = useCallback(() => { // ф-ия для откытия формы авторизации
-    setIsOpenLoginForm(true);
-  });
-  const closeLoginForm = useCallback(() => { // ф-ия для закрытия формы авторизации
-    setIsOpenLoginForm(false);
-  });
   
-
   const [isReload, setIsReload] = useState(false); // стейт для обновления приложения
   const onReload = useCallback(() => { // ф-ия для обновления
     setIsReload(prev => !prev);
     console.log('reload');
   });
 
-  
-  const [isOpenRegisterForm, setIsOpenRegisterForm] = useState(false);// стейт состояния формы регистрации
-  const openRegisterForm = useCallback(() => { // ф-ия для откытия формы регистрации
-    setIsOpenRegisterForm(true);
-  });
-  const closeRegisterForm = useCallback(() => { // ф-ия для закрытия формы регистрации
-    setIsOpenRegisterForm(false);
-  });
-
-
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
   const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
     // ----------------- закрываю все открытые карточки и списки -------------------------
-    // setCurrentLocationId(0);
-    // setCurrentLocationList([]);
-    // setIsCardVisible(false);
-    // setIsLocationListVisible(false);         
+    closeLocationCard();
+    closeLocationList();
     // ------------------------------------------------------------------------------------
 
     // удаление карточки
@@ -73,32 +40,50 @@ function App() {
         console.log('delete');
     }).catch(err => console.log(err));
   });
-  
-  // const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
-  // const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
-  // const [hideCardClass, setHideCardClass] = useState('');
-  // const openLocationCard = useCallback((locationId) => {
-  //   openCard(locationId, setHideCardClass,
-  //           'showed-slide', 'hided-slide', 
-  //           setCurrentLocationId, setIsCardVisible, 
-  //           onReload, currentLocationId, closeLocationList);
-  // })
-  // const closeLocationCard = useCallback(() => {
-  //   closeCard(setHideCardClass, 'hided-slide', setIsCardVisible, 600, onReload, 0, setCurrentLocationId);
-  // })
+
+
+  const [showsLocationForm, setShowsLocationForm] = useState({
+    isVisible: false,
+    visibleClass: '',
+  });
+ const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
+    showCard(showsLocationForm, setShowsLocationForm);
+  });
+  const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
+    closeCard(showsLocationForm, setShowsLocationForm, onReload)
+  });
+
+
+  const [showsLoginForm, setShowsLoginForm] = useState({
+    isVisible: false,
+    visibleClass: '',
+  });
+ const openLoginForm = useCallback(() => { // ф-ия для откытия формы локации
+    showCard(showsLoginForm, setShowsLoginForm);
+  });
+  const closeLoginForm = useCallback(() => { // ф-ия для закрытия формы локации
+    closeCard(showsLoginForm, setShowsLoginForm, onReload)
+  });
+
+
+  const [showsRegisterForm, setShowsRegisterForm] = useState({
+    isVisible: false,
+    visibleClass: '',
+  });
+ const openRegisterForm = useCallback(() => { // ф-ия для откытия формы регистрации
+    showCard(showsRegisterForm, setShowsRegisterForm);
+  });
+  const closeRegisterForm = useCallback(() => { // ф-ия для закрытия формы регистрации
+    closeCard(showsRegisterForm, setShowsRegisterForm, onReload)
+  });
+
 
   const [showsLocationCard, setShowsLocationCard] = useState({
     current: 0,
     isVisible: false,
     visibleClass: '',
-    // parent: 'App',
   });
-
   function openLocationCard(data, closeOther=undefined) {
-    // parent && setShowsLocationCard(prev => ({
-    //   ...prev,
-    //   parent
-    // }))
     openCard(showsLocationCard, setShowsLocationCard, onReload, 
             closeOther, 
             data);
@@ -108,34 +93,18 @@ function App() {
   }
 
 
-  // const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
-  // const [locationListTitle, setLocationListTitle] = useState('Локации');  // стейт для заголовка списка локаций
-  // const [hideListClass, setHideListClass] = useState('');
-  // const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
-  // const openLocationList = useCallback((filterLocations, title = 'Локации') => { // ф-ия открытия списка
-  //   // openCard(filterLocations, setHideListClass, 
-  //   //         'showed-slide', 'hided-slide', 
-  //   //         setCurrentLocationList, setIsLocationListVisible, 
-  //   //         onReload, currentLocationsList.length, closeLocationCard);
-  //   // setLocationListTitle(title);
-  // })
-
-  // const closeLocationList = useCallback(() => {
-  //   closeCard(setHideListClass, 'hided-slide', setIsLocationListVisible, 600, onReload, [], setCurrentLocationList);
-  // });  
-
   const [showsLocationList, setShowsLocationList] = useState({
     current: 0,
     isVisible: false,
     visibleClass: '',
-    // parent: 'App',
     title: 'Локации'
   });
-  function openLocationList(data, closeOther=undefined) {
-    // parent && setShowsLocationList(prev => ({
-    //   ...prev,
-    //   parent
-    // }))
+  function openLocationList(data, title, closeOther=undefined) {
+    setShowsLocationList(prev => ({
+      ...prev,
+      title
+    }))
+
     openCard(showsLocationList, setShowsLocationList, onReload, 
       closeOther, 
       data);
@@ -143,7 +112,6 @@ function App() {
   function closeLocationList() {
     closeCard(showsLocationList, setShowsLocationList, onReload, []);
   }
-
   const getFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
     const user = JSON.parse(localStorage.getItem('user'));
     let response = await axios.get(`${API_SERVER_PATH}/locations/favorites?user_id=${user.user_id}`)
@@ -157,25 +125,25 @@ function App() {
                               .catch(err => console.log(err));
     return response;
   })
-  
   const openFavoritesList = useCallback(() => { // ф-ия открытия списка избранного
     getFavoriteList().then(res => {
       // openLocationList(res, 'Избранное');
-      openLocationList(res, closeLocationCard);
+      openLocationList(res, 'Избранное', closeLocationCard);
     }).catch(err => console.log(err));
   });
 
 
-
-  const [isOpenProfileCard, setIsOpenProfileCard] = useState(false); // стейт состояния карточки профиля
   const [profileUser, setProfileUser] = useState(undefined); // стейт для пользователя профиля
-  const openProfileCard = useCallback((user) => { // ф-ия для откытия карточки профиля
-    setProfileUser(user);
-    setIsOpenProfileCard(true);
+  const [showsProfileCard, setShowsProfileCard] = useState({
+    isVisible: false,
+    visibleClass: '',
   });
-  const closeProfileCard = useCallback(() => { // ф-ия для закрытия карточки профиля
-    setProfileUser(undefined);
-    setIsOpenProfileCard(false);
+  const openProfileCard = useCallback((user) => { // ф-ия для откытия формы локации
+    setProfileUser(user);
+    showCard(showsProfileCard, setShowsProfileCard);
+  });
+  const closeProfileCard = useCallback(() => { // ф-ия для закрытия формы локации
+    closeCard(showsProfileCard, setShowsProfileCard, onReload)
   });
 
   return (
@@ -186,22 +154,39 @@ function App() {
                   openLocationCard(locationId, closeLocationList);
                 }} 
                 openLocationList={(locations) => {
-                  openLocationList(locations, closeLocationCard);
+                  openLocationList(locations, 'Локации', closeLocationCard);
                 }} />
                 
-        { isOpenLocationForm && <LocationForm moveToMarker={moveToMarker} 
-                                              onReload={onReload} 
-                                              onClickClose={closeLocationForm}
-                                              otherClassName={hideFormClass}/>}
-        { isOpenLoginForm && <LoginForm onClickClose={closeLoginForm} /> }
-        { isOpenRegisterForm && <RegisterForm onClickClose={closeRegisterForm} /> }
-        { isOpenProfileCard && <ProfileCard user={profileUser} 
-                                            onClickOpenLocation={(locationId, coordMarker) => {
-                                              openLocationCard(locationId);
-                                              // showsLocationCard.open('App', locationId);
-                                              moveToMarker(coordMarker);
-                                            }} 
-                                            onClickClose={closeProfileCard} /> }
+        { showsLocationForm.isVisible && 
+          <LocationForm 
+            moveToMarker={moveToMarker}
+            onReload={onReload} 
+            onClickClose={closeLocationForm}
+            otherClassName={showsLocationForm.visibleClass}/>
+        
+        }
+        { showsLoginForm.isVisible && 
+          <LoginForm 
+            onClickClose={closeLoginForm} 
+            otherClassName={showsLoginForm.visibleClass}/> 
+        }
+
+        { showsRegisterForm.isVisible && 
+          <RegisterForm 
+            onClickClose={closeRegisterForm} 
+            otherClassName={showsRegisterForm.visibleClass}/> 
+        }
+
+        { showsProfileCard.isVisible && 
+          <ProfileCard 
+            user={profileUser} 
+            onClickOpenLocation={(locationId, coordMarker) => {
+              openLocationCard(locationId);
+              moveToMarker(coordMarker);
+            }} 
+            onClickClose={closeProfileCard} 
+            otherClassName={showsProfileCard.visibleClass}/> 
+        }
 
         { showsLocationCard.isVisible &&
           <LocationCard  
@@ -209,7 +194,6 @@ function App() {
             location={locations.find(location => location.location_id === showsLocationCard.current)}
             onClose={() => {
               closeLocationCard();
-              // showsLocationCard.close();
             }}
             openUser={openProfileCard}
             onReload={onReload}
@@ -217,15 +201,10 @@ function App() {
             setFavoriteList={(showsLocationList.isVisible && showsLocationList.title === "Избранное")? getFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
           />
         } 
+
         { showsLocationList.isVisible &&
           <LocationList 
-              openLocationCard={(locationId) => {
-                openLocationCard(locationId)
-                // openCard(locationId, setHideCardClass,
-                //   'showed-slide', 'hided-slide', 
-                //   setCurrentLocationId, setIsCardVisible, 
-                //   onReload, currentLocationId);
-              }}
+              openLocationCard={openLocationCard}
               otherClassName={showsLocationList.visibleClass}
               title={showsLocationList.title}
               locations={showsLocationList.current}

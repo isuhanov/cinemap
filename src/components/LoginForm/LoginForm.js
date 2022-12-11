@@ -6,9 +6,7 @@ import './LoginForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import { loginUser } from "../../services/user-services/user-service";
 
-const LoginForm = memo(({ onClickClose }) => {
-    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
-
+const LoginForm = memo(({ onClickClose, otherClassName }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
     const loginParentRef = useRef();
     const passwordParentRef = useRef();
@@ -55,7 +53,7 @@ const LoginForm = memo(({ onClickClose }) => {
     }
     
     return (
-        <div className={`login-form-conrainer form-conrainer ${isHide ? 'hided-form' : 'showed-form'}`}>
+        <div className={`login-form-conrainer form-conrainer ${otherClassName}`}>
             <div className="login-form  form">
                 <header className="login-form__header header-card">
                     <p className="login-form-title title">
@@ -63,10 +61,7 @@ const LoginForm = memo(({ onClickClose }) => {
                     </p>
                     <div className="header-btn-container">
                         <button className="header-btn" onClick={ () => {
-                            setIsHide(true);
-                            setTimeout(() => {
-                                onClickClose();
-                            }, 600);
+                            onClickClose();
                         }}>
                             <span className="material-symbols-outlined">close</span>
                         </button>

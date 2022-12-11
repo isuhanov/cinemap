@@ -6,7 +6,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ProfileCard.css';
 
-const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation }) => {
+const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName }) => {
     const [locations, setLocations] = useState([]);
 
     useEffect(() => {
@@ -18,7 +18,7 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation }) => {
     }, []);
 
     return (
-        <div className="profile-container">
+        <div className={`profile-container ${otherClassName}`}>
             <div className="profile-card">
                 <div className="header-card profile-card__btn-header ">
                     <div className="header-btn-container">
