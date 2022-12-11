@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Class } from 'leaflet';
 import { useCallback, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
@@ -56,16 +57,12 @@ function App() {
   });
 
 
-  
-  
-
-
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
   const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
     // ----------------- закрываю все открытые карточки и списки -------------------------
-    setCurrentLocationId(0);
+    // setCurrentLocationId(0);
     setCurrentLocationList([]);
-    setIsCardVisible(false);
+    // setIsCardVisible(false);
     setIsLocationListVisible(false);         
     // ------------------------------------------------------------------------------------
 
@@ -77,18 +74,36 @@ function App() {
     }).catch(err => console.log(err));
   });
   
-  const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
-  const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
-  const [hideCardClass, setHideCardClass] = useState('');
-  const openLocationCard = useCallback((locationId) => {
-    openCard(locationId, setHideCardClass,
-            'showed-slide', 'hided-slide', 
-            setCurrentLocationId, setIsCardVisible, 
-            onReload, currentLocationId, closeLocationList);
-  })
-  const closeLocationCard = useCallback(() => {
-    closeCard(setHideCardClass, 'hided-slide', setIsCardVisible, 600, onReload, 0, setCurrentLocationId);
-  })
+  // const [currentLocationId, setCurrentLocationId] = useState(0);  // стейт для получения id локации при клике на маркер
+  // const [isCardVisible, setIsCardVisible] = useState(false);   // стейт состояния карточки локации (видна/не видна)
+  // const [hideCardClass, setHideCardClass] = useState('');
+  // const openLocationCard = useCallback((locationId) => {
+  //   openCard(locationId, setHideCardClass,
+  //           'showed-slide', 'hided-slide', 
+  //           setCurrentLocationId, setIsCardVisible, 
+  //           onReload, currentLocationId, closeLocationList);
+  // })
+  // const closeLocationCard = useCallback(() => {
+  //   closeCard(setHideCardClass, 'hided-slide', setIsCardVisible, 600, onReload, 0, setCurrentLocationId);
+  // })
+
+  const [showsLocationCard, setShowsLocationCard] = useState({
+    current: 0,
+    isVisible: false,
+    visibleClass: '',
+    parent: 'App',
+  });
+
+  function openLocationCard(data, parent=undefined) {
+    parent && setShowsLocationCard(prev => ({
+      ...prev,
+      parent
+    }))
+    openCard(showsLocationCard, setShowsLocationCard, onReload, data);
+  }
+  function closeLocationCard() {
+    closeCard(showsLocationCard, setShowsLocationCard, onReload, 0);
+  }
 
 
   const [currentLocationsList, setCurrentLocationList] = useState([]);  // стейт для получения id локации при клике на маркер
@@ -96,11 +111,11 @@ function App() {
   const [hideListClass, setHideListClass] = useState('');
   const [isLocationListVisible, setIsLocationListVisible] = useState(false);   // стейт состояния карточки списка локации (видна/не видна)
   const openLocationList = useCallback((filterLocations, title = 'Локации') => { // ф-ия открытия списка
-    openCard(filterLocations, setHideListClass, 
-            'showed-slide', 'hided-slide', 
-            setCurrentLocationList, setIsLocationListVisible, 
-            onReload, currentLocationsList.length, closeLocationCard);
-    setLocationListTitle(title);
+    // openCard(filterLocations, setHideListClass, 
+    //         'showed-slide', 'hided-slide', 
+    //         setCurrentLocationList, setIsLocationListVisible, 
+    //         onReload, currentLocationsList.length, closeLocationCard);
+    // setLocationListTitle(title);
   })
 
   const closeLocationList = useCallback(() => {
@@ -151,16 +166,18 @@ function App() {
         { isOpenProfileCard && <ProfileCard user={profileUser} 
                                             onClickOpenLocation={(locationId, coordMarker) => {
                                               openLocationCard(locationId);
+                                              // showsLocationCard.open('App', locationId);
                                               moveToMarker(coordMarker);
                                             }} 
                                             onClickClose={closeProfileCard} /> }
 
-        { isCardVisible &&
+        { showsLocationCard.isVisible &&
           <LocationCard  
-            otherClassName={`shadow-block ${hideCardClass}`}
-            location={locations.find(location => location.location_id === currentLocationId)}
+            otherClassName={`shadow-block ${showsLocationCard.visibleClass}`}
+            location={locations.find(location => location.location_id === showsLocationCard.current)}
             onClose={() => {
               closeLocationCard();
+              // showsLocationCard.close();
             }}
             openUser={openProfileCard}
             onReload={onReload}
@@ -171,10 +188,11 @@ function App() {
         { isLocationListVisible &&
           <LocationList 
               openLocationCard={(locationId) => {
-                openCard(locationId, setHideCardClass,
-                  'showed-slide', 'hided-slide', 
-                  setCurrentLocationId, setIsCardVisible, 
-                  onReload, currentLocationId);
+                openLocationCard(locationId, 'List')
+                // openCard(locationId, setHideCardClass,
+                //   'showed-slide', 'hided-slide', 
+                //   setCurrentLocationId, setIsCardVisible, 
+                //   onReload, currentLocationId);
               }}
               otherClassName={hideListClass}
               title={locationListTitle}
