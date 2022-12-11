@@ -321,7 +321,7 @@ body {
   animation: show-cover-fon .9s ease-in-out;
 }
 
-.showed-cover .form {
+.showed-cover .animation-content {
   animation: show-cover .9s ease-in-out;
 }
 
@@ -329,7 +329,7 @@ body {
   animation: hide-cover-fon .6s ease-in-out;
 }
 
-.hided-cover .form {
+.hided-cover .animation-content {
   animation: hide-cover .6s ease-in-out;
 }
 

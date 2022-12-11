@@ -19,7 +19,7 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
 
     return (
         <div className={`profile-container ${otherClassName}`}>
-            <div className="profile-card">
+            <div className="profile-card animation-content">
                 <div className="header-card profile-card__btn-header ">
                     <div className="header-btn-container">
                         <button className="header-btn" onClick={onClickClose}>

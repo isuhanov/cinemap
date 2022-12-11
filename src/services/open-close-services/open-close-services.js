@@ -5,7 +5,7 @@ function openCard(card, setCard, onReload,  closeOther,data=undefined){
   } else {
     setCard(prev => ({
       ...prev,
-      visibleClass: 'hided-slide'
+      visibleClass: `hided-${card.animatioType}`
     }))
     setTimeout(() => {
       showCard(card, setCard, data, closeOther)
@@ -16,7 +16,7 @@ function openCard(card, setCard, onReload,  closeOther,data=undefined){
 const closeCard = (card, setCard, onReload, data=undefined) => {
     setCard(prev => ({
       ...prev,
-      visibleClass: 'hided-slide'
+      visibleClass: `hided-${card.animatioType}`
     }))
     setTimeout(() => {
         setCard(prev => ({
@@ -33,7 +33,7 @@ function showCard(card, setCard, data=undefined, hideOtherCard=undefined) {
     setCard(prev => ({
       ...prev,
       current: data || card.current,
-      visibleClass: 'showed-slide',
+      visibleClass: `showed-${card.animatioType}`,
       isVisible: true
     }))
 }

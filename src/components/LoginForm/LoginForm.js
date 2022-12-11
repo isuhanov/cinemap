@@ -54,7 +54,7 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
     
     return (
         <div className={`login-form-conrainer form-conrainer ${otherClassName}`}>
-            <div className="login-form  form">
+            <div className="login-form form animation-content">
                 <header className="login-form__header header-card">
                     <p className="login-form-title title">
                         Авторизация

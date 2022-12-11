@@ -403,7 +403,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
     return (
         <div className={`location-form-container form-conrainer ${otherClassName}`}>
-            <div className="location-form form">
+            <div className="location-form form animation-content">
                 <header className="location-form__header header-card">
                     <p className="location-form-title title">
                         { isUpdate ?  'Редактирование локации:' : 'Добавление локации:'}

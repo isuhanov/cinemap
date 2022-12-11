@@ -135,7 +135,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
 
     return (
         <div className={`register-form-conrainer form-conrainer ${otherClassName}`}>
-            <div className="register-form  form">
+            <div className="register-form form animation-content">
                 <header className="register-form__header header-card">
                     <p className="register-form-title title">
                         Регистрация

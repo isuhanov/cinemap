@@ -45,6 +45,7 @@ function App() {
   const [showsLocationForm, setShowsLocationForm] = useState({
     isVisible: false,
     visibleClass: '',
+    animatioType: 'cover'
   });
  const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
     showCard(showsLocationForm, setShowsLocationForm);
@@ -57,6 +58,7 @@ function App() {
   const [showsLoginForm, setShowsLoginForm] = useState({
     isVisible: false,
     visibleClass: '',
+    animatioType: 'cover'
   });
  const openLoginForm = useCallback(() => { // ф-ия для откытия формы локации
     showCard(showsLoginForm, setShowsLoginForm);
@@ -69,6 +71,7 @@ function App() {
   const [showsRegisterForm, setShowsRegisterForm] = useState({
     isVisible: false,
     visibleClass: '',
+    animatioType: 'cover'
   });
  const openRegisterForm = useCallback(() => { // ф-ия для откытия формы регистрации
     showCard(showsRegisterForm, setShowsRegisterForm);
@@ -82,6 +85,7 @@ function App() {
     current: 0,
     isVisible: false,
     visibleClass: '',
+    animatioType: 'slide'
   });
   function openLocationCard(data, closeOther=undefined) {
     openCard(showsLocationCard, setShowsLocationCard, onReload, 
@@ -97,7 +101,8 @@ function App() {
     current: 0,
     isVisible: false,
     visibleClass: '',
-    title: 'Локации'
+    title: 'Локации',
+    animatioType: 'slide'
   });
   function openLocationList(data, title, closeOther=undefined) {
     setShowsLocationList(prev => ({
@@ -137,6 +142,7 @@ function App() {
   const [showsProfileCard, setShowsProfileCard] = useState({
     isVisible: false,
     visibleClass: '',
+    animatioType: 'cover'
   });
   const openProfileCard = useCallback((user) => { // ф-ия для откытия формы локации
     setProfileUser(user);
