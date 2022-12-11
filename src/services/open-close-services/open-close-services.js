@@ -1,7 +1,7 @@
-function openCard(card, setCard, onReload, data=undefined){
+function openCard(card, setCard, onReload,  closeOther,data=undefined){
   // console.log(`current = ${current}`);
   if (card.current === 0) {
-    showCard(card, setCard, data)
+    showCard(card, setCard, data, closeOther)
     onReload();
   } else {
     setCard(prev => ({
@@ -9,7 +9,7 @@ function openCard(card, setCard, onReload, data=undefined){
       visibleClass: 'hided-slide'
     }))
     setTimeout(() => {
-      showCard(card, setCard, data)
+      showCard(card, setCard, data, closeOther)
     }, 500);
   }
 };
@@ -33,9 +33,10 @@ const closeCard = (card, setCard, onReload, data=undefined) => {
 };
 
 function showCard(card, setCard, data=undefined, hideOtherCard=undefined) {
-    if (card.parent === 'App') {
-      // скрыть другие
-    }
+    // if (card.parent === 'App') {
+    //   // скрыть другие
+    // }
+    hideOtherCard && hideOtherCard();
     setCard(prev => ({
       ...prev,
       current: data || card.current,
