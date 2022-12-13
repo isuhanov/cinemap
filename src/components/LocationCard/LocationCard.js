@@ -3,25 +3,30 @@ import { memo, useCallback, useEffect, useState } from "react";
 import LocationForm from "../LocationForm/LocationForm";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
+// import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
+
 
 import API_SERVER_PATH from "../../lib/api/api-path";
 import './LocationCard.css'
+import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
-    const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
-
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
-    const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
+    // const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
     const [localReload, setLocalReload] = useState(false); // стейт для локальной перезагрузки карточки
     const [isFavorite, setIsFavorite] = useState(false); // стейт для состояния избранного
 
+    const [showsLocationForm, setShowsLocationForm] = useState({
+        isVisible: false,
+        visibleClass: '',
+        animatioType: 'cover'
+      });
     const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
-        setIsOpenLocationForm(true);
+        showCard(showsLocationForm, setShowsLocationForm);
     });
-    
     const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
-        setIsOpenLocationForm(false);
+        closeCard(showsLocationForm, setShowsLocationForm, onReload)
     });
 
     useEffect(() => { // заполняю необходимые стейты при загрузке
@@ -170,7 +175,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                 </footer>
             }
         </div>
-        { isOpenLocationForm && <LocationForm isUpdate={true} 
+        { showsLocationForm.isVisible && <LocationForm isUpdate={true} 
                                                 location={({
                                                     ...location,
                                                     photos: [...locationPhoto]
@@ -179,7 +184,8 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                                                     onReload();
                                                     setLocalReload(prev => !prev);
                                                 }} 
-                                                onClickClose={closeLocationForm}/>}
+                                                onClickClose={closeLocationForm}
+                                                otherClassName={showsLocationForm.visibleClass}/>}
         </>
     )
 });
