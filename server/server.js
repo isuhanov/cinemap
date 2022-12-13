@@ -19,6 +19,7 @@ import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 import { addUser, loginUser } from './services/users/user-service.js'
+import checkJwt from './services/users/user-auth-service.js'
 
 const app = express();
 // const app = 
@@ -32,33 +33,6 @@ app.use(fileUpload());
 app.use(express.static('img'));
 
 app.use(express.json())
-app.use((req, res, next) => {
-    if (req.headers.authorization) {
-    jwt.verify(
-        req.headers.authorization.split(' ')[1],
-        tokenKey,
-        (err, payload) => {
-            if (err) next()
-            else if (payload) {
-                connection.query(  // получение id пользователя 
-                    `SELECT * FROM users WHERE user_id = '${payload.id}';`,
-                    function(err, results, fields) {
-                        const user = results[0];
-                        if (results.length === 0) {
-                            next();
-                        } else {
-                            req.user = user;
-                            next();
-                        }
-                    }
-                );
-            }
-        }
-    )
-}
-
-  next()
-})
 
 const connection = mysql.createConnection({ // подключение к БД
     host: 'localhost',
@@ -77,7 +51,7 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 
 //---------------------------------------------- locations ---------------------------------------------- 
 
-app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+app.get('/locations', checkJwt, function(req, res){ // обработка GET запроса на выборку из таблицы Locations
     if (req.query.user_id) {
         selectUsersLocations(req.query.user_id).then(response => {
             res.send(response);  // отправка результата в ответ на запрос

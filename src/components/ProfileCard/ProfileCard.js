@@ -1,6 +1,7 @@
 import axios from "axios";
 import { memo, useEffect, useRef, useState } from "react";
 import API_SERVER_PATH from "../../lib/api/api-path";
+import { headers } from "../../lib/user-headers/user-headers";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 
@@ -10,8 +11,7 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
     const [locations, setLocations] = useState([]);
 
     useEffect(() => {
-        console.log(user);
-        axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`).then(res => {
+        axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`, {headers}).then(res => {
             console.log(res.data);
             setLocations(res.data);
         }).catch(err => console.log(err));
