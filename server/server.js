@@ -1,7 +1,7 @@
 // const mysql = require("mysql2");
 import mysql from 'mysql2'
 // const express = require("express");
-import express from 'express'
+import express, { response } from 'express'
 // const bodyParser = require('body-parser')
 import bodyParser from 'body-parser'
 // const fileUpload = require('express-fileupload');
@@ -18,7 +18,7 @@ import fs from 'fs'
 import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
-import { addUser } from './services/users/user-service.js'
+import { addUser, loginUser } from './services/users/user-service.js'
 
 const app = express();
 // const app = 
@@ -204,35 +204,16 @@ app.get('/users', function(req, res){ // обработка GET запроса �
             }
         );
     } 
-    // else if (req.query.login) {
-    //     console.log('1');
-    //     // console.log(req.user);
-    //     if (req.user) {
-    //         // console.log(req.user);
-    //         res.send(req.user);
-    //     } else {
-    //         res.status(404).send('Not found');
-    //     }
-    // }
 });
 
 app.post('/users/login', function(req, res) { // обработка запроса на авторизацию
-    if (req.query.user_login && req.query.user_pass) {
-        connection.query(  // получение id пользователя 
-            `SELECT * FROM users WHERE user_login = '${req.query.user_login}' and user_pass = '${req.query.user_pass}';`,
-            function(err, results, fields) {
-                if (results.length === 0) { // если пользователя нет, то 404
-                    res.status(404).send('Not found');
-                } else { // иначе отправка токена и инф-ции о пользователе на клиент
-                    let data = {
-                        ...results[0],
-                        accessToken:  jwt.sign({ id: results[0].user_id }, tokenKey), // формирование токена
-                    }
-                    res.send(data);
-                }
-            }
-        );
-    }
+    loginUser(req.body.login, req.body.password).then(response => {
+        let data = {
+            ...response,
+            accessToken:  jwt.sign({ id: response.user_id }, tokenKey), // формирование токена
+        }
+        res.send(data); // отправка результата в ответ на запрос
+    }).catch(err => res.send(err));
 });
 
 app.post('/users/registration', function(req, res) {

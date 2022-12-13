@@ -45,7 +45,7 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
 
 
     function onClickAuth() { // ф-ия авторизации
-        axios.post(`${API_SERVER_PATH}/users/login?user_login=${login.value}&user_pass=${password.value}`).then(res => {
+        axios.post(`${API_SERVER_PATH}/users/login`, {login: login.value, password: password.value}).then(res => {
             loginUser(res.data) // сохранение данных пользователя
             onClickClose(); // закрытие формы
         })
