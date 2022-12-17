@@ -5,6 +5,7 @@ import axios from "axios";
 import './LoginForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import { loginUser } from "../../services/user-services/user-service";
+import FormField from "../../services/form-services/form-field";
 
 const LoginForm = memo(({ onClickClose, otherClassName }) => {
     // -------------------- ссылка на родительские блоки полей -------------------
@@ -27,29 +28,34 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
     }
 
     // стейт для логина
-    const [login, setLogin] = useState({
-        value: '',
-        error: '',
-        parent: loginParentRef,
-        isTouched: false,
-        set: onLoginChange
-    }); 
+    const [login, setLogin] = useState(new FormField('', useRef(), onLoginChange)); 
+    
     // стейт для пароля
-    const [password, setPassword] = useState({
-        value: '',
-        error: '',
-        parent: passwordParentRef,
-        isTouched: false,
-        set: onPasswordChange
-    });
+    const [password, setPassword] = useState(new FormField('', useRef(), onPasswordChange));
 
 
     function onClickAuth() { // ф-ия авторизации
-        axios.post(`${API_SERVER_PATH}/users/login`, {login: login.value, password: password.value}).then(res => {
-            loginUser(res.data) // сохранение данных пользователя
-            onClickClose(); // закрытие формы
+        if (login.value.trim().length === 0 || password.value.trim().length === 0) {
+            setError('Поля не должны быть пустыми')
+        } else {
+            axios.post(`${API_SERVER_PATH}/users/login`, {login: login.value, password: password.value}).then(res => {
+                console.log(res.data);
+                loginUser(res.data) // сохранение данных пользователя
+                onClickClose(); // закрытие формы
+            })
+            .catch(err => {
+                console.log(err);
+                setError('Неверный логин или пароль')
+            });
+        }
+    }
+
+    function setError(error) {
+        login.parent.current.classList.add('error');
+        password.parent.current.classList.add('error');
+        password.set({
+            error,
         })
-        .catch(err => console.log(err));
     }
     
     return (
@@ -69,7 +75,7 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
                 </header>
                 <div className="login-form__main">
                     <form>
-                        <div className="field-block">
+                        <div className="field-block" ref={login.parent}>
                             <label htmlFor="loginform-login">
                                 Логин:
                             </label>
@@ -81,7 +87,7 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
                                     className="field"
                             />
                         </div>
-                        <div className="field-block">
+                        <div className="field-block" ref={password.parent}>
                             <label htmlFor="location-name">
                                 Пароль:
                             </label>
@@ -93,6 +99,11 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
                                     })}
                                     className="field"
                             />
+                            { password.error && 
+                                <p>
+                                    { password.error }
+                                </p>
+                            }
                         </div>
                     </form>
                 </div>
