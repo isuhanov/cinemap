@@ -188,7 +188,7 @@ app.post('/users/login', function(req, res) { // обработка запрос
             accessToken:  jwt.sign({ id: response.user_id }, tokenKey), // формирование токена
         }
         res.send(data); // отправка результата в ответ на запрос
-    }).catch(err => res.send(err));
+    }).catch(err => res.status(404).send("Error"));
 });
 
 app.post('/users/registration', function(req, res) {

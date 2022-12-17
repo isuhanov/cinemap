@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 
@@ -6,18 +6,11 @@ import './RegisterForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import { addUser } from "../../services/user-services/user-service";
+import FormField from "../../services/form-services/form-field";
+import { formIsValid, loginFieldIsValid, passswordFieldIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 
 
 const RegisterForm = memo(({ onClickClose, otherClassName }) => {
-    // -------------------- ссылка на родительские блоки полей -------------------
-    const loginParentRef = useRef();
-    const passwordParentRef = useRef();
-    const nameParentRef = useRef();
-    const surnameParentRef = useRef();
-    const statusParentRef = useRef();
-    const photoParentRef = useRef();
-    // ---------------------------------------------------------------------------
-
     const onLoginChange = (login) => { // обработка значения поля login
         setLogin(prev => ({
             ...prev,
@@ -53,63 +46,37 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
         }))
     }
 
-    const onDropPhoto = (photo) => { // обработка значения поля photo
+
+
+    const onDropPhoto = useCallback((photos) => { // обработка значения поля photo
+        changePhotos(photos, setPhoto);
+    })
+
+    function changePhotos(photos, setPhoto) {
+        let photosObj;
+        if (Array.isArray(photos)) {
+            photosObj = {value: photos, isTouched: true};
+        } else if (typeof photos === 'object' && photos !== null) {
+            photosObj = {...photos};    
+        }
         setPhoto(prev => ({
             ...prev,
-            ...photo
+            ...photosObj
         }))
     }
 
     // стейт для логина
-    const [login, setLogin] = useState({
-        value: '',
-        error: '',
-        parent: loginParentRef,
-        isTouched: false,
-        set: onLoginChange
-    }); 
+    const [login, setLogin] = useState(new FormField('', useRef(), onLoginChange)); 
     // стейт для пароля
-    const [password, setPassword] = useState({
-        value: '',
-        error: '',
-        parent: passwordParentRef,
-        isTouched: false,
-        set: onPasswordChange
-    });
+    const [password, setPassword] = useState(new FormField('', useRef(), onPasswordChange));
     // стейт для имени
-    const [name, setName] = useState({
-        value: '',
-        error: '',
-        parent: nameParentRef,
-        isTouched: false,
-        set: onNameChange
-    });
+    const [name, setName] = useState(new FormField('', useRef(), onNameChange));
     // стейт для фамилии
-    const [surname, setSurname] = useState({
-        value: '',
-        error: '',
-        parent: surnameParentRef,
-        isTouched: false,
-        set: onSurnameChange
-    });
+    const [surname, setSurname] = useState(new FormField('', useRef(), onSurnameChange));
     // стейт для статуса
-    const [status, setStatus] = useState({
-        value: '',
-        error: '',
-        parent: statusParentRef,
-        isTouched: false,
-        set: onStatusChange
-    });
-
+    const [status, setStatus] = useState(new FormField('', useRef(), onStatusChange));
     // стейт для статуса
-    const [photo, setPhoto] = useState({
-        value: [],
-        error: '',
-        parent: photoParentRef,
-        isTouched: false,
-        set: onDropPhoto
-    });
-
+    const [photo, setPhoto] = useState(new FormField([], useRef(), onDropPhoto));
 
     // объект для хранения полей формы
     const form = {
@@ -121,7 +88,24 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
         photo
     }
 
-    function onClickSave(data) { //  post-запрос на добавление локации в БД 
+    useEffect(() => {
+        // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
+        if (form.login.isTouched) loginFieldIsValid(form.login, 100);
+        if (form.password.isTouched) passswordFieldIsValid(form.password);
+        if (form.name.isTouched) textFieldIsValid(form.name, 100);
+        if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
+        if (form.status.isTouched) textFieldIsValid(form.status, 200);
+        if (form.photo.isTouched) photosFieldIsValid({ formItem: form.photo, maxWidth: 1 });
+    }, [login.value, password.value, name.value, surname.value, status.value, JSON.stringify(photo.value)])
+
+
+
+    function onClickSave() { //  post-запрос на добавление локации в БД 
+        if (!formIsValid(form)) return
+        post();
+    }
+
+    function post() {
         const formData = new FormData(); // объект для хранения данных отправляемой формы
         photo.value.forEach(element => {
             formData.append('photo', element);
@@ -150,7 +134,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                 </header>
                 <div className="register-form__main">
                     <form>
-                        <div className="field-block" ref={loginParentRef}>
+                        <div className="field-block" ref={login.parent}>
                             <label htmlFor="registerform-login">
                                 Логин:
                             </label>
@@ -161,8 +145,13 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                                     })}
                                     className="field"
                             />
+                            { login.error && 
+                                <p>
+                                    { login.error }
+                                </p>
+                            }
                         </div>
-                        <div className="field-block" ref={passwordParentRef}>
+                        <div className="field-block" ref={password.parent}>
                             <label htmlFor="location-name">
                                 Пароль:
                             </label>
@@ -174,8 +163,13 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                                     })}
                                     className="field"
                             />
+                            { password.error && 
+                                <p>
+                                    { password.error }
+                                </p>
+                            }
                         </div>
-                        <div className="field-block" ref={nameParentRef}>
+                        <div className="field-block" ref={name.parent}>
                             <label htmlFor="location-name">
                                 Имя:
                             </label>
@@ -187,8 +181,13 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                                     })}
                                     className="field"
                             />
+                            { name.error && 
+                                <p>
+                                    { name.error }
+                                </p>
+                            }
                         </div>
-                        <div className="field-block" ref={surnameParentRef}>
+                        <div className="field-block" ref={surname.parent}>
                             <label htmlFor="location-name">
                                 Фамилия:
                             </label>
@@ -200,8 +199,13 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                                     })}
                                     className="field"
                             />
+                            { surname.error && 
+                                <p>
+                                    { surname.error }
+                                </p>
+                            }
                         </div>
-                        <div className="field-block" ref={statusParentRef}>
+                        <div className="field-block" ref={status.parent}>
                             <label htmlFor="location-name">
                                 Статус:
                             </label>
@@ -213,8 +217,13 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                                     })}
                                     className="field"
                             />
+                            { status.error && 
+                                <p>
+                                    { status.error }
+                                </p>
+                            }
                         </div>
-                        <div className="field-block" ref={photoParentRef}>
+                        <div className="field-block" ref={photo.parent}>
                             <label>
                                 Фото из фильма:                              
                             </label>
