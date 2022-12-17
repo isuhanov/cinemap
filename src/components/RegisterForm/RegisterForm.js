@@ -7,7 +7,7 @@ import API_SERVER_PATH from "../../lib/api/api-path";
 import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import { addUser } from "../../services/user-services/user-service";
 import FormField from "../../services/form-services/form-field";
-import { formIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
+import { formIsValid, loginFieldIsValid, passswordFieldIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 
 
 const RegisterForm = memo(({ onClickClose, otherClassName }) => {
@@ -90,8 +90,8 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
 
     useEffect(() => {
         // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
-        if (form.login.isTouched) textFieldIsValid(form.login, 100);
-        if (form.password.isTouched) textFieldIsValid(form.password, 100);
+        if (form.login.isTouched) loginFieldIsValid(form.login, 100);
+        if (form.password.isTouched) passswordFieldIsValid(form.password);
         if (form.name.isTouched) textFieldIsValid(form.name, 100);
         if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
         if (form.status.isTouched) textFieldIsValid(form.status, 200);
@@ -147,7 +147,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                             />
                             { login.error && 
                                 <p>
-                                    { name.error }
+                                    { login.error }
                                 </p>
                             }
                         </div>
@@ -165,7 +165,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                             />
                             { password.error && 
                                 <p>
-                                    { name.error }
+                                    { password.error }
                                 </p>
                             }
                         </div>
@@ -201,7 +201,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                             />
                             { surname.error && 
                                 <p>
-                                    { name.error }
+                                    { surname.error }
                                 </p>
                             }
                         </div>
@@ -219,7 +219,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                             />
                             { status.error && 
                                 <p>
-                                    { name.error }
+                                    { status.error }
                                 </p>
                             }
                         </div>
