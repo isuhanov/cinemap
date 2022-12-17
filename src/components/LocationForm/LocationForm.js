@@ -12,7 +12,6 @@ import { formIsValid, photosFieldIsValid, textFieldIsValid, timeFieldIsValid } f
 import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import FormField from "../../services/form-services/form-field";
-import filedForm from "../../services/form-services/form-field";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker, otherClassName }) => {
     // стейт для хранения данных фотографий из карточки локации (при открытии формы изменения)
@@ -34,7 +33,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         // провожу валидацию полей фотографий
         const typePhoto = locationPhotos.find(photo => photo.photo.locations_photo_id === photoId).photo.locations_photo_status;
         const photoFiled = typePhoto === 'user' ? usersPhoto : filmsPhoto;
-        photosFieldIsValid(photoFiled, isUpdate, locationPhotos, typePhoto);
+        photosFieldIsValid({ formItem:photoFiled, isUpdate, photos: locationPhotos, typePhoto});
     })
 
     const onNameChange = (name) => { // обработка значения поля названия локации
@@ -133,8 +132,8 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         if (form.address.isTouched) textFieldIsValid(form.address);
         if (form.route.isTouched) textFieldIsValid(form.route);
         if (form.timing.isTouched) timeFieldIsValid(form.timing);
-        if (form.filmsPhoto.isTouched) photosFieldIsValid(form.filmsPhoto, isUpdate, locationPhotos, 'film');
-        if (form.usersPhoto.isTouched) photosFieldIsValid(form.usersPhoto, isUpdate, locationPhotos, 'user');
+        if (form.filmsPhoto.isTouched) photosFieldIsValid({ formItem:form.filmsPhoto, isUpdate, photos:locationPhotos, typePhoto:'film' });
+        if (form.usersPhoto.isTouched) photosFieldIsValid({ formItem:form.usersPhoto, isUpdate, photos:locationPhotos, typePhoto:'user' });
     }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
 

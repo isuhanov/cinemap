@@ -49,13 +49,19 @@ function timeFieldIsValid(formItem, max = undefined) { // ф-ия для вал�
     }
 }
 
-function photosFieldIsValid(formItem, isUpdate=false, photos=undefined, typePhoto=undefined) { // ф-ия для валидации полей фотографий
+function photosFieldIsValid({ formItem, maxWidth=undefined, isUpdate=false, photos=undefined, typePhoto=undefined }) { // ф-ия для валидации полей фотографий
     let fieldIsValid = true;
     if (formItem.value.length === 0 && !isUpdate) {
     // if (formItem.value.length === 0) {
         formItem.parent.current.classList.add('error');
         formItem.set({
             error: 'Пустое поле'
+        })
+        fieldIsValid = false;
+    } else if (formItem.value.length > maxWidth) {
+        formItem.parent.current.classList.add('error');
+        formItem.set({
+            error: 'Можно внести только 1 элемент'
         })
         fieldIsValid = false;
     } else {
