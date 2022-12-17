@@ -50,7 +50,6 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
-        onClose();
         onDelete(location.location_id)
     }
 

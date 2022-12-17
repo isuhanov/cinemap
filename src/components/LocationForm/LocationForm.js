@@ -5,6 +5,8 @@ import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import TimingInput from "../ui/TimingInput/TimingInput";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
+import { headers } from "../../lib/user-headers/user-headers";
+
 import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 

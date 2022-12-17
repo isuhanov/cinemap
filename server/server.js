@@ -11,7 +11,6 @@ import cors from 'cors'
 
 // const jwt = require('jsonwebtoken');
 import jwt from'jsonwebtoken'
-const tokenKey = '1a2b-3c4d-5e6f-7g8h'
 
 import fs from 'fs'
 // const nanoid = require('nanoid')
@@ -20,6 +19,7 @@ import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 import { addUser, loginUser } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
+import { tokenKey } from './lib/token.js'
 
 const app = express();
 // const app = 
@@ -51,7 +51,7 @@ app.all('*', function(req, res, next) {  // настройки Core для за�
 
 //---------------------------------------------- locations ---------------------------------------------- 
 
-app.get('/locations', checkJwt, function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
     if (req.query.user_id) {
         selectUsersLocations(req.query.user_id).then(response => {
             res.send(response);  // отправка результата в ответ на запрос
@@ -68,12 +68,13 @@ app.get('/locations', checkJwt, function(req, res){ // обработка GET з
 });
 
 app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
+    // console.log(req.headers.authorization);
     addLocations(req.body, req.files).then(response => {
         res.send(response);  // отправка результата в ответ на запрос
     }).catch(err => res.status(500).send(err));
 });
 
-app.put('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
+app.put('/locations', function(req, res){ // обработка GET запроса на обновление в таблице Locations
     connection.query(  // обновляю данные текстовых полей
         `UPDATE locations SET location_name = '${req.body.name}', 
                                  location_film = '${req.body.filmName}', 
