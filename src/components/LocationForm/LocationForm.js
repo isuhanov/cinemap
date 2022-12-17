@@ -6,6 +6,8 @@ import TimingInput from "../ui/TimingInput/TimingInput";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 
 import { headers } from "../../lib/user-headers/user-headers";
+import { formIsValid, photosFieldIsValid, textFieldIsValid, timeFieldIsValid } from "../../services/form-services/form-valid-services";
+
 
 import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
@@ -40,7 +42,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         // провожу валидацию полей фотографий
         const typePhoto = locationPhotos.find(photo => photo.photo.locations_photo_id === photoId).photo.locations_photo_status;
         const photoFiled = typePhoto === 'user' ? usersPhoto : filmsPhoto;
-        photosFieldIsValid(photoFiled, typePhoto);
+        photosFieldIsValid(photoFiled, isUpdate, locationPhotos, typePhoto);
     })
 
     const onNameChange = (name) => { // обработка значения поля названия локации
@@ -174,30 +176,15 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         usersPhoto
     }
 
-
     useEffect(() => {
         // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
-        if (form.name.isTouched) {
-            textFieldIsValid(form.name, 200);
-        }
-        if (form.filmName.isTouched) {
-            textFieldIsValid(form.filmName, 150);
-        }
-        if (form.address.isTouched) {
-            textFieldIsValid(form.address);
-        }
-        if (form.route.isTouched) {
-            textFieldIsValid(form.route);
-        }
-        if (form.timing.isTouched) {
-            timeFieldIsValid(form.timing);
-        }
-        if (form.filmsPhoto.isTouched) {
-            photosFieldIsValid(form.filmsPhoto, 'film');
-        }
-        if (form.usersPhoto.isTouched) {
-            photosFieldIsValid(form.usersPhoto, 'user');
-        }
+        if (form.name.isTouched) textFieldIsValid(form.name, 200);
+        if (form.filmName.isTouched) textFieldIsValid(form.filmName, 150);
+        if (form.address.isTouched) textFieldIsValid(form.address);
+        if (form.route.isTouched) textFieldIsValid(form.route);
+        if (form.timing.isTouched) timeFieldIsValid(form.timing);
+        if (form.filmsPhoto.isTouched) photosFieldIsValid(form.filmsPhoto, isUpdate, locationPhotos, 'film');
+        if (form.usersPhoto.isTouched) photosFieldIsValid(form.usersPhoto, isUpdate, locationPhotos, 'user');
     }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
 
@@ -205,40 +192,13 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         isUpdate ? update() : save();
     }
 
-    function update() {
-        let formIsValid = true;
-        for (const key in form) {
-            // если имеется ошибка, то форма не валидна
-            if (form[key].error !== '') {
-                formIsValid = false;
-            }
-        }
-
-        if (!formIsValid) return
-        console.log('выборка');
-
+    function update() { // ф-ия проверки при изменении локации
+        if (!formIsValid(form, isUpdate)) return
         generationData(putLocation);
     }
 
-    function save() { // обработчик нажатия на кнопку сохранения
-        let formIsValid = true;
-        for (const key in form) {
-            // если значение поля формы пустое, то вывести сообщение об ошибке
-            if (form[key].value.length === 0) {
-                form[key].set({
-                    error: 'Пустое поле'
-                });
-                form[key].parent.current.classList.add('error');
-                formIsValid = false;
-            }
-            // если имеется ошибка, то форма не валидна
-            if (form[key].error !== '') {
-                formIsValid = false;
-            }
-        }
-        if (!formIsValid) return
-        console.log('выборка');
-
+    function save() { // ф-ия проверки при сохранении локации
+        if (!formIsValid(form)) return
         generationData(postLocation);
     }
 
@@ -307,99 +267,6 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
             onReload(); // обновляю карту
             
         }).catch(err => console.log(err));
-    }
-
-    function textFieldIsValid(formItem, max = undefined) { // ф-ия для валидации текстовых полей
-        if (formItem.value.length === 0) {
-            formItem.parent.current.classList.add('error');
-            formItem.set({
-                error: 'Пустое поле',
-            })
-        } else if (formItem.value.length > max) {
-            formItem.parent.current.classList.add('error');
-            formItem.set({
-                error: 'Слишком много символов',
-            })
-        } else {
-            formItem.parent.current.classList.remove('error');
-            formItem.set({
-                error: '',
-            })
-        }
-    }
-
-    function timeFieldIsValid(formItem, max = undefined) { // ф-ия для валидации временных полей
-        if (formItem.value.length === 0) {
-            formItem.parent.current.classList.add('error');
-            formItem.set({
-                error: 'Пустое поле'
-            })
-        } else if (formItem.value.length < 8) {
-            formItem.parent.current.classList.add('error');
-            formItem.set({
-                error: 'Поле не заполнено до конца'
-            })
-        } else {
-            let timingArr = formItem.value.split(':');
-            if (Number(timingArr[1]) > 59) {
-                formItem.parent.current.classList.add('error');
-                formItem.set({
-                    error: 'Кол-во минут превышает 59'
-                })
-            } else if (Number(timingArr[2]) > 59) {
-                formItem.parent.current.classList.add('error');
-                formItem.set({
-                    error: 'Кол-во секунд превышает 59'
-                })
-            } else {
-                formItem.parent.current.classList.remove('error');
-                formItem.set({
-                    error: '',
-                })
-            }
-        }
-    }
-
-    function photosFieldIsValid(formItem, typePhoto = undefined) { // ф-ия для валидации полей фотографий
-        let fieldIsValid = true;
-        if (formItem.value.length === 0 && !isUpdate) {
-            formItem.parent.current.classList.add('error');
-            formItem.set({
-                error: 'Пустое поле'
-            })
-            fieldIsValid = false;
-        } else {
-            const extentions = ['jpg', 'jpeg', 'png', 'svg', 'webp']
-            formItem.value.forEach(file => {
-                if (!extentions.includes(file.name.split('.').pop().toLowerCase())) {
-                    formItem.parent.current.classList.add('error');
-                    formItem.set({
-                        error: 'Разрешены только файлы с расширениеми: jpg, jpeg, png, svg, webp'
-                    })
-                    fieldIsValid = false;
-                }                    
-            });
-        }
-
-        if (isUpdate) {
-            const countPhoto = locationPhotos.filter(photo => photo.photo.locations_photo_status === typePhoto).length;
-            const countRemovedPhoto = locationPhotos.filter(photo => (photo.photo.locations_photo_status === typePhoto && photo.status === false)).length;
-    
-            if (formItem.value.length === 0 && countPhoto === countRemovedPhoto) {
-                formItem.parent.current.classList.add('error');
-                formItem.set({
-                    error: 'Должна иметься хотя бы одна фотография'
-                });
-                fieldIsValid = false;
-            } 
-        }
-        
-        if (fieldIsValid) {
-            formItem.parent.current.classList.remove('error');
-            formItem.set({
-                error: '',
-            })
-        }
     }
 
 
