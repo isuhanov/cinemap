@@ -11,18 +11,10 @@ import { formIsValid, photosFieldIsValid, textFieldIsValid, timeFieldIsValid } f
 
 import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
+import FormField from "../../services/form-services/form-field";
+import filedForm from "../../services/form-services/form-field";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker, otherClassName }) => {
-    // -------------------- ссылка на родительские блоки полей -------------------
-    const namesParentRef = useRef();
-    const filmNamesParentRef = useRef();
-    const addressParentRef = useRef();
-    const routeParentRef = useRef();
-    const timingParentRef = useRef();
-    const filmsPhotoParentRef = useRef();
-    const usersParentRef = useRef();
-    // ----------------------------------------------------------------------------
-
     // стейт для хранения данных фотографий из карточки локации (при открытии формы изменения)
     const [locationPhotos, setLocationPhoto] = useState(location ? 
                                                         location.photos.map(photo => ({
@@ -109,61 +101,19 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
     }
 
     // стейт для названия локации
-    const [name, setName] = useState({
-        value: location ? location.location_name : '',
-        error: '',
-        parent: namesParentRef,
-        isTouched: false,
-        set: onNameChange
-    }); 
+    const [name, setName] = useState(new FormField(location ? location.location_name : '', useRef(), onNameChange)); 
     // стейт для названия фильма
-    const [filmName, setFilmName] = useState({
-        value: location ? location.location_film : '',
-        error: '',
-        parent: filmNamesParentRef,
-        isTouched: false,
-        set: onFilmNameChange
-    });  
+    const [filmName, setFilmName] = useState(new FormField(location ? location.location_film : '', useRef(), onFilmNameChange));  
     // стейт для адреса локации
-    const [address, setAddress] = useState({
-        value: location ? location.location_address : '',
-        error: '',
-        parent: addressParentRef,
-        isTouched: false,
-        set: onAddressChange
-    });  
+    const [address, setAddress] = useState(new FormField(location ? location.location_address : '', useRef(), onAddressChange));  
     // стейт для пути
-    const [route, setRoute] = useState({
-        value: location ? location.location_route : '',
-        error: '',
-        parent: routeParentRef,
-        isTouched: false,
-        set: onRouteChange
-    });  
+    const [route, setRoute] = useState(new FormField(location ? location.location_route : '', useRef(), onRouteChange));  
     // стейт для тайминга
-    const [timing, setTiming] = useState({
-        value: location ? location.location_timing : '',
-        error: '',
-        parent: timingParentRef,
-        isTouched: false,
-        set: onTimingChange
-    }); 
+    const [timing, setTiming] = useState(new FormField(location ? location.location_timing : '', useRef(), onTimingChange)); 
     // стейт для фото из фильма
-    const [filmsPhoto, setFilmsPhoto] = useState({
-        value: [],
-        error: '',
-        parent: filmsPhotoParentRef,
-        isTouched: false,
-        set: onDropFilmsPhoto
-    }); 
+    const [filmsPhoto, setFilmsPhoto] = useState(new FormField([], useRef(), onDropFilmsPhoto)); 
     // стейт для фото пользователя
-    const [usersPhoto, setUsersPhoto] = useState({
-        value: [],
-        error: '',
-        parent: usersParentRef,
-        isTouched: false,
-        set: onDropUsersPhoto
-    }); 
+    const [usersPhoto, setUsersPhoto] = useState(new FormField([], useRef(), onDropUsersPhoto)); 
 
     // объект для хранения полей формы
     const form = {
@@ -189,17 +139,8 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения
-        isUpdate ? update() : save();
-    }
-
-    function update() { // ф-ия проверки при изменении локации
         if (!formIsValid(form, isUpdate)) return
-        generationData(putLocation);
-    }
-
-    function save() { // ф-ия проверки при сохранении локации
-        if (!formIsValid(form)) return
-        generationData(postLocation);
+        generationData(isUpdate ? putLocation : postLocation);
     }
 
     function generationData(queryFunc) { // ф-ия формирует объект с данными из формы и вызывает ф-ию для соответсвующего запроса (POST/PUT)
@@ -287,7 +228,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                 </header>
                 <div className="location-form__main">
                     <form>
-                        <div className="field-block" ref={namesParentRef}>
+                        <div className="field-block" ref={name.parent}>
                             <label htmlFor="location-name">
                                 Название локации:
                             </label>
@@ -305,7 +246,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                             }
                         </div>
 
-                        <div className="field-block" ref={filmNamesParentRef}>
+                        <div className="field-block" ref={filmName.parent}>
                             <label htmlFor="location-film">
                                 Название фильма:
                             </label>
@@ -323,7 +264,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                             }
                         </div>
 
-                        <div className="field-block" ref={addressParentRef}>
+                        <div className="field-block" ref={address.parent}>
                             <label htmlFor="location-address">
                                 Адрес:
                             </label>
@@ -341,7 +282,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                             }
                         </div>
 
-                        <div className="field-block" ref={routeParentRef}>
+                        <div className="field-block" ref={route.parent}>
                             <label htmlFor="location-route">
                                 Как пройти:
                             </label>
@@ -359,7 +300,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                             }
                         </div>
 
-                        <div className="field-block timing-block" ref={timingParentRef}>
+                        <div className="field-block timing-block" ref={timing.parent}>
                             <label htmlFor="location-timing">
                                 Тайминг:
                             </label>
@@ -371,7 +312,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                             }
                         </div>
 
-                        <div className="field-block" ref={filmsPhotoParentRef}>
+                        <div className="field-block" ref={filmsPhoto.parent}>
                             <label>
                                 Фото из фильма:                              
                             </label>
@@ -389,7 +330,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                             }
                         </div>
 
-                        <div className="field-block" ref={usersParentRef}>
+                        <div className="field-block" ref={usersPhoto.parent}>
                             <label>
                                 Ваши фото локации:                               
                             </label>

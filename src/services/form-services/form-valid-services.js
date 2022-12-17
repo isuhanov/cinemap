@@ -94,7 +94,6 @@ function photosFieldIsValid(formItem, isUpdate=false, photos=undefined, typePhot
 
 function formIsValid(form, isUpdate=false) {
     let isValid = true;
-    console.log(form);
     for (const key in form) {
         if (!isUpdate) {
             // если значение поля формы пустое, то вывести сообщение об ошибке
