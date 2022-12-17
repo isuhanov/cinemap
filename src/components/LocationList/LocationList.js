@@ -1,9 +1,8 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 
 import './LocationList.css';
 
 const LocationList = memo(({ title, locations, onClose, openLocationCard, otherClassName }) => {
-    // const [isHide, setIsHide] = useState(false); // стейт для скрытия формы
 
     return (
         <div className={`location-list menu ${otherClassName}`}>
@@ -13,10 +12,6 @@ const LocationList = memo(({ title, locations, onClose, openLocationCard, otherC
                 </p>
                 <div className="header-btn-container">
                     <button className="header-btn" onClick={() => {
-                        // setIsHide(true);
-                        // setTimeout(() => {
-                        //     onClose();
-                        // }, 600);
                         onClose();
                     }}>
                         <span className="material-symbols-outlined">close</span>

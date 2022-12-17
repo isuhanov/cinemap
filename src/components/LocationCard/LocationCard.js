@@ -50,7 +50,11 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
-        onDelete(location.location_id)
+        axios.delete(`${API_SERVER_PATH}/locations?location_id=${location.location_id}`).then(res => {
+            console.log(res);
+            onDelete();
+            console.log('delete');
+        }).catch(err => console.log(err));
     }
 
     function onFavoritesBtnClick() { // ф-ия обработки нажатия флажка избранного

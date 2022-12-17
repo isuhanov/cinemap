@@ -27,19 +27,22 @@ function App() {
   });
 
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
-  const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
-    // ----------------- закрываю все открытые карточки и списки -------------------------
-    closeLocationCard();
-    closeLocationList();
-    // ------------------------------------------------------------------------------------
+  // const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
+  //   // debugger;
+  //   // ----------------- закрываю все открытые карточки и списки -------------------------
+  //   closeLocationCard();
+  //   closeLocationList();
+  //   // ------------------------------------------------------------------------------------
 
-    // удаление карточки
-    axios.delete(`${API_SERVER_PATH}/locations?location_id=${locationId}`).then(res => {
-        console.log(res);
-        onReload();
-        console.log('delete');
-    }).catch(err => console.log(err));
-  });
+  //   // удаление карточки
+  //   axios.delete(`${API_SERVER_PATH}/locations?location_id=${locationId}`).then(res => {
+  //       console.log(res);
+  //       closeLocationCard();
+  //       closeLocationList();
+  //       onReload();
+  //       console.log('delete');
+  //   }).catch(err => console.log(err));
+  // });
 
 
   const [showsLocationForm, setShowsLocationForm] = useState({
@@ -132,7 +135,6 @@ function App() {
   })
   const openFavoritesList = useCallback(() => { // ф-ия открытия списка избранного
     getFavoriteList().then(res => {
-      // openLocationList(res, 'Избранное');
       openLocationList(res, 'Избранное', closeLocationCard);
     }).catch(err => console.log(err));
   });
@@ -203,7 +205,10 @@ function App() {
             }}
             openUser={openProfileCard}
             onReload={onReload}
-            onDelete={deleteLocation}
+            onDelete={() => {
+              closeLocationCard();
+              closeLocationList();
+            }}
             setFavoriteList={(showsLocationList.isVisible && showsLocationList.title === "Избранное")? getFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
           />
         } 
