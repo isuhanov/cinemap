@@ -21,7 +21,13 @@ import { addUser, loginUser } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
 import { tokenKey } from './lib/token.js'
 
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { addPhotos } from './services/files/file-service.js'
+
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 // const app = 
 
 // настрока парсера сервера для запросов
@@ -42,12 +48,26 @@ const connection = mysql.createConnection({ // подключение к БД
 });
 
 app.all('*', function(req, res, next) {  // настройки Core для запросов
-    res.header('Access-Control-Allow-Origin', '*');
+    // res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
-  });
+});
 
+server.prependListener("request", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+});
+
+// import fs from 'fs'
+
+io.on("connection", (socket) => {
+    socket.on('locations:add', (data, callback) => {
+        addLocations(data.data, data.files).then(response => {
+            callback('success');
+        }).catch(err => callback(err));
+    })
+});  
 
 //---------------------------------------------- locations ---------------------------------------------- 
 
@@ -67,12 +87,14 @@ app.get('/locations', function(req, res){ // обработка GET запрос
     }
 });
 
-app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
-    // console.log(req.headers.authorization);
-    addLocations(req.body, req.files).then(response => {
-        res.send(response);  // отправка результата в ответ на запрос
-    }).catch(err => res.status(500).send(err));
-});
+// app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
+//     // console.log(req.headers.authorization);
+//     console.log(req.files);
+//     addPhotos()
+// //     addLocations(req.body, req.files).then(response => {
+// //         res.send(response);  // отправка результата в ответ на запрос
+// //     }).catch(err => res.status(500).send(err));
+// });
 
 app.put('/locations', function(req, res){ // обработка GET запроса на обновление в таблице Locations
     connection.query(  // обновляю данные текстовых полей
@@ -212,6 +234,6 @@ app.get('/photos', function(req, res){ // обработка GET запроса 
     }   
 });
   
-app.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
+server.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
     console.log("Сервер запущен на 8000 порту");
 });

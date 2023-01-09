@@ -39,7 +39,9 @@ async function selectSearchLocations(params) { // ф-ия фильтрации �
 }
 
 async function addLocations(body, files) { // ф-ия добавления локации
+    // console.log(files);
     let response = await new Promise((resolve, reject) => {
+        // console.log('test');
         connection.query(
             `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
             VALUES ('${body.name}', '${body.filmName}', '${body.address}', '${body.latitude}', '${body.longitude}', '${body.route}', '${body.timing}');`,

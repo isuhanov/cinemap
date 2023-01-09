@@ -12,6 +12,7 @@ import { formIsValid, photosFieldIsValid, textFieldIsValid, timeFieldIsValid } f
 import './LocationForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import FormField from "../../services/form-services/form-field";
+import { io } from "socket.io-client";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker, otherClassName }) => {
     // стейт для хранения данных фотографий из карточки локации (при открытии формы изменения)
@@ -136,6 +137,8 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         if (form.usersPhoto.isTouched) photosFieldIsValid({ formItem:form.usersPhoto, isUpdate, photos:locationPhotos, typePhoto:'user' });
     }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
+    const { current: socket } = useRef(io(API_SERVER_PATH)  )
+
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения
         if (!formIsValid(form, isUpdate)) return
@@ -167,23 +170,40 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
     }
 
     function postLocation(data) { //  post-запрос на добавление локации в БД 
-        const formData = new FormData(); // объект для хранения данных отправляемой формы
-        usersPhoto.value.forEach(element => {
-            formData.append('usersPhoto', element);
-        });        
-        filmsPhoto.value.forEach(element => {
-            formData.append('filmsPhoto', element);
-        });    
-        for (const key in data) {
-            formData.append(key, data[key]);
+        const formData = {
+            data, 
+            files: { 
+                usersPhoto: usersPhoto.value.map(photo => ({
+                    name: photo.name,
+                    photo
+                })),
+                filmsPhoto: filmsPhoto.value.map(photo => ({
+                    name: photo.name,
+                    photo
+                }))
+            }
         }
 
-        axios.post(`${API_SERVER_PATH}/locations`, formData).then(response => {
-            console.log(response);
-            moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
-            onClickClose(); // закрытие формы при удачном добавлении
-            onReload(); // обновляю карту
-        }).catch(err => console.log(err));
+        console.log(formData);
+
+        socket.emit('locations:add', formData, (status) => {
+            if (status === 'success') {   
+                // console.log(response);
+                moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
+                onClickClose(); // закрытие формы при удачном добавлении
+                onReload(); // обновляю карту
+            } else {
+                console.log(status);
+            }
+        })
+
+        // axios.post(`${API_SERVER_PATH}/locations`, formData).then(response => {
+            //     console.log(response);
+            //     moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
+            //     onClickClose(); // закрытие формы при удачном добавлении
+            //     onReload(); // обновляю карту
+            // }).catch(err => console.log(err));
+
     }
 
     function putLocation(data) { //  put-запрос на изменение локации в БД 
