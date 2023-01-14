@@ -15,7 +15,7 @@ import jwt from'jsonwebtoken'
 import fs from 'fs'
 // const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
-import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations } from './services/locations/location-service.js'
+import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 import { addUser, loginUser } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
@@ -38,6 +38,13 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     })
 
+    socket.on('locations:update', (data, callback) => {
+        updateLocations(data.data, data.files).then(location => {
+            callback('success');
+            io.sockets.emit('map:update', location);
+            // res.send(response) // отправка результата в ответ на запрос
+        }).catch(err => callback(err));
+    })
 
     socket.on('locations:delete', (locationId, callback) => { // при удалении локации запрос в БД и поднятие события обновления карты
         deleteLocation(locationId).then(response => {
@@ -112,52 +119,55 @@ app.get('/locations', function(req, res){ // обработка GET запрос
 // });
 
 app.put('/locations', function(req, res){ // обработка GET запроса на обновление в таблице Locations
-    connection.query(  // обновляю данные текстовых полей
-        `UPDATE locations SET location_name = '${req.body.name}', 
-                                 location_film = '${req.body.filmName}', 
-                                 location_address = '${req.body.address}', 
-                                 location_latitude = '${req.body.latitude}', location_longitude = '${req.body.longitude}', 
-                                 location_route = '${req.body.route}', 
-                                 location_timing = '${req.body.timing}'
-                 WHERE (location_id = '${req.query.location_id}');`,
-        function(err, results, fields) {
-            if (err) {
-                console.log(err);
-                res.status(500).send(err) // выбрасываю ошибку сервера при наличии ошибок
-            } else {
-                // удаляю все выбранные фотографии из БД и с сервера
-                for (const photo of JSON.parse(req.body.deletePhotos)) {
-                    connection.query(
-                        `DELETE FROM locations_photos WHERE (locations_photo_id = '${photo.locations_photo_id}');`,
-                        function(err, results, fields) {
-                            if (err) {
-                                res.status(500).send(err);
-                            }
-                        }
-                    );
-                    fs.unlinkSync(`./img/${photo.locations_photo_path.slice(22)}`);
-                }
+    // updateLocations(body, files).then(response => {
+    //     res.send(response) // отправка результата в ответ на запрос
+    // }).catch(err => res.status(500).send(err));
+    // connection.query(  // обновляю данные текстовых полей
+    //     `UPDATE locations SET location_name = '${req.body.name}', 
+    //                              location_film = '${req.body.filmName}', 
+    //                              location_address = '${req.body.address}', 
+    //                              location_latitude = '${req.body.latitude}', location_longitude = '${req.body.longitude}', 
+    //                              location_route = '${req.body.route}', 
+    //                              location_timing = '${req.body.timing}'
+    //              WHERE (location_id = '${req.query.location_id}');`,
+    //     function(err, results, fields) {
+    //         if (err) {
+    //             console.log(err);
+    //             res.status(500).send(err) // выбрасываю ошибку сервера при наличии ошибок
+    //         } else {
+    //             // удаляю все выбранные фотографии из БД и с сервера
+    //             for (const photo of JSON.parse(req.body.deletePhotos)) {
+    //                 connection.query(
+    //                     `DELETE FROM locations_photos WHERE (locations_photo_id = '${photo.locations_photo_id}');`,
+    //                     function(err, results, fields) {
+    //                         if (err) {
+    //                             res.status(500).send(err);
+    //                         }
+    //                     }
+    //                 );
+    //                 fs.unlinkSync(`./img/${photo.locations_photo_path.slice(22)}`);
+    //             }
                 
-                // добавляю новые фотографии, если они имеются
-                let fail;
-                if (req.files) {
-                    if (req.files.usersPhoto) {
-                        fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${req.query.location_id}/user/`, 'user', req.query.location_id); 
-                    }
-                    if (req.files.filmsPhoto) {
-                        fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${req.query.location_id}/film/`, 'film', req.query.location_id);
-                    }
+    //             // добавляю новые фотографии, если они имеются
+    //             let fail;
+    //             if (req.files) {
+    //                 if (req.files.usersPhoto) {
+    //                     fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${req.query.location_id}/user/`, 'user', req.query.location_id); 
+    //                 }
+    //                 if (req.files.filmsPhoto) {
+    //                     fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${req.query.location_id}/film/`, 'film', req.query.location_id);
+    //                 }
 
-                }
-                if (fail) {
-                    res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
-                } else {
-                    res.send(results); // отправка результата в ответ на запрос
-                }
+    //             }
+    //             if (fail) {
+    //                 res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
+    //             } else {
+    //                 res.send(results); // отправка результата в ответ на запрос
+    //             }
 
-            }
-        }
-    );
+    //         }
+    //     }
+    // );
 });
 
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations

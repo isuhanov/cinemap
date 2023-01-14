@@ -2,11 +2,15 @@ import { Icon, Marker} from 'leaflet';
 import LocationIcon from '../../assets/place-marker.svg';
 
 function removeMarker(map, markers, lat, lng) { // ф-ия удаления маркера с карты маркера 
-  map.removeLayer(markers.find(marker => (
+  console.log('test');
+  map.removeLayer(markers.find(marker => {
+    console.log(marker);
+    console.log(lat, lng);
+    return (
       marker.getLatLng().lat === lat 
         && 
       marker.getLatLng().lng === lng
-    )
+    )}
   ));
 }
 

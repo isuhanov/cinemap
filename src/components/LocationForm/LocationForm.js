@@ -152,7 +152,7 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
             location_film: filmName.value,
             location_route: route.value,
             location_timing: timing.value,
-            user_id: user.user_id
+            user_id: user.user_id,
         }
         
         //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
@@ -196,37 +196,59 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
                 console.log(status);
             }
         })
-
-        // axios.post(`${API_SERVER_PATH}/locations`, formData).then(response => {
-            //     console.log(response);
-            //     moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
-            //     onClickClose(); // закрытие формы при удачном добавлении
-            //     onReload(); // обновляю карту
-            // }).catch(err => console.log(err));
-
     }
 
     function putLocation(data) { //  put-запрос на изменение локации в БД 
-        const formData = new FormData(); // объект для хранения данных отправляемой формы
-        usersPhoto.value.forEach(element => {
-            formData.append('usersPhoto', element);
-        });        
-        filmsPhoto.value.forEach(element => {
-            formData.append('filmsPhoto', element);
-        });    
-        for (const key in data) {
-            formData.append(key, data[key]);
+        // const formData = new FormData(); // объект для хранения данных отправляемой формы
+        // usersPhoto.value.forEach(element => {
+        //     formData.append('usersPhoto', element);
+        // });        
+        // filmsPhoto.value.forEach(element => {
+        //     formData.append('filmsPhoto', element);
+        // });    
+        // for (const key in data) {
+        //     formData.append(key, data[key]);
+        // }
+        const formData = {
+            data: {
+                ...data,
+                location_id: location.location_id,
+                deletePhotos: locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
+            }, 
+            files: { 
+                usersPhoto: usersPhoto.value.map(photo => ({
+                    name: photo.name,
+                    photo
+                })),
+                filmsPhoto: filmsPhoto.value.map(photo => ({
+                    name: photo.name,
+                    photo
+                }))
+            },
         }
 
-        const deletePhotos = locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
-            formData.append('deletePhotos', JSON.stringify(deletePhotos));
+        // const deletePhotos = locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
+        // formData.append('deletePhotos', JSON.stringify(deletePhotos));
+        // console.log(location);
+        // console.log(formData);
 
-        axios.put(`${API_SERVER_PATH}/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
-            console.log(response);
-            onClickClose(); // закрытие формы при удачном добавлении
-            onReload(); // обновляю карту
+        socket.emit('locations:update', formData, (status) => {
+            if (status === 'success') {   
+                // console.log(status);
+                // moveToMarker([data.location_latitude, data.location_longitude]); // установка координт нового маркера для плавного перехода
+                onClickClose(); // закрытие формы при удачном добавлении
+                // onReload(); // обновляю карту
+            } else {
+                console.log(status);
+            }
+        })
+
+        // axios.put(`${API_SERVER_PATH}/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
+        //     console.log(response);
+        //     onClickClose(); // закрытие формы при удачном добавлении
+        //     onReload(); // обновляю карту
             
-        }).catch(err => console.log(err));
+        // }).catch(err => console.log(err));
     }
 
 
