@@ -30,6 +30,30 @@ const server = createServer(app);
 const io = new Server(server);
 // const app = 
 
+io.on("connection", (socket) => {
+    socket.on('locations:add', (data, callback) => { // при добавлении локации запрос в БД и поднятие события обновления карты
+        addLocations(data.data, data.files).then(location => {
+            callback('success');
+            io.sockets.emit('map:add', location);
+        }).catch(err => callback(err));
+    })
+
+
+    socket.on('locations:delete', (locationId, callback) => { // при удалении локации запрос в БД и поднятие события обновления карты
+        deleteLocation(locationId).then(response => {
+            callback('success');
+            io.sockets.emit('map:delete', locationId);
+            // res.send(response) // отправка результата в ответ на запрос
+        }).catch(err => callback(err));
+    })
+
+});  
+  
+server.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
+    console.log("Сервер запущен на 8000 порту");
+});
+
+
 // настрока парсера сервера для запросов
 app.use(bodyParser.urlencoded({ extended: true })); 
 app.use(bodyParser.json());   
@@ -59,15 +83,6 @@ server.prependListener("request", (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
 });
 
-// import fs from 'fs'
-
-io.on("connection", (socket) => {
-    socket.on('locations:add', (data, callback) => {
-        addLocations(data.data, data.files).then(response => {
-            callback('success');
-        }).catch(err => callback(err));
-    })
-});  
 
 //---------------------------------------------- locations ---------------------------------------------- 
 
@@ -146,9 +161,9 @@ app.put('/locations', function(req, res){ // обработка GET запрос
 });
 
 app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
-    deleteLocation(req.query.location_id).then(response => {
-        res.send(response) // отправка результата в ответ на запрос
-    }).catch(err => res.status(500).send(err));
+    // deleteLocation(req.query.location_id).then(response => {
+    //     res.send(response) // отправка результата в ответ на запрос
+    // }).catch(err => res.status(500).send(err));
 });
 
 
@@ -232,8 +247,4 @@ app.get('/photos', function(req, res){ // обработка GET запроса 
             }
         );
     }   
-});
-  
-server.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
-    console.log("Сервер запущен на 8000 порту");
 });

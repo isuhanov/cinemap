@@ -15,6 +15,19 @@ async function selectAllLocations() { // ф-ия поиска всех лока�
     return response;
 }
 
+// async function selectLocation(locationId) { // ф-ия поиска одной локации
+//     let response = await new Promise((resolve, reject) => {
+//         connection.query(
+//             `SELECT * FROM locations WHERE location_name = ${locationId};`,
+//             function(err, results, fields) {
+//                 if (err) reject(err);
+//                 else resolve(results); // отправка результата в ответ на запрос
+//             }
+//         )   
+//     });
+//     return response;
+// }
+
 async function selectSearchLocations(params) { // ф-ия фильтрации локаций
     let response = await new Promise((resolve, reject) => {
         let query = 'SELECT * FROM locations WHERE ';
@@ -39,12 +52,10 @@ async function selectSearchLocations(params) { // ф-ия фильтрации �
 }
 
 async function addLocations(body, files) { // ф-ия добавления локации
-    // console.log(files);
     let response = await new Promise((resolve, reject) => {
-        // console.log('test');
         connection.query(
             `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
-            VALUES ('${body.name}', '${body.filmName}', '${body.address}', '${body.latitude}', '${body.longitude}', '${body.route}', '${body.timing}');`,
+            VALUES ('${body.location_name}', '${body.location_film}', '${body.location_address}', '${body.location_latitude}', '${body.location_longitude}', '${body.location_route}', '${body.location_timing}');`,
             function(err, results, fields) {
                 if (err) {
                     reject(err);
@@ -52,12 +63,12 @@ async function addLocations(body, files) { // ф-ия добавления ло�
                     let fail = addPhotos(results.insertId, files.usersPhoto, files.filmsPhoto); // добавление картинок
         
                     // создание связи между пользователем и локацией
-                    fail = insertUserLocation(body.userId, results.insertId);
+                    fail = insertUserLocation(body.user_id, results.insertId);
         
                     if (fail) {
                         reject(fail); // отправка ошибки в ответ на запрос при неудачном добавлении 
                     } else {
-                        resolve(results); // отправка результата в ответ на запрос
+                        resolve({...body, location_id:results.insertId}); // отправка результата в ответ на запрос
                     }
                 }
             }

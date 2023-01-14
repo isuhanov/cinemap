@@ -29,7 +29,6 @@ function App() {
     // socket.on('test', (test) => {
     //   console.log(test);
     // });
-
   }, [])
 
   const [markerPos, setMarkerPos] = useState(undefined); // стейт для позиции маркера при добавлении
@@ -174,7 +173,7 @@ function App() {
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
-                onReload={onReload} setLocations={setLocations} 
+                onReload={onReload} setLocations={setLocations} locations={locations}
                 openLocationCard={(locationId) => {
                   openLocationCard(locationId, closeLocationList);
                 }} 

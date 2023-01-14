@@ -148,11 +148,11 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
     function generationData(queryFunc) { // ф-ия формирует объект с данными из формы и вызывает ф-ию для соответсвующего запроса (POST/PUT)
         const user = JSON.parse(localStorage.getItem('user'));
         let queryLocationObj = {
-            name: name.value,
-            filmName: filmName.value,
-            route: route.value,
-            timing: timing.value,
-            userId: user.user_id
+            location_name: name.value,
+            location_film: filmName.value,
+            location_route: route.value,
+            location_timing: timing.value,
+            user_id: user.user_id
         }
         
         //------------------------------- ДОДЕЛАТЬ ----------------------------------------------
@@ -161,9 +161,9 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
         // получение координат и адреса от OSM 
         axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {  
-            queryLocationObj['address'] = res.data[0].display_name;
-            queryLocationObj['latitude'] = res.data[0].lat;
-            queryLocationObj['longitude'] = res.data[0].lon;
+            queryLocationObj['location_address'] = res.data[0].display_name;
+            queryLocationObj['location_latitude'] = res.data[0].lat;
+            queryLocationObj['location_longitude'] = res.data[0].lon;
         }).then(res => {
             queryFunc(queryLocationObj); // добавление локации в БД
         }).catch(err => console.log(err));
@@ -189,9 +189,9 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         socket.emit('locations:add', formData, (status) => {
             if (status === 'success') {   
                 // console.log(response);
-                moveToMarker([data.latitude, data.longitude]); // установка координт нового маркера для плавного перехода
+                moveToMarker([data.location_latitude, data.location_longitude]); // установка координт нового маркера для плавного перехода
                 onClickClose(); // закрытие формы при удачном добавлении
-                onReload(); // обновляю карту
+                // onReload(); // обновляю карту
             } else {
                 console.log(status);
             }
