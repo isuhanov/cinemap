@@ -42,7 +42,6 @@ io.on("connection", (socket) => {
         updateLocations(data.data, data.files).then(location => {
             callback('success');
             io.sockets.emit('map:update', location);
-            // res.send(response) // отправка результата в ответ на запрос
         }).catch(err => callback(err));
     })
 

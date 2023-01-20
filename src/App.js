@@ -18,17 +18,9 @@ import { io } from 'socket.io-client'
 function App() {
 
   const { current: socket } = useRef(io(API_SERVER_PATH)  )
-  // const socket = io(API_SERVER_PATH);
 
   useEffect(() => {
     socket.connect();
-    // socket.emit('hello', 'world');
-    // // socket.on("connect", () => {
-    // //   console.log(socket.id);
-    // // });
-    // socket.on('test', (test) => {
-    //   console.log(test);
-    // });
   }, [])
 
   const [markerPos, setMarkerPos] = useState(undefined); // стейт для позиции маркера при добавлении
@@ -174,6 +166,10 @@ function App() {
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
                 onReload={onReload} setLocations={setLocations} locations={locations}
+                // onDelete={() => {
+                //   closeLocationCard();
+                //   closeLocationList();
+                // }}
                 openLocationCard={(locationId) => {
                   openLocationCard(locationId, closeLocationList);
                 }} 

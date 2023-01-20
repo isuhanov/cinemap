@@ -118,7 +118,6 @@ async function updateLocations(body, files) {
                         reject(fail);
                     } else {
                         selectLocation(body.location_id).then(res => {
-                            console.log(res);
                             resolve(res);
                         }).catch(err => reject(err));
                     }

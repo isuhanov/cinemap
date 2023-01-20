@@ -51,12 +51,14 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
-        socket.emit('locations:delete', location.location_id, (status) => {
-            if (status === 'success') {
-                onDelete();
-                console.log('delete');
-            } else console.log(status);
-        })
+        onDelete();
+        setTimeout(()=>{
+            socket.emit('locations:delete', location.location_id, (status) => {
+                if (status === 'success') {
+                    console.log('delete');
+                } else console.log(status);
+            })
+        }, 600)
         // axios.delete(`${API_SERVER_PATH}/locations?location_id=${location.location_id}`).then(res => {
         //     console.log(res);
         //     onDelete();

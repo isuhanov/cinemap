@@ -8,7 +8,9 @@ function removeMarker(map, markers, lat, lng) { // ф-ия удаления ма
         && 
       marker.getLatLng().lng === lng
     )})
+    console.log(remove);
   map.removeLayer(remove);
+  console.log('удален');
 }
 
 function createMarker(lat, lng) { // ф-ия создания маркера 

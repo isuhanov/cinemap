@@ -36,12 +36,14 @@ const BGMap = memo(({ reload, onReload, markerPos, setLocations, locations, open
     }
   }, [markerPos])
 
+  // useEffect(() => {
+  //   console.log(locations);
+  // }, [locations])
   
   const { current: socket } = useRef(io(API_SERVER_PATH)  ) // постоянная ссылка на сокет
-  useEffect(() => { // !!!!!!!!!!! РЕШИТЬ ПРОБЛЕМУ УДАЛЕНИЯ 
+  useEffect(() => {
     if (map) {
       socket.on('map:add', (res) => { // при добавлении нового маркера обновляю списко локаци и ставлю маркер (если такого еще нет)
-        setLocations(prev => [...prev, res]);
         const marker = createMarker(res.location_latitude, res.location_longitude);
         const filterLocations = locations.filter(filterLoc => filterLoc.location_address === res.location_address);
         if (filterLocations.length >= 1) {
@@ -55,9 +57,15 @@ const BGMap = memo(({ reload, onReload, markerPos, setLocations, locations, open
             openLocationCard(res.location_id);
           });
         }
+
+        // console.log(res);
+        setLocations(prev => [
+          ...prev,
+          res
+        ]);
       });
 
-      socket.on('map:update', (res) => { // при добавлении нового маркера обновляю списко локаци и ставлю маркер (если такого еще нет)
+      socket.on('map:update', (res) => { // при обновлении нового маркера обновляю списко локаци и ставлю маркер (если такого еще нет)
         const prevLocation = locations.find(location => location.location_id === res.location_id);
         if (prevLocation.location_address !== res.location_address) {
           const newFilterLocations = locations.filter(filterLoc => filterLoc.location_address === res.location_address);
@@ -92,7 +100,6 @@ const BGMap = memo(({ reload, onReload, markerPos, setLocations, locations, open
             addListMarker(setMarkers, map, marker, () => {
               openLocationList(prevFilterLocations);
             })
-          } else {
           }
         }
 
@@ -102,8 +109,30 @@ const BGMap = memo(({ reload, onReload, markerPos, setLocations, locations, open
         ]);
       });
 
-      // socket.on('map:delete', (locationId) => {
-      // }); 
+      socket.on('map:delete', (locationId) => { // при удалении удаляю маркер или изменяю списко локаций маркера 
+        console.log(locations);
+        const deleteLocation = locations.find(location => location.location_id == locationId);
+        const filterLocations = locations.filter(filterLoc => filterLoc.location_address === deleteLocation.location_address 
+                                                  &&
+                                                filterLoc.location_id !== deleteLocation.location_id);
+        
+        const [prevLat, prevLng] = [deleteLocation.location_latitude, deleteLocation.location_longitude];
+        removeMarker(map, markers, prevLat, prevLng); // удаляю предыдущий маркер
+        if (filterLocations.length === 1) {
+          const marker = createMarker(prevLat, prevLng); // создаю новый маркер для 1 локации на том же самом месте
+          addMarker(setMarkers, map, marker, () => {
+            openLocationCard(filterLocations[0].location_id);
+          });
+        } else if (filterLocations.length > 1){
+          const marker = createMarker(prevLat, prevLng); // создаю новый маркер для списка локаций
+          addListMarker(setMarkers, map, marker, () => {
+            openLocationList(filterLocations);
+          })
+        }
+        setLocations(prev => [
+          ...prev.filter(filterLoc => filterLoc.location_id !== locationId),
+        ]);
+      }); 
     }
   }, [locations]);
 
