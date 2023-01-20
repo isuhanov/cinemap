@@ -15,18 +15,18 @@ async function selectAllLocations() { // ф-ия поиска всех лока�
     return response;
 }
 
-// async function selectLocation(locationId) { // ф-ия поиска одной локации
-//     let response = await new Promise((resolve, reject) => {
-//         connection.query(
-//             `SELECT * FROM locations WHERE location_name = ${locationId};`,
-//             function(err, results, fields) {
-//                 if (err) reject(err);
-//                 else resolve(results); // отправка результата в ответ на запрос
-//             }
-//         )   
-//     });
-//     return response;
-// }
+async function selectLocation(locationId) { // ф-ия фильтрации ожной локации
+    let response = await new Promise((resolve, reject) => {
+        connection.query( // получаю данные из БД
+            `SELECT * FROM locations WHERE location_id = ${locationId}`,            
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results[0]); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
 
 async function selectSearchLocations(params) { // ф-ия фильтрации локаций
     let response = await new Promise((resolve, reject) => {
@@ -78,8 +78,6 @@ async function addLocations(body, files) { // ф-ия добавления ло�
 }
 
 async function updateLocations(body, files) {
-    // console.log(body);
-    // console.log(files);
     let response = new Promise((resolve, reject) => {
         connection.query(  // обновляю данные текстовых полей
             `UPDATE locations SET location_name = '${body.location_name}', 
@@ -92,8 +90,6 @@ async function updateLocations(body, files) {
             function(err, results, fields) {
                 if (err) {
                     reject(err);
-                    // console.log(err);
-                    // res.status(500).send(err) // выбрасываю ошибку сервера при наличии ошибок
                 } else {
                     // удаляю все выбранные фотографии из БД и с сервера
                     for (const photo of body.deletePhotos) {
@@ -102,19 +98,14 @@ async function updateLocations(body, files) {
                             function(err, results, fields) {
                                 if (err) {
                                     reject(err);
-                                    // res.status(500).send(err);
                                 }
                             }
                         );
                         removeFile(`./img/${photo.locations_photo_path.slice(22)}`)
-                        // removeFile(`./img/photo/locationphoto/196/user/v1J13VoSfn.jpg`)
-                        // fs.unlinkSync(`./img/${photo.locations_photo_path.slice(22)}`);
-                    }
-                    
+                    }                    
                     // добавляю новые фотографии, если они имеются
                     let fail;
                     if (files) {
-                        // fail = addPhotos(body.location_id, files.usersPhoto, files.filmsPhoto); // добавление картинок
                         if (files.usersPhoto) {
                             fail = addPhotosToDir(files.usersPhoto, `./img/photo/locationphoto/${body.location_id}/user/`, 'user', body.location_id); 
                         }
@@ -125,10 +116,11 @@ async function updateLocations(body, files) {
                     }
                     if (fail) {
                         reject(fail);
-                        // res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
                     } else {
-                        resolve(body);
-                        // res.send(results); // отправка результата в ответ на запрос
+                        selectLocation(body.location_id).then(res => {
+                            console.log(res);
+                            resolve(res);
+                        }).catch(err => reject(err));
                     }
     
                 }
@@ -196,4 +188,4 @@ function insertUserLocation(userId, locationId) { // ф-ия создания с
 }
 
 
-export { selectAllLocations, selectSearchLocations, addLocations, updateLocations, deleteLocation, selectUsersLocations };
+export { selectAllLocations, selectLocation, selectSearchLocations, addLocations, updateLocations, deleteLocation, selectUsersLocations };
