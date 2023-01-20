@@ -225,7 +225,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                         </div>
                         <div className="field-block" ref={photo.parent}>
                             <label>
-                                Фото из фильма:                              
+                                Фото из профиля:                              
                             </label>
                             {/* { isUpdate &&
                                 <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} 

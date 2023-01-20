@@ -123,12 +123,12 @@ function photosFieldIsValid({ formItem, maxWidth=undefined, isUpdate=false, phot
         })
         fieldIsValid = false;
     } else {
-        const extentions = ['jpg', 'jpeg', 'png', 'svg', 'webp']
+        const extentions = ['jpg', 'jpeg', 'png']
         formItem.value.forEach(file => {
             if (!extentions.includes(file.name.split('.').pop().toLowerCase())) {
                 formItem.parent.current.classList.add('error');
                 formItem.set({
-                    error: 'Разрешены только файлы с расширениеми: jpg, jpeg, png, svg, webp'
+                    error: 'Разрешены только файлы с расширениеми: jpg, jpeg, png'
                 })
                 fieldIsValid = false;
             }                    

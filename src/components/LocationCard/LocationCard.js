@@ -1,14 +1,13 @@
 import axios from "axios";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import LocationForm from "../LocationForm/LocationForm";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
-// import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
-
 
 import API_SERVER_PATH from "../../lib/api/api-path";
 import './LocationCard.css'
 import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
+import { io } from "socket.io-client";
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
@@ -16,6 +15,8 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     // const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
     const [localReload, setLocalReload] = useState(false); // стейт для локальной перезагрузки карточки
     const [isFavorite, setIsFavorite] = useState(false); // стейт для состояния избранного
+
+    const { current: socket } = useRef(io(API_SERVER_PATH)  ) // постоянная ссылка на сокет
 
     const [showsLocationForm, setShowsLocationForm] = useState({
         isVisible: false,
@@ -50,11 +51,19 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
-        axios.delete(`${API_SERVER_PATH}/locations?location_id=${location.location_id}`).then(res => {
-            console.log(res);
-            onDelete();
-            console.log('delete');
-        }).catch(err => console.log(err));
+        onDelete();
+        setTimeout(()=>{
+            socket.emit('locations:delete', location.location_id, (status) => {
+                if (status === 'success') {
+                    console.log('delete');
+                } else console.log(status);
+            })
+        }, 600)
+        // axios.delete(`${API_SERVER_PATH}/locations?location_id=${location.location_id}`).then(res => {
+        //     console.log(res);
+        //     onDelete();
+        //     console.log('delete');
+        // }).catch(err => console.log(err));
     }
 
     function onFavoritesBtnClick() { // ф-ия обработки нажатия флажка избранного

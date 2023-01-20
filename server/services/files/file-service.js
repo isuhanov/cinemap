@@ -9,19 +9,23 @@ import connection from '../db/db-service.js';
 const API_PATH = 'http://localhost:8000';
 
 function removeDir(dir) { // ф-ия удалеения файлов 
-    let files = fs.readdirSync(dir)
-    for(var i=0;i<files.length;i++){
-      let newPath = path.join(dir, files[i]);
-      let stat = fs.statSync(newPath)
-      if(stat.isDirectory()){
-        // Если это папка, рекурсивно вниз
-        removeDir(newPath);
-      }else {
-       //Удалить файлы
-        fs.unlinkSync(newPath);
-      }
+  let files = fs.readdirSync(dir)
+  for(var i=0;i<files.length;i++){
+    let newPath = path.join(dir, files[i]);
+    let stat = fs.statSync(newPath)
+    if(stat.isDirectory()){
+      // Если это папка, рекурсивно вниз
+      removeDir(newPath);
+    }else {
+      //Удалить файлы
+      fs.unlinkSync(newPath);
     }
-    fs.rmdirSync(dir)// Если папка пуста, удаляем себя
+  }
+  fs.rmdirSync(dir)// Если папка пуста, удаляем себя
+}
+
+function removeFile(dir) {
+  fs.unlinkSync(dir);
 }
 
 function addPhotos(id, usersPhoto, filmsPhoto) {  // функция добавления фото
@@ -38,10 +42,14 @@ function addPhotos(id, usersPhoto, filmsPhoto) {  // функция добавл
 function addPhotosToDir(photos, path, status, locationId) { // ф-ия добавления фото в папку сервера
   let photoPath;
   let photoName;
-  if (Array.isArray(photos)) {
+  // console.log(photos);
+//   if (Array.isArray(photos)) {
       for (const photo of photos) {
           photoName = nanoid(10) + '.' + photo.name.split('.').pop();
-          photo.mv(path + photoName);
+        //   photo.mv(path + photoName);
+        fs.writeFile(path + photoName, photo.photo, (err) => {
+            console.log(err);
+        });
           photoPath = `${API_PATH}${path.slice(5)}${photoName}`;
           connection.query(
               `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
@@ -52,19 +60,19 @@ function addPhotosToDir(photos, path, status, locationId) { // ф-ия доба�
               }
           ); 
       }
-  } else {
-      photoName = nanoid(10) + '.' + photos.name.split('.').pop();        
-      photos.mv(path + photoName);
-      photoPath = `${API_PATH}${path.slice(5)}${photoName}`;
-      connection.query(
-          `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
-          function(err, results, fields) {
-              if (err) {
-                  return err;
-              }
-          }
-      );
-  }
+//   } else {
+//       photoName = nanoid(10) + '.' + photos.name.split('.').pop();        
+//       photos.mv(path + photoName);
+//       photoPath = `${API_PATH}${path.slice(5)}${photoName}`;
+//       connection.query(
+//           `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
+//           function(err, results, fields) {
+//               if (err) {
+//                   return err;
+//               }
+//           }
+//       );
+//   }
 }
 
 function addUserPhoto(photo, path) { // ф-ия добавления фотографий пользователя в папке сервера
@@ -75,4 +83,4 @@ function addUserPhoto(photo, path) { // ф-ия добавления фотог�
     return photoPath;
 }
 
-export { removeDir, addPhotos, addUserPhoto };
+export { removeDir, removeFile, addPhotos, addPhotosToDir, addUserPhoto };

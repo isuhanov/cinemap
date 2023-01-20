@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
 import LocationCard from './components/LocationCard/LocationCard';
@@ -13,8 +13,16 @@ import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
 import API_SERVER_PATH from './lib/api/api-path';
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
+import { io } from 'socket.io-client'
 
 function App() {
+
+  const { current: socket } = useRef(io(API_SERVER_PATH)  )
+
+  useEffect(() => {
+    socket.connect();
+  }, [])
+
   const [markerPos, setMarkerPos] = useState(undefined); // стейт для позиции маркера при добавлении
   const moveToMarker = useCallback((newMarkerPos) => { // ф-ия установки координт нового маркера для плавного перехода
     setMarkerPos(newMarkerPos);
@@ -157,7 +165,11 @@ function App() {
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
-                onReload={onReload} setLocations={setLocations} 
+                onReload={onReload} setLocations={setLocations} locations={locations}
+                // onDelete={() => {
+                //   closeLocationCard();
+                //   closeLocationList();
+                // }}
                 openLocationCard={(locationId) => {
                   openLocationCard(locationId, closeLocationList);
                 }} 

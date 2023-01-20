@@ -1,6 +1,6 @@
 import connection from '../db/db-service.js';
 import { deleteAllFavourites } from '../favourites-locations/favourites-location-service.js';
-import { addPhotos, removeDir } from '../files/file-service.js';
+import { addPhotos, addPhotosToDir, removeDir, removeFile } from '../files/file-service.js';
 
 async function selectAllLocations() { // ф-ия поиска всех локаций
     let response = await new Promise((resolve, reject) => {
@@ -9,6 +9,19 @@ async function selectAllLocations() { // ф-ия поиска всех лока�
             function(err, results, fields) {
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
+
+async function selectLocation(locationId) { // ф-ия фильтрации ожной локации
+    let response = await new Promise((resolve, reject) => {
+        connection.query( // получаю данные из БД
+            `SELECT * FROM locations WHERE location_id = ${locationId}`,            
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results[0]); // отправка результата в ответ на запрос
             }
         )   
     });
@@ -42,7 +55,7 @@ async function addLocations(body, files) { // ф-ия добавления ло�
     let response = await new Promise((resolve, reject) => {
         connection.query(
             `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
-            VALUES ('${body.name}', '${body.filmName}', '${body.address}', '${body.latitude}', '${body.longitude}', '${body.route}', '${body.timing}');`,
+            VALUES ('${body.location_name}', '${body.location_film}', '${body.location_address}', '${body.location_latitude}', '${body.location_longitude}', '${body.location_route}', '${body.location_timing}');`,
             function(err, results, fields) {
                 if (err) {
                     reject(err);
@@ -50,17 +63,70 @@ async function addLocations(body, files) { // ф-ия добавления ло�
                     let fail = addPhotos(results.insertId, files.usersPhoto, files.filmsPhoto); // добавление картинок
         
                     // создание связи между пользователем и локацией
-                    fail = insertUserLocation(body.userId, results.insertId);
+                    fail = insertUserLocation(body.user_id, results.insertId);
         
                     if (fail) {
                         reject(fail); // отправка ошибки в ответ на запрос при неудачном добавлении 
                     } else {
-                        resolve(results); // отправка результата в ответ на запрос
+                        resolve({...body, location_id:results.insertId}); // отправка результата в ответ на запрос
                     }
                 }
             }
         ); 
     });
+    return response;
+}
+
+async function updateLocations(body, files) {
+    let response = new Promise((resolve, reject) => {
+        connection.query(  // обновляю данные текстовых полей
+            `UPDATE locations SET location_name = '${body.location_name}', 
+                                     location_film = '${body.location_film}', 
+                                     location_address = '${body.location_address}', 
+                                     location_latitude = '${body.location_latitude}', location_longitude = '${body.location_longitude}', 
+                                     location_route = '${body.location_route}', 
+                                     location_timing = '${body.location_timing}'
+                     WHERE (location_id = '${body.location_id}');`,
+            function(err, results, fields) {
+                if (err) {
+                    reject(err);
+                } else {
+                    // удаляю все выбранные фотографии из БД и с сервера
+                    for (const photo of body.deletePhotos) {
+                        connection.query(
+                            `DELETE FROM locations_photos WHERE (locations_photo_id = '${photo.locations_photo_id}');`,
+                            function(err, results, fields) {
+                                if (err) {
+                                    reject(err);
+                                }
+                            }
+                        );
+                        removeFile(`./img/${photo.locations_photo_path.slice(22)}`)
+                    }                    
+                    // добавляю новые фотографии, если они имеются
+                    let fail;
+                    if (files) {
+                        if (files.usersPhoto) {
+                            fail = addPhotosToDir(files.usersPhoto, `./img/photo/locationphoto/${body.location_id}/user/`, 'user', body.location_id); 
+                        }
+                        if (files.filmsPhoto) {
+                            fail = addPhotosToDir(files.filmsPhoto, `./img/photo/locationphoto/${body.location_id}/film/`, 'film', body.location_id);
+                        }
+    
+                    }
+                    if (fail) {
+                        reject(fail);
+                    } else {
+                        selectLocation(body.location_id).then(res => {
+                            resolve(res);
+                        }).catch(err => reject(err));
+                    }
+    
+                }
+            }
+        );
+    });
+
     return response;
 }
 
@@ -121,4 +187,4 @@ function insertUserLocation(userId, locationId) { // ф-ия создания с
 }
 
 
-export { selectAllLocations, selectSearchLocations, addLocations, deleteLocation, selectUsersLocations };
+export { selectAllLocations, selectLocation, selectSearchLocations, addLocations, updateLocations, deleteLocation, selectUsersLocations };
