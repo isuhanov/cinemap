@@ -14,6 +14,7 @@ import SideBar from './components/SideBar/SideBar';
 import API_SERVER_PATH from './lib/api/api-path';
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 import { io } from 'socket.io-client'
+import Messenger from './components/Messenger/Messenger';
 
 function App() {
 
@@ -176,6 +177,8 @@ function App() {
                 openLocationList={(locations) => {
                   openLocationList(locations, 'Локации', closeLocationCard);
                 }} />
+
+        <Messenger />
                 
         { showsLocationForm.isVisible && 
           <LocationForm 
