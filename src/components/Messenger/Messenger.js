@@ -13,14 +13,14 @@ const Messenger = memo(() => {
                         Мессенджер
                     </p>
                     <div className="header-btn-container">
-                        <button className="header-btn" onClick={''}>
+                        <button className="header-btn" >
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>
                 </header>
                 <div className="messenger-main">
                     { [1, 2].map(chatItem => (
-                            <div className="messenger-chat-item" onClick={''}>
+                            <div className="messenger-chat-item" key={chatItem}>
                                 <ProfileAvatar otherClassName="messenger__profile-userimg" imgSrc={undefined}/>
                                 <div className="messenger-chat__info">
                                     <p className="messenger-chat__login">
@@ -36,8 +36,8 @@ const Messenger = memo(() => {
                                         {'13:46'}
                                     </p>
                                     <p className="messenger-chat__status unread">
-                                        <span class="material-symbols-outlined done-outlined">done</span>
-                                        <span class="material-symbols-outlined done-outlined">done</span>
+                                        <span className="material-symbols-outlined done-outlined">done</span>
+                                        <span className="material-symbols-outlined done-outlined">done</span>
                                     </p>
                                 </div>
                             </div>

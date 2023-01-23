@@ -24,6 +24,7 @@ import { tokenKey } from './lib/token.js'
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { addPhotos } from './services/files/file-service.js'
+import { addMessage, selectMessages } from './services/chat/chat-services.js'
 
 const app = express();
 const server = createServer(app);
@@ -49,10 +50,23 @@ io.on("connection", (socket) => {
         deleteLocation(locationId).then(response => {
             callback('success');
             io.sockets.emit('map:delete', locationId);
-            // res.send(response) // отправка результата в ответ на запрос
         }).catch(err => callback(err));
     })
 
+    socket.on('messages:get', (chatId, callback) => {
+        selectMessages(chatId).then(messages=> {
+            console.log(messages);
+            callback({status:'success', messages});
+        }).catch(err => callback(err));
+    });
+
+    socket.on('messages:add', (body, callback) => {
+        addMessage(body).then(message=> {
+            console.log(message);
+            callback('success');
+            io.sockets.emit('messages:update_list', message);
+        }).catch(err => callback(err));
+    });
 });  
   
 server.listen(8000, () => { // запус и прослушка сервера на 8000 порту 
