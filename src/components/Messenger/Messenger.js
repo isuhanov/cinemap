@@ -5,6 +5,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 import './Messenger.css';
 
 const Messenger = memo(() => {
+
     return (
         <div className={`messenger-container ${''}`}>
             <div className="location-card messenger-card animation-content">
