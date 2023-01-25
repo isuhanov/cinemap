@@ -1,53 +1,48 @@
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
+import API_SERVER_PATH from "../../lib/api/api-path";
 import ChatCard from "../ChatCard/ChatCard";
+import ChatItem from "../ChatItem/ChatItem";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './Messenger.css';
 
-const Messenger = memo(() => {
+const Messenger = memo(({ onClickClose, otherClassName }) => {
+    const [chats, setChats] = useState([]);
+
+    const { current: socket } = useRef(io(API_SERVER_PATH)  )
+    useEffect(() => {
+      socket.emit('chats:get', JSON.parse(localStorage.getItem('user')).user_id,(response) => {
+        if (response.status === 'success') {
+            setChats(response.chats)
+        }
+      });
+    }, [])
 
     return (
-        <div className={`messenger-container ${''}`}>
+        <div className={`messenger-container ${otherClassName}`}>
             <div className="location-card messenger-card animation-content">
                 <header className="header-card messenger-card__header">
                     <p className="location-card-title title">
                         Мессенджер
                     </p>
                     <div className="header-btn-container">
-                        <button className="header-btn" >
+                        <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>
                 </header>
                 <div className="messenger-main">
-                    { [1, 2].map(chatItem => (
-                            <div className="messenger-chat-item" key={chatItem}>
-                                <ProfileAvatar otherClassName="messenger__profile-userimg" imgSrc={undefined}/>
-                                <div className="messenger-chat__info">
-                                    <p className="messenger-chat__login">
-                                        {'login'}
-                                    </p>
-                                    <p className="messenger-chat__text">
-                                        {'Тут какое-то сообщение сообщение сообщение сообщение сообщение сообщение...'}
-                                        {'Тут какое-то сообщение сообщение сообщение сообщение сообщение сообщение...'}
-                                    </p>
-                                </div>
-                                <div className="messenger-chat__description">
-                                    <p className="messenger-chat__time">
-                                        {'13:46'}
-                                    </p>
-                                    <p className="messenger-chat__status unread">
-                                        <span className="material-symbols-outlined done-outlined">done</span>
-                                        <span className="material-symbols-outlined done-outlined">done</span>
-                                    </p>
-                                </div>
-                            </div>
+                    { chats.map(chatItem => (
+                            <ChatItem key={chatItem.chat_id} 
+                                    chatId={chatItem.chat_id}
+                            />
                         )
                     )}
                 </div>
             </div>
 
-            <ChatCard />
+            {/* <ChatCard /> */}
         </div>
     )
 });

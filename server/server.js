@@ -1,19 +1,12 @@
-// const mysql = require("mysql2");
 import mysql from 'mysql2'
-// const express = require("express");
 import express, { response } from 'express'
-// const bodyParser = require('body-parser')
 import bodyParser from 'body-parser'
-// const fileUpload = require('express-fileupload');
 import fileUpload from 'express-fileupload'
-// const cors = require('cors');
 import cors from 'cors'
 
-// const jwt = require('jsonwebtoken');
 import jwt from'jsonwebtoken'
 
 import fs from 'fs'
-// const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
@@ -24,12 +17,11 @@ import { tokenKey } from './lib/token.js'
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { addPhotos } from './services/files/file-service.js'
-import { addMessage, selectMessages } from './services/chat/chat-services.js'
+import { addMessage, selectChatInfo, selectChats, selectMessages } from './services/chat/chat-services.js'
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
-// const app = 
 
 io.on("connection", (socket) => {
     socket.on('locations:add', (data, callback) => { // при добавлении локации запрос в БД и поднятие события обновления карты
@@ -53,16 +45,27 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     })
 
+    socket.on('chats:get', (userId, callback) => {
+        selectChats(userId).then(chats=> {
+            callback({status:'success', chats});
+        }).catch(err => callback(err));
+    });
+
+    socket.on('chats:getInfo', (userId, callback) => {
+        selectChatInfo(userId).then(chatInfo => {
+            console.log(chatInfo);
+            callback({status:'success', chatInfo});
+        }).catch(err => callback(err));
+    });
+
     socket.on('messages:get', (chatId, callback) => {
         selectMessages(chatId).then(messages=> {
-            console.log(messages);
             callback({status:'success', messages});
         }).catch(err => callback(err));
     });
 
     socket.on('messages:add', (body, callback) => {
         addMessage(body).then(message=> {
-            console.log(message);
             callback('success');
             io.sockets.emit('messages:update_list', message);
         }).catch(err => callback(err));
@@ -121,74 +124,6 @@ app.get('/locations', function(req, res){ // обработка GET запрос
         }).catch(err => res.status(500).send(err));
     }
 });
-
-// app.post('/locations', function(req, res){ // обработка POST запроса на добавление в таблицу Locations
-//     // console.log(req.headers.authorization);
-//     console.log(req.files);
-//     addPhotos()
-// //     addLocations(req.body, req.files).then(response => {
-// //         res.send(response);  // отправка результата в ответ на запрос
-// //     }).catch(err => res.status(500).send(err));
-// });
-
-app.put('/locations', function(req, res){ // обработка GET запроса на обновление в таблице Locations
-    // updateLocations(body, files).then(response => {
-    //     res.send(response) // отправка результата в ответ на запрос
-    // }).catch(err => res.status(500).send(err));
-    // connection.query(  // обновляю данные текстовых полей
-    //     `UPDATE locations SET location_name = '${req.body.name}', 
-    //                              location_film = '${req.body.filmName}', 
-    //                              location_address = '${req.body.address}', 
-    //                              location_latitude = '${req.body.latitude}', location_longitude = '${req.body.longitude}', 
-    //                              location_route = '${req.body.route}', 
-    //                              location_timing = '${req.body.timing}'
-    //              WHERE (location_id = '${req.query.location_id}');`,
-    //     function(err, results, fields) {
-    //         if (err) {
-    //             console.log(err);
-    //             res.status(500).send(err) // выбрасываю ошибку сервера при наличии ошибок
-    //         } else {
-    //             // удаляю все выбранные фотографии из БД и с сервера
-    //             for (const photo of JSON.parse(req.body.deletePhotos)) {
-    //                 connection.query(
-    //                     `DELETE FROM locations_photos WHERE (locations_photo_id = '${photo.locations_photo_id}');`,
-    //                     function(err, results, fields) {
-    //                         if (err) {
-    //                             res.status(500).send(err);
-    //                         }
-    //                     }
-    //                 );
-    //                 fs.unlinkSync(`./img/${photo.locations_photo_path.slice(22)}`);
-    //             }
-                
-    //             // добавляю новые фотографии, если они имеются
-    //             let fail;
-    //             if (req.files) {
-    //                 if (req.files.usersPhoto) {
-    //                     fail = addPhotos(req.files.usersPhoto, `./img/photo/locationphoto/${req.query.location_id}/user/`, 'user', req.query.location_id); 
-    //                 }
-    //                 if (req.files.filmsPhoto) {
-    //                     fail = addPhotos(req.files.filmsPhoto, `./img/photo/locationphoto/${req.query.location_id}/film/`, 'film', req.query.location_id);
-    //                 }
-
-    //             }
-    //             if (fail) {
-    //                 res.status(500).send(fail); // отправка ошибки в ответ на запрос при неудачном добавлении фото
-    //             } else {
-    //                 res.send(results); // отправка результата в ответ на запрос
-    //             }
-
-    //         }
-    //     }
-    // );
-});
-
-app.delete("/locations", function(req, res){  // обработка DELETE запроса на удаление из таблицы Locations
-    // deleteLocation(req.query.location_id).then(response => {
-    //     res.send(response) // отправка результата в ответ на запрос
-    // }).catch(err => res.status(500).send(err));
-});
-
 
 
 //---------------------------------------------- favorites locations ---------------------------------------------- 

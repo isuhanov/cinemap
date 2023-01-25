@@ -16,8 +16,6 @@ import { closeCard, openCard, showCard } from './services/open-close-services/op
 import { io } from 'socket.io-client'
 import Messenger from './components/Messenger/Messenger';
 import useOpen from './services/hooks/useOpen';
-// import useOpenCover from './services/hooks/useOpen';
-import useOpenCard from './services/hooks/useOpenCard';
 
 function App() {
 
@@ -39,13 +37,13 @@ function App() {
 
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
 
-  const [showsLocationForm, openLocationForm, closeLocationForm] = useOpen('', 'cover', onReload);
+  const [showsLocationForm, openLocationForm, closeLocationForm] = useOpen('cover', onReload);
 
-  const [showsLoginForm, openLoginForm, closeLoginForm] = useOpen('', 'cover', onReload);
+  const [showsLoginForm, openLoginForm, closeLoginForm] = useOpen('cover', onReload);
 
-  const [showsRegisterForm, openRegisterForm, closeRegisterForm] = useOpen('', 'cover', onReload);
+  const [showsRegisterForm, openRegisterForm, closeRegisterForm] = useOpen('cover', onReload);
 
-  const [showsLocationCard, openLocationCard, closeLocationCard] = useOpen('', 'slide', onReload, 0);
+  const [showsLocationCard, openLocationCard, closeLocationCard] = useOpen('slide', onReload, 0);
 
   // const [showsLocationList, openLocationList, closeLocationList] = useOpenCover('', 'slide', onReload, 0);
 
@@ -110,10 +108,6 @@ function App() {
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
                 onReload={onReload} setLocations={setLocations} locations={locations}
-                // onDelete={() => {
-                //   closeLocationCard();
-                //   closeLocationList();
-                // }}
                 openLocationCard={(locationId) => {
                   openLocationCard(locationId, closeLocationList);
                 }} 
@@ -121,7 +115,11 @@ function App() {
                   openLocationList(locations, 'Локации', closeLocationCard);
                 }} />
 
-        {/* <Messenger /> */}
+        { showsMessangers.isVisible && 
+          <Messenger
+            onClickClose={closeMessangers}
+            otherClassName={showsMessangers.visibleClass}/>
+        }
                 
         { showsLocationForm.isVisible && 
           <LocationForm 
@@ -193,7 +191,8 @@ function App() {
             <SearchInput onReload={onReload}/>  
           </div>
           <div className="side-bar-block">
-            <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}/>
+            <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
+                    onClickMessenger={openMessangers}  />
           </div>
         </div>
       </div>
