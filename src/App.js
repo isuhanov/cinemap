@@ -117,6 +117,7 @@ function App() {
 
         { showsMessangers.isVisible && 
           <Messenger
+            onReload={onReload}
             onClickClose={closeMessangers}
             otherClassName={showsMessangers.visibleClass}/>
         }

@@ -1,13 +1,14 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import API_SERVER_PATH from "../../lib/api/api-path";
+import useOpen from "../../services/hooks/useOpen";
 import ChatCard from "../ChatCard/ChatCard";
 import ChatItem from "../ChatItem/ChatItem";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './Messenger.css';
 
-const Messenger = memo(({ onClickClose, otherClassName }) => {
+const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
     const [chats, setChats] = useState([]);
 
     const { current: socket } = useRef(io(API_SERVER_PATH)  )
@@ -18,6 +19,8 @@ const Messenger = memo(({ onClickClose, otherClassName }) => {
         }
       });
     }, [])
+
+    const [showsChatCard, openChatCard, closeChatCard] = useOpen('cover', onReload);
 
     return (
         <div className={`messenger-container ${otherClassName}`}>
@@ -36,13 +39,18 @@ const Messenger = memo(({ onClickClose, otherClassName }) => {
                     { chats.map(chatItem => (
                             <ChatItem key={chatItem.chat_id} 
                                     chatId={chatItem.chat_id}
+                                    onClick={openChatCard} 
                             />
                         )
                     )}
                 </div>
             </div>
 
-            {/* <ChatCard /> */}
+            { showsChatCard.isVisible && 
+                <ChatCard
+                    onClickClose={closeChatCard}
+                />
+            }
         </div>
     )
 });

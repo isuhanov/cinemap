@@ -6,7 +6,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ChatItem.css';
 
-const ChatItem = memo(({ chatId }) => {
+const ChatItem = memo(({ chatId, onClick }) => {
     const [chatName, setChatName] = useState('');
     const [chatAvatar, setChatAvatar] = useState('');
     const [chatLastMess, setChatLastMess] = useState('');
@@ -29,7 +29,7 @@ const ChatItem = memo(({ chatId }) => {
     }, [])
 
     return (
-        <div className="messenger-chat-item">
+        <div className="messenger-chat-item" onClick={onClick}>
             <ProfileAvatar otherClassName="messenger__profile-userimg" imgSrc={chatAvatar}/>
             <div className="messenger-chat__info">
                 <p className="messenger-chat__login">

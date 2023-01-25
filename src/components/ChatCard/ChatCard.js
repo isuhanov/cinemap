@@ -6,7 +6,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ChatCard.css';
 
-const ChatCard = memo(() => {
+const ChatCard = memo(({ onClickClose }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
     const [sendValue, setSendValue] = useState(''); // стейт для поля ввода
     const chatRef = useRef(); // ссылка тело чата
@@ -65,7 +65,7 @@ const ChatCard = memo(() => {
                         </p>
                     </div>
                     <div className="header-btn-container">
-                        <button className="header-btn">
+                        <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>
