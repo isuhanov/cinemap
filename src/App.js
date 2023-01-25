@@ -119,7 +119,8 @@ function App() {
           <Messenger
             onReload={onReload}
             onClickClose={closeMessangers}
-            otherClassName={showsMessangers.visibleClass}/>
+            otherClassName={showsMessangers.visibleClass}
+          />
         }
                 
         { showsLocationForm.isVisible && 

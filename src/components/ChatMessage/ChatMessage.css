@@ -13,9 +13,9 @@
 
 .chat-messege__desription {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 5px;
     min-height: 20px;
 }

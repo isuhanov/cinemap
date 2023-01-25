@@ -364,3 +364,22 @@ body {
   from {background-color: rgba(0, 0, 0, 0.79); }
   to {background-color: rgba(0, 0, 0, 0); }
 }
+
+
+.showed-move-left {
+  animation: move-left 1s ease-in-out;
+}
+
+.hided-move-left {
+  animation: move-right 1s ease-in-out;
+}
+
+@keyframes move-left {
+  from {transform: translateX(100vw);}
+  to {transform: translateX(0);}
+}
+
+@keyframes move-right {
+  from {transform: translateX(0);}
+  to {transform: translateX(100vw);}
+}

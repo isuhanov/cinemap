@@ -6,14 +6,33 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ChatCard.css';
 
-const ChatCard = memo(({ onClickClose }) => {
+const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
     const [sendValue, setSendValue] = useState(''); // стейт для поля ввода
     const chatRef = useRef(); // ссылка тело чата
-    const { current: socket } = useRef(io(API_SERVER_PATH)  ) // постоянная ссылка на сокет
+    const [chatName, setChatName] = useState('');
+    const [chatAvatar, setChatAvatar] = useState('');
+    const userId = JSON.parse(localStorage.getItem('user')).user_id;
+
+    const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
 
     useEffect(() => {
-        socket.emit('messages:get', 1, (response) => { // получение списка сообщений 
+        console.log(chatId);
+
+        socket.emit('chats:getInfo', chatId,(response) => {
+            if (response.status === 'success') {
+                if (response.chatInfo.users.length === 2) {
+                    const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
+                    setChatName(user.user_login);
+                    setChatAvatar(user.user_img_path);
+                } else {
+                    setChatName(response.chatInfo.chat.chat_name);
+                    setChatAvatar(response.chatInfo.chat.chat_photo_path);    
+                }
+            }
+          });
+
+        socket.emit('messages:get', chatId, (response) => { // получение списка сообщений 
             console.log(response);
             if (response.status === 'success') {
                 setMessages(response.messages);
@@ -46,22 +65,22 @@ const ChatCard = memo(({ onClickClose }) => {
             chat_messege_is_edit: 0,
             chat_messege_type: 'text',
             chat_messege_replay_id: null,
-            chat_id: 1,
-            user_id: 13
+            chat_id: chatId,
+            user_id: userId
         }
         setSendValue('');
         socket.emit('messages:add', body, (status) => {
             console.log(status);
         })
     }
-
+// !!!!!!!!!!!!!!!!!!!!!!! СДЕЛАТЬ АНИМАЦИЮ ОТКРЫТИЯ ЧАТА, ОТОБРАЖЕНИЕ СООБЩЕНИЙ СОБЕСЕДНИКА, ЗАМЕНИТЬ СТАТУС НА КОМПОНЕНТ В СООБЩЕНИИ !!!!!!!!
     return (
-            <div className="location-card chat-card animation-content">
+            <div className={`location-card chat-card ${otherClassName}`}>
                 <header className="header-card chat-card__header">
                     <div className="chat-card__userinfo">
-                        <ProfileAvatar otherClassName="chat__profile-userimg" imgSrc={undefined}/>
+                        <ProfileAvatar otherClassName="chat__profile-userimg" imgSrc={chatAvatar}/>
                         <p className="location-card-title title">
-                            {'login'}
+                            {chatName}
                         </p>
                     </div>
                     <div className="header-btn-container">
@@ -77,7 +96,8 @@ const ChatCard = memo(({ onClickClose }) => {
                             <ChatMessage key={message.chat_messege_id}
                                         text={message.chat_messege_text}
                                         isRead={message.chat_messege_is_read}
-                                        time={getLocalTime(message.chat_messege_time).toLocaleTimeString()}    
+                                        isSender={userId === message.user_id}
+                                        time={message.chat_messege_time}    
                             />
                         )) }
                     </div>

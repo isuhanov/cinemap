@@ -7,6 +7,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin: 0;
+  -webkit-box-shadow: -14px 0px 10px -3px rgba(0, 0, 0, 0.11);
+  -moz-box-shadow: -14px 0px 10px -3px rgba(0, 0, 0, 0.11);
+  box-shadow: -8px 0px 10px -3px rgba(0, 0, 0, 0.11);  
 }
 
 .chat-card header,

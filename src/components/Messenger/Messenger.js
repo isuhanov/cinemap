@@ -20,7 +20,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
       });
     }, [])
 
-    const [showsChatCard, openChatCard, closeChatCard] = useOpen('cover', onReload);
+    const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);
 
     return (
         <div className={`messenger-container ${otherClassName}`}>
@@ -39,18 +39,21 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
                     { chats.map(chatItem => (
                             <ChatItem key={chatItem.chat_id} 
                                     chatId={chatItem.chat_id}
-                                    onClick={openChatCard} 
+                                    onClick={() => openChatCard(chatItem.chat_id)} 
                             />
                         )
                     )}
                 </div>
+                { showsChatCard.isVisible && 
+                    <ChatCard
+                        chatId={showsChatCard.current}
+                        onClickClose={closeChatCard}
+                        otherClassName={showsChatCard.visibleClass}
+                    />
+                }
             </div>
 
-            { showsChatCard.isVisible && 
-                <ChatCard
-                    onClickClose={closeChatCard}
-                />
-            }
+            
         </div>
     )
 });

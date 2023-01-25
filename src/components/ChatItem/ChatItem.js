@@ -12,21 +12,28 @@ const ChatItem = memo(({ chatId, onClick }) => {
     const [chatLastMess, setChatLastMess] = useState('');
     const { current: socket } = useRef(io(API_SERVER_PATH)  )
     useEffect(() => {
-      socket.emit('chats:getInfo', chatId,(response) => {
-        if (response.status === 'success') {
-            setChatLastMess(response.chatInfo.chat);
-            console.log(response);
-            if (response.chatInfo.users.length === 2) {
-                const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
-                setChatName(user.user_login);
-                setChatAvatar(user.user_img_path);
-            } else {
-                setChatName(response.chatInfo.chat.chat_name);
-                setChatAvatar(response.chatInfo.chat.chat_photo_path);    
-            }
-        }
-      });
+        getChatInfo();
+        socket.on('messages:update_list', (message) => { // стейт для нового сообщение
+            getChatInfo();
+        })
     }, [])
+
+    function getChatInfo(params) {
+        socket.emit('chats:getInfo', chatId,(response) => {
+            if (response.status === 'success') {
+                setChatLastMess(response.chatInfo.chat);
+                console.log(response);
+                if (response.chatInfo.users.length === 2) {
+                    const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
+                    setChatName(user.user_login);
+                    setChatAvatar(user.user_img_path);
+                } else {
+                    setChatName(response.chatInfo.chat.chat_name);
+                    setChatAvatar(response.chatInfo.chat.chat_photo_path);    
+                }
+            }
+          });
+    }
 
     return (
         <div className="messenger-chat-item" onClick={onClick}>
