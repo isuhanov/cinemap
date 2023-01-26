@@ -1,14 +1,11 @@
-import { memo, useEffect } from "react";
+import { forwardRef, memo, useEffect } from "react";
 import ChatMessageDesr from "../ui/ChatMessageDesr/ChatMessageDesr";
 
 import './ChatMessage.css'
 
-const ChatMessage = memo(({ text, isRead, time, isSender  }) => {
-    useEffect(() => {
-        console.log(isSender);
-    }, [])
+const ChatMessage = forwardRef(({ text, isRead, time, isSender  }, ref) => {
     return (
-        <div className={`chat-messege ${isSender ? 'messege-sender' : 'messege-recipient'}`}>
+        <div ref={ref} className={`chat-messege ${isSender ? 'messege-sender' : 'messege-recipient'}`}>
             <div className="chat-messege-text">
                 {text}
             </div>
@@ -20,17 +17,8 @@ const ChatMessage = memo(({ text, isRead, time, isSender  }) => {
                             statusClass={`chat-messege__status ${isRead ? 'read-chat' : 'unread-chat'}`}
                             checkClass={'done-chat'}
             />
-            {/* <div className="chat-messege__desription">
-                <p className={`chat-messege__status ${isRead ?'read-chat' : 'unread-chat'}`}>
-                    <span className="material-symbols-outlined done-chat">done</span>
-                    <span className="material-symbols-outlined done-chat">done</span>
-                </p>
-                <p className="chat-messege__time">
-                    {time.slice(0, 5)}
-                </p>
-            </div> */}
         </div>
     );
 });
 
-export default ChatMessage;
+export default memo(ChatMessage);

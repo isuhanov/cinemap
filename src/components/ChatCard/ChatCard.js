@@ -14,11 +14,11 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
     const [chatAvatar, setChatAvatar] = useState('');
     const userId = JSON.parse(localStorage.getItem('user')).user_id;
 
+    const [messagesRefs, setMessagesRefs] = useState([])
+
     const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
 
     useEffect(() => {
-        console.log(chatId);
-
         socket.emit('chats:getInfo', chatId,(response) => {
             if (response.status === 'success') {
                 if (response.chatInfo.users.length === 2) {
@@ -33,29 +33,34 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
           });
 
         socket.emit('messages:get', chatId, (response) => { // получение списка сообщений 
-            console.log(response);
             if (response.status === 'success') {
-                setMessages(response.messages);
+                // setMessages(response.messages);
+                response.messages.map(message => {
+                    setMessages(prevMess => [
+                        ...prevMess,
+                        {
+                            message,
+                            ref: undefined
+                        }
+                    ])
+                })
             }
         })
         
         socket.on('messages:update_list', (message) => { // стейт для нового сообщение
-            setMessages(prevMessages => [
-                ...prevMessages,
-                message
-            ]);
+            setMessages(prevMess => [
+                ...prevMess,
+                {
+                    message,
+                    ref: undefined
+                }
+            ])
         })
     }, []);
 
     useEffect(() => {  // перемеотка вниз чата при получении обновлении списка сообщений
         chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }, [messages])
-
-    function getLocalTime(utcTime) { // ф-ия получения локального времени
-        const dt = new Date(utcTime).getTime();
-        const offset = new Date().getTimezoneOffset() * 60 * 1000;
-        return new Date(dt - offset);
-    }
 
     function sendMessage() { // ф-ия отправки сообщения
         console.log(sendValue);
@@ -93,11 +98,12 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
                 <div className="chat-main" ref={chatRef}>
                     <div className="chat-main__inner">
                         { messages.map(message => (
-                            <ChatMessage key={message.chat_messege_id}
-                                        text={message.chat_messege_text}
-                                        isRead={message.chat_messege_is_read}
-                                        isSender={userId === message.user_id}
-                                        time={message.chat_messege_time}    
+                            <ChatMessage key={message.message.chat_messege_id}
+                                        text={message.message.chat_messege_text}
+                                        isRead={message.message.chat_messege_is_read}
+                                        isSender={userId === message.message.user_id}
+                                        time={message.message.chat_messege_time}   
+                                        ref={thisMessage => (message.ref = thisMessage)}
                             />
                         )) }
                     </div>

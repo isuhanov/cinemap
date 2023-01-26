@@ -22,7 +22,6 @@ const ChatItem = memo(({ chatId, onClick }) => {
         socket.emit('chats:getInfo', chatId,(response) => {
             if (response.status === 'success') {
                 setChatLastMess(response.chatInfo.chat);
-                console.log(response);
                 if (response.chatInfo.users.length === 2) {
                     const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
                     setChatName(user.user_login);

@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
 
     socket.on('chats:getInfo', (userId, callback) => {
         selectChatInfo(userId).then(chatInfo => {
-            console.log(chatInfo);
+            // console.log(chatInfo);
             callback({status:'success', chatInfo});
         }).catch(err => callback(err));
     });
