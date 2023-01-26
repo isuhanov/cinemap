@@ -59,7 +59,18 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
     }, []);
 
     useEffect(() => {  // перемеотка вниз чата при получении обновлении списка сообщений
-        chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        const unreadMessage = messages.filter(message => !message.message.chat_messege_is_read);
+        if (unreadMessage[0]?.message.user_id !== userId) {
+            chatRef.current.scrollTo({top: unreadMessage[0]?.ref.offsetTop - chatRef.current.offsetTop + 10, behavior: 'smooth'});
+            
+        } else {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }
+        // for (const message of messages) {
+        //     if (offsetBottomChat >= message.ref.offsetTop) {
+        //         console.dir(`${offsetBottomChat}, ${message.ref.offsetTop}, ${message.message.chat_messege_text}`);
+        //     }
+        // }
     }, [messages])
 
     function sendMessage() { // ф-ия отправки сообщения
