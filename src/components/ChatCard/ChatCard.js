@@ -8,6 +8,7 @@ import './ChatCard.css';
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
+    const [unreadMessage, setUnreadMessage] = useState([]); // стейт для списка непрочитанных сообщений
     const [sendValue, setSendValue] = useState(''); // стейт для поля ввода
     const chatRef = useRef(); // ссылка тело чата
     const [chatName, setChatName] = useState('');
@@ -17,6 +18,9 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
     const [messagesRefs, setMessagesRefs] = useState([])
 
     const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
+    // useEffect(()=>{
+    //     chatRef.current.onscroll();
+    // },[])
 
     useEffect(() => {
         socket.emit('chats:getInfo', chatId,(response) => {
@@ -58,20 +62,61 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
         })
     }, []);
 
+    // const [scrollPosition, setScrollPosition] = useState(0);
+    // const handleScroll = () => {
+    //     const position = chatRef.current.pageYOffset;
+    //     setScrollPosition(position);
+    // };
+
+    // useEffect(() => {
+    //     chatRef.current.addEventListener("scroll", handleScroll);
+
+    //     return () => {
+    //         chatRef.current.removeEventListener("scroll", handleScroll);
+    //     };
+    // }, []);
+
+    useEffect(() => {
+        // setUnreadMessage([]);
+        setUnreadMessage(messages.filter(message => !message.message.chat_messege_is_read));
+    }, [messages])
+
     useEffect(() => {  // перемеотка вниз чата при получении обновлении списка сообщений
-        const unreadMessage = messages.filter(message => !message.message.chat_messege_is_read);
-        if (unreadMessage[0]?.message.user_id !== userId) {
+        // let chatRef = document.getElementById('chat-main'); 
+        // console.log('test');
+        if (unreadMessage[0] && unreadMessage[0]?.message.user_id !== userId) {
             chatRef.current.scrollTo({top: unreadMessage[0]?.ref.offsetTop - chatRef.current.offsetTop + 10, behavior: 'smooth'});
-            
         } else {
             chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
-        // for (const message of messages) {
-        //     if (offsetBottomChat >= message.ref.offsetTop) {
-        //         console.dir(`${offsetBottomChat}, ${message.ref.offsetTop}, ${message.message.chat_messege_text}`);
-        //     }
+        // console.log(chatRef.current.firstChild.scrollTop, chatRef.current.firstChild.offsetHeight, chatRef.current.firstChild.scrollTop + chatRef.current.firstChild.offsetHeight);
+        // chatRef.onscroll((e)=>{
+        //     console.log(chatRef.scrollTop);
+        // });
+        // console.log(chatRef.scrollHeight);
+        // for (const key in chatRef) {
+        //     console.log(`${key}: ${chatRef[key]}`);
         // }
-    }, [messages])
+        // console.log(chatRef.scrollTop);
+        // unreadMessage.filter(message => message.message.user_id !== userId).map(message => {
+        //     console.log(message.ref.offsetTop);
+        // })
+        // console.log(chatRef.current.firstChild.scrollTop + chatRef.current.firstChild.offsetHeight);
+        // if ((chatRef.current.firstChild.scrollTop + chatRef.current.firstChild.offsetHeight) > message.ref.offsetTop) {
+        //     console.log(message);
+        //     // console.dir(`${chatRef.current.firstChild.scrollTop + chatRef.current.firstChild.offsetHeight}, ${message.ref.offsetTop}, ${message.message.chat_messege_text}`);
+        // }
+        // for (const message of messages) {
+        // }
+    }, [unreadMessage]);
+
+    function readMessageOnScroll(e) {
+        unreadMessage.filter(message => message.message.user_id !== userId).map(message => {
+            if ((e.target.scrollTop + e.target.offsetHeight) > (message.ref.offsetTop - e.target.offsetTop)) {
+                console.dir(`${e.target.scrollTop + e.target.offsetHeight}, ${message.ref.offsetTop - e.target.offsetTop}, ${message.message.chat_messege_text}`);
+            }
+        })
+    }
 
     function sendMessage() { // ф-ия отправки сообщения
         console.log(sendValue);
@@ -106,7 +151,8 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
                     </div>
                 </header>
 
-                <div className="chat-main" ref={chatRef}>
+                {/* <div className="chat-main" id="chat-main"> */}
+                <div className="chat-main" ref={chatRef} onScroll={readMessageOnScroll}>
                     <div className="chat-main__inner">
                         { messages.map(message => (
                             <ChatMessage key={message.message.chat_messege_id}
