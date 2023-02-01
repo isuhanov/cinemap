@@ -17,7 +17,7 @@ import { tokenKey } from './lib/token.js'
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { addPhotos } from './services/files/file-service.js'
-import { addMessage, selectChatInfo, selectChats, selectMessages } from './services/chat/chat-services.js'
+import { addMessage, readMessage, selectChatInfo, selectChats, selectMessages } from './services/chat/chat-services.js'
 
 const app = express();
 const server = createServer(app);
@@ -45,29 +45,37 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     })
 
-    socket.on('chats:get', (userId, callback) => {
+    socket.on('chats:get', (userId, callback) => { // отправка списка чатов
         selectChats(userId).then(chats=> {
             callback({status:'success', chats});
         }).catch(err => callback(err));
     });
 
-    socket.on('chats:getInfo', (userId, callback) => {
+    socket.on('chats:getInfo', (userId, callback) => { // отправка информации о чате
         selectChatInfo(userId).then(chatInfo => {
-            // console.log(chatInfo);
             callback({status:'success', chatInfo});
         }).catch(err => callback(err));
     });
 
-    socket.on('messages:get', (chatId, callback) => {
+    socket.on('messages:get', (chatId, callback) => { // отправка списка сообщений
         selectMessages(chatId).then(messages=> {
             callback({status:'success', messages});
         }).catch(err => callback(err));
     });
 
-    socket.on('messages:add', (body, callback) => {
+    socket.on('messages:add', (body, callback) => { // при получении сообщения запрос в БД и поднятие событий
         addMessage(body).then(message=> {
             callback('success');
             io.sockets.emit('messages:update_list', message);
+            io.sockets.emit('messages:update_item');
+        }).catch(err => callback(err));
+    });
+
+    socket.on('messages:read', (messageId, callback) => { // при чтении сообщения запрос в БД и поднятие сообытий
+        readMessage(messageId).then(message=> {
+            callback('success');
+            io.sockets.emit('messages:update_read', messageId);
+            io.sockets.emit('messages:update_item');
         }).catch(err => callback(err));
     });
 });  

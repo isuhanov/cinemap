@@ -86,4 +86,21 @@ async function addMessage(body) { // ф-ия добавления сообщен
     return response;
 }
 
-export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage };
+async function readMessage(messageId) { // ф-ия чтения сообщения
+    let response = await new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE chats_messeges SET chat_messege_is_read = '1' WHERE (chat_messege_id = '${messageId}');`,
+            function(err, results, fields) {
+                console.log('прочитано ' + messageId);
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results.insertId); // отправка результата в ответ на запрос
+                }
+            }
+        );  
+    });
+    return response;
+}
+
+export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage, readMessage };

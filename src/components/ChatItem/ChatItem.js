@@ -11,22 +11,23 @@ const ChatItem = memo(({ chatId, onClick }) => {
     const [chatAvatar, setChatAvatar] = useState('');
     const [chatLastMess, setChatLastMess] = useState('');
     const { current: socket } = useRef(io(API_SERVER_PATH)  )
-    useEffect(() => {
+    
+    useEffect(() => { // обновление айтем чата
         getChatInfo();
-        socket.on('messages:update_list', (message) => { // стейт для нового сообщение
+        socket.on('messages:update_item', (message) => {
             getChatInfo();
         })
     }, [])
 
-    function getChatInfo(params) {
+    function getChatInfo(params) { // ф-ия получения информации о чате
         socket.emit('chats:getInfo', chatId,(response) => {
             if (response.status === 'success') {
-                setChatLastMess(response.chatInfo.chat);
-                if (response.chatInfo.users.length === 2) {
+                setChatLastMess(response.chatInfo.chat); // установка последнего сообщения
+                if (response.chatInfo.users.length === 2) { // если в чате 2 пользователя, то название и фото берутся из пользователя
                     const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
                     setChatName(user.user_login);
                     setChatAvatar(user.user_img_path);
-                } else {
+                } else { // иначе название и фото берутся из БД 
                     setChatName(response.chatInfo.chat.chat_name);
                     setChatAvatar(response.chatInfo.chat.chat_photo_path);    
                 }
