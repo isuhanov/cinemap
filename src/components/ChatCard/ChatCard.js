@@ -1,12 +1,14 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import API_SERVER_PATH from "../../lib/api/api-path";
+import useOpen from "../../services/hooks/useOpen";
 import ChatMessage from "../ChatMessage/ChatMessage";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
+import MessageMenu from "../MessageMenu/MessageMenu";
 
 import './ChatCard.css';
 
-const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
+const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
     const [unreadMessage, setUnreadMessage] = useState([]); // стейт для списка непрочитанных сообщений
     const [sendValue, setSendValue] = useState(''); // стейт для поля ввода
@@ -108,6 +110,27 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
         })
     }
 
+    const [menuIsVisible, setMenuIsVisible] = useState(false);
+    const [menuCoord, setMenuCoord] = useState({});
+    const openMenu = useCallback((messageId) => {
+        console.log(messageId);
+        console.log(messages);
+        const message = messages.find(message => message.message.chat_messege_id === messageId);
+        console.log(message.ref.offsetTop);
+        console.log(chatRef.current.offsetHeight/2.5);
+        console.log(chatRef);
+        setMenuCoord({
+            top: message.ref.offsetTop, 
+            left: message.ref.offsetLeft,
+            divLeft: message.message.user_id !== userId && message.ref.offsetWidth,
+            divTop: message.ref.offsetTop < chatRef.current.offsetHeight/2 
+        });
+        setMenuIsVisible(true);
+    }, [messages]);
+    const closeMenu = useCallback(() => {
+        setMenuIsVisible(false);
+    }, [])
+
     return (
             <div className={`location-card chat-card ${otherClassName}`}>
                 <header className="header-card chat-card__header">
@@ -126,6 +149,12 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
 
                 <div className="chat-main" ref={chatRef} onScroll={readMessageOnScroll}>
                     <div className="chat-main__inner">
+
+                        { menuIsVisible && 
+                            <MessageMenu 
+                                messageCoord={menuCoord} 
+                                /> }
+                        
                         { messages.map(message => (
                             <ChatMessage key={message.message.chat_messege_id}
                                         text={message.message.chat_messege_text}
@@ -133,6 +162,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName }) => {
                                         isSender={userId === message.message.user_id}
                                         time={message.message.chat_messege_time}   
                                         ref={thisMessage => (message.ref = thisMessage)}
+                                        openMenu={() => openMenu(message.message.chat_messege_id)}
                             />
                         )) }
                     </div>

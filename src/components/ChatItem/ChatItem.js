@@ -47,7 +47,7 @@ const ChatItem = memo(({ chatId, onClick }) => {
                 </p>
             </div>
             <ChatMessageDesr time={chatLastMess.chat_messege_time} 
-                            isSender={JSON.parse(localStorage.getItem('user')).user_id == chatLastMess.user_id}
+                            isSender={JSON.parse(localStorage.getItem('user')).user_id === chatLastMess.user_id}
                             isRead={chatLastMess.chat_messege_is_read}
                             containerClass={'messenger-chat__description'}
                             timeClass={'messenger-chat__time'}

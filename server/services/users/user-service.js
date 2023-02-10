@@ -14,6 +14,7 @@ async function addUser(body, photo) { // ф-ия добавления новог
             `INSERT INTO users (user_login, user_pass, user_staff, user_name, user_surname, user_img_path, user_status, user_salt) 
             VALUES ('${body.login}', '${hash}', 'user', '${body.name}', '${body.surname}', '${imgPath.replace('/img', '')}', '${body.status}', '${salt}');`,
             function(err, results, fields) {
+                console.log(err)
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
             }

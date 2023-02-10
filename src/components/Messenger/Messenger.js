@@ -46,6 +46,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
                 </div>
                 { showsChatCard.isVisible && 
                     <ChatCard
+                        onReload={onReload}
                         chatId={showsChatCard.current}
                         onClickClose={closeChatCard}
                         otherClassName={showsChatCard.visibleClass}

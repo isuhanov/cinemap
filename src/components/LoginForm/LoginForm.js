@@ -39,7 +39,6 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
             setError('Поля не должны быть пустыми')
         } else {
             axios.post(`${API_SERVER_PATH}/users/login`, {login: login.value, password: password.value}).then(res => {
-                console.log(res.data);
                 loginUser(res.data) // сохранение данных пользователя
                 onClickClose(); // закрытие формы
             })

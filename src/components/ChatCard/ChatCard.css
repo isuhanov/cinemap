@@ -46,6 +46,7 @@
 }
 
 .chat-main__inner {
+    position: relative;
     display: flex;
     min-height: 100vh;
     flex-direction: column;
