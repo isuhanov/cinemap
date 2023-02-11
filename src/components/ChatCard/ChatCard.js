@@ -7,6 +7,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 import MessageMenu from "../MessageMenu/MessageMenu";
 
 import './ChatCard.css';
+import deepCompare from "../../services/comparing/deepCompare";
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
@@ -91,7 +92,10 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     }, []);
 
     useEffect(() => { // установка непрочитанных сообщений чата
-            setUnreadMessage(messages.filter(message => !message.message.chat_messege_is_read));
+        const newUnreadMessage = messages.filter(message => !message.message.chat_messege_is_read);
+        if (!deepCompare(unreadMessage, newUnreadMessage)){ // если непрочитанные сообщения изменились
+            setUnreadMessage(newUnreadMessage);
+        }
     }, [messages])
 
     useEffect(() => {  // перемеотка вниз чата при получении обновлении списка сообщений
