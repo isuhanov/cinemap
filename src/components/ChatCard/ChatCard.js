@@ -47,7 +47,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                     ])
                 })
             }
-        })
+        });
         
         socket.on('messages:update_list', (message) => { // изменение списка сообщений
             setMessages(prevMess => [
@@ -57,7 +57,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                     ref: undefined
                 }
             ])
-        })
+        });
 
         socket.on('messages:update_read', (messageId) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
@@ -68,7 +68,19 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                     return message
                 })
             ]);
-        })
+        });
+
+        socket.on('messages:update_edit', (messageInfo) => { // изменение сообщений при чтении 
+            setMessages(prevMess => [
+                ...prevMess.map(message => {
+                    if(message.message.chat_messege_id === messageInfo.chat_messege_id) {
+                        message.message.chat_messege_is_edit = 1;
+                        message.message.chat_messege_text = messageInfo.chat_messege_text;
+                    } 
+                    return message
+                })
+            ]);
+        });
     }, []);
 
     useEffect(() => { // установка непрочитанных сообщений чата
@@ -94,32 +106,12 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         })
     }
 
-    function sendMessage() { // ф-ия отправки сообщения
-        const body = {
-            chat_messege_text: sendValue,
-            chat_messege_is_read: 0,
-            chat_messege_is_edit: 0,
-            chat_messege_type: 'text',
-            chat_messege_replay_id: null,
-            chat_id: chatId,
-            user_id: userId
-        }
-        setSendValue('');
-        socket.emit('messages:add', body, (status) => {
-            if (status !== 'success') console.log(status);
-        })
-    }
-
     const [menuIsVisible, setMenuIsVisible] = useState(false);
-    const [menuCoord, setMenuCoord] = useState({});
+    const [menuInfo, setMenuInfo] = useState(undefined);
     const openMenu = useCallback((messageId) => {
-        console.log(messageId);
-        console.log(messages);
         const message = messages.find(message => message.message.chat_messege_id === messageId);
-        console.log(message.ref.offsetTop - chatRef.current.offsetTop);
-        console.log(chatRef.current.offsetHeight/2);
-        console.log(chatRef);
-        setMenuCoord({
+        setMenuInfo({
+            messageId,
             top: message.ref.offsetTop, 
             left: message.ref.offsetLeft,
             divLeft: message.message.user_id !== userId && message.ref.offsetWidth, // смещение по ширине, есть сообщение не от пользователя
@@ -130,6 +122,36 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const closeMenu = useCallback(() => {
         setMenuIsVisible(false);
     }, [])
+
+    const onEditClick = useCallback(() => {
+        setSendValue(messages.find(message => message.message.chat_messege_id === menuInfo.messageId).message.chat_messege_text);
+    }, [menuInfo]);
+
+    function sendMessage() { // ф-ия отправки сообщения
+        const body = menuInfo ? // создание разных объектов для добавления и обновления сообщения
+                {
+                    chat_messege_id: menuInfo.messageId, 
+                    chat_messege_text: sendValue,
+                    chat_messege_is_edit: 1
+                }
+            :
+                {
+                    chat_messege_text: sendValue,
+                    chat_messege_is_read: 0,
+                    chat_messege_is_edit: 0,
+                    chat_messege_type: 'text',
+                    chat_messege_replay_id: null,
+                    chat_id: chatId,
+                    user_id: userId
+                }
+            
+        setSendValue('');
+        socket.emit(menuInfo ? 'messages:edit' : 'messages:add', body, (status) => {
+            if (status !== 'success') console.log(status);
+            closeMenu();
+            setMenuInfo(undefined);
+        })
+    }
 
     return (
             <div className={`location-card chat-card ${otherClassName}`}>
@@ -152,13 +174,15 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
 
                         { menuIsVisible && 
                             <MessageMenu 
-                                messageCoord={menuCoord} 
+                                messageInfo={menuInfo} 
+                                onEditClick={onEditClick}
                                 /> }
                         
                         { messages.map(message => (
                             <ChatMessage key={message.message.chat_messege_id}
                                         text={message.message.chat_messege_text}
                                         isRead={message.message.chat_messege_is_read}
+                                        isEdit={message.message.chat_messege_is_edit}
                                         isSender={userId === message.message.user_id}
                                         time={message.message.chat_messege_time}   
                                         ref={thisMessage => (message.ref = thisMessage)}

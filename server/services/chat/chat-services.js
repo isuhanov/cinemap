@@ -86,6 +86,22 @@ async function addMessage(body) { // ф-ия добавления сообщен
     return response;
 }
 
+async function editMessage(body) { // ф-ия изменения текста сообщений
+    let response = await new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE chats_messeges SET chat_messege_text = '${body.chat_messege_text}', chat_messege_is_edit = '1' WHERE (chat_messege_id = '${body.chat_messege_id}');`,
+            function(err, results, fields) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(body); // отправка результата в ответ на запрос
+                }
+            }
+        );  
+    });
+    return response;
+}
+
 async function readMessage(messageId) { // ф-ия чтения сообщения
     let response = await new Promise((resolve, reject) => {
         connection.query(
@@ -103,4 +119,4 @@ async function readMessage(messageId) { // ф-ия чтения сообщени
     return response;
 }
 
-export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage, readMessage };
+export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage, editMessage, readMessage };
