@@ -16,7 +16,7 @@ async function selectChats(userId) { // ф-ия получения всех ча
 async function selectChatInfo(chatId) { // ф-ия получения информации чата
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `select cm.*, c.chat_name, c.chat_photo_path from chats_messeges cm inner Join chats c on cm.chat_id = c.chat_id where cm.chat_id = ${chatId} order by cm.chat_messege_id desc limit 1;`,
+            `select cm.*, c.chat_name, c.chat_photo_path from chats_messeges cm inner Join chats c on cm.chat_id = c.chat_id where cm.chat_id = ${chatId} and cm.is_deleted = 0 order by cm.chat_messege_id desc limit 1;`,
             function(err, results, fields) {
                 if (err) reject(err);
                 else {
@@ -29,20 +29,11 @@ async function selectChatInfo(chatId) { // ф-ия получения инфор
                 }
             }
         )
-        
-// последнее сообщение чата     select * from chats_messeges where chat_id = 1 order by chat_messege_id desc limit 1;
-    //     connection.query(
-    //         `select * from chats c inner join chats_users cu on c.chat_id = cu.chat_id where user_id = ${userId};`,
-    //         function(err, results, fields) {
-    //             if (err) reject(err);
-    //             else resolve(results); // отправка результата в ответ на запрос
-    //         }
-    //     )   
     });
     return response;
 }
 
-async function selectChatUsers(chatId) {
+async function selectChatUsers(chatId) { // ф-ия получения пользователей чата
     let response = await new Promise((resolve, reject) => {
         connection.query(
             `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u inner join chats_users cu on u.user_id = cu.user_id where cu.chat_id = ${chatId};`,
@@ -58,7 +49,7 @@ async function selectChatUsers(chatId) {
 async function selectMessages(chatId) { // ф-ия получения всех сообщений чата 
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `SELECT * FROM chats_messeges WHERE chat_id = ${chatId};`,
+            `SELECT * FROM chats_messeges WHERE chat_id = ${chatId} and is_deleted = 0;`,
             function(err, results, fields) {
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
@@ -107,7 +98,6 @@ async function readMessage(messageId) { // ф-ия чтения сообщени
         connection.query(
             `UPDATE chats_messeges SET chat_messege_is_read = '1' WHERE (chat_messege_id = '${messageId}');`,
             function(err, results, fields) {
-                console.log('прочитано ' + messageId);
                 if (err) {
                     reject(err);
                 } else {
@@ -119,4 +109,20 @@ async function readMessage(messageId) { // ф-ия чтения сообщени
     return response;
 }
 
-export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage, editMessage, readMessage };
+async function deleteMessage(messageId) {
+    let response = new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE chats_messeges SET is_deleted = '1' WHERE (chat_messege_id = '${messageId}');`,
+            function(err, results, fields) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results.insertId); // отправка результата в ответ на запрос
+                }
+            }
+        )
+    });
+    return response
+}
+
+export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage, editMessage, readMessage, deleteMessage };

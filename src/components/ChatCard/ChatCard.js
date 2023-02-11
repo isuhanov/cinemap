@@ -81,10 +81,17 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                 })
             ]);
         });
+
+        socket.on('messages:update_delete', (messageId) => { // изменение сообщений при чтении 
+            setMessages(prevMess => [
+                ...prevMess.filter(message => message.message.chat_messege_id !== messageId)
+            ]);
+        });
+
     }, []);
 
     useEffect(() => { // установка непрочитанных сообщений чата
-        setUnreadMessage(messages.filter(message => !message.message.chat_messege_is_read));
+            setUnreadMessage(messages.filter(message => !message.message.chat_messege_is_read));
     }, [messages])
 
     useEffect(() => {  // перемеотка вниз чата при получении обновлении списка сообщений
@@ -100,7 +107,6 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
             if ((e.target.scrollTop + e.target.offsetHeight) > (message.ref.offsetTop - e.target.offsetTop)) {
                 socket.emit('messages:read', message.message.chat_messege_id, (status) => {
                     if (status !== 'success') console.log(status);
-                    // console.dir(`${e.target.scrollTop + e.target.offsetHeight}, ${message.ref.offsetTop - e.target.offsetTop}, ${message.message.chat_messege_text}`);
                 })
             }
         })
@@ -112,6 +118,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         const message = messages.find(message => message.message.chat_messege_id === messageId);
         setMenuInfo({
             messageId,
+            userId: message.message.user_id, 
             top: message.ref.offsetTop, 
             left: message.ref.offsetLeft,
             divLeft: message.message.user_id !== userId && message.ref.offsetWidth, // смещение по ширине, есть сообщение не от пользователя
@@ -123,11 +130,22 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         setMenuIsVisible(false);
     }, [])
 
+
     const onEditClick = useCallback(() => {
         setSendValue(messages.find(message => message.message.chat_messege_id === menuInfo.messageId).message.chat_messege_text);
     }, [menuInfo]);
 
+    const onDeleteClick = useCallback(() => {
+        socket.emit('messages:delete', menuInfo.messageId, (status) => {
+            if (status !== 'success') console.log(status);
+            closeMenu();
+            setMenuInfo(undefined);
+        })
+    }, [menuInfo]);
+
+
     function sendMessage() { // ф-ия отправки сообщения
+        if (sendValue.trim().length === 0) return;
         const body = menuInfo ? // создание разных объектов для добавления и обновления сообщения
                 {
                     chat_messege_id: menuInfo.messageId, 
@@ -153,6 +171,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         })
     }
 
+
     return (
             <div className={`location-card chat-card ${otherClassName}`}>
                 <header className="header-card chat-card__header">
@@ -176,7 +195,9 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                             <MessageMenu 
                                 messageInfo={menuInfo} 
                                 onEditClick={onEditClick}
-                                /> }
+                                onDeleteClick={onDeleteClick}
+                            /> 
+                        }
                         
                         { messages.map(message => (
                             <ChatMessage key={message.message.chat_messege_id}

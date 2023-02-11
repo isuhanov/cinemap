@@ -5,7 +5,7 @@ import './ChatMessage.css'
 
 const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, openMenu }, ref) => {
     return (
-            <div ref={ref} onClick={() => console.log('1')}  onContextMenu={(e) => {
+            <div ref={ref} onContextMenu={(e) => {
                 e.preventDefault();
                 openMenu();
             }} className={`chat-messege ${isSender ? 'messege-sender' : 'messege-recipient'}`}>

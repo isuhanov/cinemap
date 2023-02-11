@@ -17,7 +17,7 @@ import { tokenKey } from './lib/token.js'
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { addPhotos } from './services/files/file-service.js'
-import { addMessage, editMessage, readMessage, selectChatInfo, selectChats, selectMessages } from './services/chat/chat-services.js'
+import { addMessage, deleteMessage, editMessage, readMessage, selectChatInfo, selectChats, selectMessages } from './services/chat/chat-services.js'
 
 const app = express();
 const server = createServer(app);
@@ -83,6 +83,14 @@ io.on("connection", (socket) => {
         readMessage(messageId).then(message => {
             callback('success');
             io.sockets.emit('messages:update_read', messageId);
+            io.sockets.emit('messages:update_item');
+        }).catch(err => callback(err));
+    });
+
+    socket.on('messages:delete', (messageId, callback) => { // при чтении сообщения запрос в БД и поднятие сообытий
+        deleteMessage(messageId).then(message => {
+            callback('success');
+            io.sockets.emit('messages:update_delete', messageId);
             io.sockets.emit('messages:update_item');
         }).catch(err => callback(err));
     });
