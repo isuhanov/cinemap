@@ -116,14 +116,14 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         console.log(messageId);
         console.log(messages);
         const message = messages.find(message => message.message.chat_messege_id === messageId);
-        console.log(message.ref.offsetTop);
-        console.log(chatRef.current.offsetHeight/2.5);
+        console.log(message.ref.offsetTop - chatRef.current.offsetTop);
+        console.log(chatRef.current.offsetHeight/2);
         console.log(chatRef);
         setMenuCoord({
             top: message.ref.offsetTop, 
             left: message.ref.offsetLeft,
-            divLeft: message.message.user_id !== userId && message.ref.offsetWidth,
-            divTop: message.ref.offsetTop < chatRef.current.offsetHeight/2 
+            divLeft: message.message.user_id !== userId && message.ref.offsetWidth, // смещение по ширине, есть сообщение не от пользователя
+            divTop: (message.ref.offsetTop - chatRef.current.offsetTop) < chatRef.current.offsetHeight/2 // смещение по высоте, если оно выше середины
         });
         setMenuIsVisible(true);
     }, [messages]);
