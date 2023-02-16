@@ -8,6 +8,7 @@ import MessageMenu from "../MessageMenu/MessageMenu";
 
 import './ChatCard.css';
 import deepCompare from "../../services/comparing/deepCompare";
+import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
@@ -116,6 +117,8 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         })
     }
 
+    const [inputHeaderInfo, setInputHeaderInfo] = useState(undefined);
+
     const [menuIsVisible, setMenuIsVisible] = useState(false);
     const [menuInfo, setMenuInfo] = useState(undefined);
     const openMenu = useCallback((messageId) => {
@@ -136,7 +139,15 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
 
 
     const onEditClick = useCallback(() => {
-        setSendValue(messages.find(message => message.message.chat_messege_id === menuInfo.messageId).message.chat_messege_text);
+        const message = messages.find(message => message.message.chat_messege_id === menuInfo.messageId);
+        setInputHeaderInfo({
+            message,
+            type: 'edit',
+            title: 'Редактирование'
+        })
+        setSendValue(message.message.chat_messege_text);
+        closeMenu();
+        
     }, [menuInfo]);
 
     const onDeleteClick = useCallback(() => {
@@ -170,8 +181,8 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         setSendValue('');
         socket.emit(menuInfo ? 'messages:edit' : 'messages:add', body, (status) => {
             if (status !== 'success') console.log(status);
-            closeMenu();
             setMenuInfo(undefined);
+            setInputHeaderInfo(undefined);
         })
     }
 
@@ -217,6 +228,16 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                     </div>
                 </div>
                 
+                { inputHeaderInfo &&
+                    <MessageInputHeader title={inputHeaderInfo.title}
+                                    text={inputHeaderInfo.message.message.chat_messege_text} 
+                                    type={inputHeaderInfo.type} 
+                                    onClickClose={() => {
+                                        setSendValue('');
+                                        setInputHeaderInfo(undefined);
+                                    }}
+                                />
+                }
                 <footer className="chat-footer">
                     <div className="chat-input-container">
                         <textarea value={sendValue} onChange={(e) => {

@@ -15,7 +15,8 @@
 
 .chat-card header,
 .chat-card .chat-main__inner,
-.chat-card footer {
+.chat-card footer,
+.chat-card .message-input-header {
     padding: 15px;
 }
 
