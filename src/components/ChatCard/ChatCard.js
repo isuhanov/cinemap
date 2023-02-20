@@ -12,6 +12,7 @@ import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
+    const [users, setUsers] = useState([]); // стейт для списка пользователей
     const [unreadMessage, setUnreadMessage] = useState([]); // стейт для списка непрочитанных сообщений
     const [sendValue, setSendValue] = useState(''); // стейт для поля ввода
     const chatRef = useRef(); // ссылка тело чата
@@ -25,6 +26,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     useEffect(() => {
         socket.emit('chats:getInfo', chatId,(response) => {
             if (response.status === 'success') {
+                setUsers([...response.chatInfo.users]);
                 if (response.chatInfo.users.length === 2) {
                     const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
                     setChatName(user.user_login);
@@ -147,7 +149,16 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         })
         setSendValue(message.message.chat_messege_text);
         closeMenu();
-        
+    }, [menuInfo]);
+
+    const onReplyClick = useCallback(() => {
+        const message = messages.find(message => message.message.chat_messege_id === menuInfo.messageId);
+        setInputHeaderInfo({
+            message,
+            type: 'reply',
+            title: users.find(user => user.user_id === message.message.user_id).user_login
+        })
+        closeMenu();
     }, [menuInfo]);
 
     const onDeleteClick = useCallback(() => {
@@ -161,9 +172,9 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
 
     function sendMessage() { // ф-ия отправки сообщения
         if (sendValue.trim().length === 0) return;
-        const body = menuInfo ? // создание разных объектов для добавления и обновления сообщения
+        const body = inputHeaderInfo?.type === 'edit' ? // создание разных объектов для добавления и обновления сообщения
                 {
-                    chat_messege_id: menuInfo.messageId, 
+                    chat_messege_id: inputHeaderInfo.message.message.chat_messege_id, 
                     chat_messege_text: sendValue,
                     chat_messege_is_edit: 1
                 }
@@ -173,13 +184,13 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                     chat_messege_is_read: 0,
                     chat_messege_is_edit: 0,
                     chat_messege_type: 'text',
-                    chat_messege_replay_id: null,
+                    chat_messege_reply_id: inputHeaderInfo?.message.message.chat_messege_id || null,
                     chat_id: chatId,
                     user_id: userId
                 }
             
         setSendValue('');
-        socket.emit(menuInfo ? 'messages:edit' : 'messages:add', body, (status) => {
+        socket.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
             if (status !== 'success') console.log(status);
             setMenuInfo(undefined);
             setInputHeaderInfo(undefined);
@@ -211,20 +222,25 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                                 messageInfo={menuInfo} 
                                 onEditClick={onEditClick}
                                 onDeleteClick={onDeleteClick}
+                                onReplyClick={onReplyClick}
                             /> 
                         }
                         
-                        { messages.map(message => (
-                            <ChatMessage key={message.message.chat_messege_id}
-                                        text={message.message.chat_messege_text}
-                                        isRead={message.message.chat_messege_is_read}
-                                        isEdit={message.message.chat_messege_is_edit}
-                                        isSender={userId === message.message.user_id}
-                                        time={message.message.chat_messege_time}   
-                                        ref={thisMessage => (message.ref = thisMessage)}
-                                        openMenu={() => openMenu(message.message.chat_messege_id)}
-                            />
-                        )) }
+                        { messages.length > 0 &&
+                             messages.map(message => (
+                                <ChatMessage key={message.message.chat_messege_id}
+                                            text={message.message.chat_messege_text}
+                                            isRead={message.message.chat_messege_is_read}
+                                            isEdit={message.message.chat_messege_is_edit}
+                                            isSender={userId === message.message.user_id}
+                                            time={message.message.chat_messege_time}   
+                                            ref={thisMessage => (message.ref = thisMessage)}
+                                            replyMessage={messages.find(mess => mess.message.chat_messege_id === message.message.chat_messege_reply_id)}
+                                            replyMessageUser={users.find(user => user.user_id === message.message.user_id)?.user_login}
+                                            openMenu={() => openMenu(message.message.chat_messege_id)}
+                                />
+                            ))
+                        }
                     </div>
                 </div>
                 

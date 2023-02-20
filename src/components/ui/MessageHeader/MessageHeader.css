@@ -1,0 +1,13 @@
+.message-header .input-header-title,
+.message-header .input-header-message {
+    color: white;
+    font-size: 13px;
+}
+
+.message-header .input-header-title {
+    font-weight: 500;
+}
+
+.message-header .input-header-text {
+    border-color: white;
+}

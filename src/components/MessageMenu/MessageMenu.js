@@ -3,7 +3,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import '../../App.css';
 import './MessageMenu.css';
 
-const MessageMenu = memo(({ messageInfo, onEditClick, onDeleteClick }) => {
+const MessageMenu = memo(({ messageInfo, onEditClick, onDeleteClick, onReplyClick }) => {
     const ref = useRef();
     const [coord, setCoord] = useState({});
     useEffect(() => { // настройка меню
@@ -17,7 +17,7 @@ const MessageMenu = memo(({ messageInfo, onEditClick, onDeleteClick }) => {
         <div className="message-menu menu" ref={ref} style={coord}>
             <nav>
                 <ul>
-                    <li className="message-menu__item menu-item">Ответить<span className="material-symbols-outlined">reply</span></li>
+                    <li onClick={onReplyClick} className="message-menu__item menu-item">Ответить<span className="material-symbols-outlined">reply</span></li>
                     { JSON.parse(localStorage.getItem('user')).user_id === messageInfo.userId
                         &&
                         <>
