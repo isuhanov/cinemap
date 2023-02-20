@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 
-import '../../App.css';
-import './MessageMenu.css';
+import '../../../App.css';
+import './MessageMenu.css'
 
 const MessageMenu = memo(({ messageInfo, onEditClick, onDeleteClick, onReplyClick }) => {
     const ref = useRef();

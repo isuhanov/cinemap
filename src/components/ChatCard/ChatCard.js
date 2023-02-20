@@ -2,13 +2,13 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import API_SERVER_PATH from "../../lib/api/api-path";
 import useOpen from "../../services/hooks/useOpen";
-import ChatMessage from "../ChatMessage/ChatMessage";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
-import MessageMenu from "../MessageMenu/MessageMenu";
 
 import './ChatCard.css';
 import deepCompare from "../../services/comparing/deepCompare";
 import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
+import ChatMessage from "../ui/ChatMessage/ChatMessage";
+import MessageMenu from "../ui/MessageMenu/MessageMenu";
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений

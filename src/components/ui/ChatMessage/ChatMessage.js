@@ -1,6 +1,6 @@
 import { forwardRef, memo, useEffect } from "react";
-import ChatMessageDesr from "../ui/ChatMessageDesr/ChatMessageDesr";
-import MessageHeader from "../ui/MessageHeader/MessageHeader";
+import ChatMessageDesr from "../ChatMessageDesr/ChatMessageDesr";
+import MessageHeader from "../MessageHeader/MessageHeader";
 
 import './ChatMessage.css'
 
