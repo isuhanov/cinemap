@@ -55,6 +55,20 @@
     gap: 10px;
 }
 
+.chat-messege-conatiner {
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.unread-title {
+    text-align: center;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 20px 0 10px;
+    color: #7DACF2;
+}
+
 .chat-footer {
     height: 55px;
     padding: 10px;

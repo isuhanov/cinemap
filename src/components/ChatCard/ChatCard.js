@@ -9,23 +9,25 @@ import deepCompare from "../../services/comparing/deepCompare";
 import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
 import ChatMessage from "../ui/ChatMessage/ChatMessage";
 import MessageMenu from "../ui/MessageMenu/MessageMenu";
+import useChatScroll from "../../services/hooks/useChatScroll";
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
     const [users, setUsers] = useState([]); // стейт для списка пользователей
     const [unreadMessage, setUnreadMessage] = useState([]); // стейт для списка непрочитанных сообщений
+    const [firstUnreadMessage, setFirstUnreadMessage] = useState(undefined); // стейт для списка непрочитанных сообщений
+
     const [sendValue, setSendValue] = useState(''); // стейт для поля ввода
     const chatRef = useRef(); // ссылка тело чата
-    const [chatName, setChatName] = useState('');
-    const [chatAvatar, setChatAvatar] = useState('');
-    const userId = JSON.parse(localStorage.getItem('user')).user_id;
+    const [chatName, setChatName] = useState(''); // стейт для имени чата
+    const [chatAvatar, setChatAvatar] = useState(''); // стейт для аватара чата
+    const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
 
-    const [messagesRefs, setMessagesRefs] = useState([])
 
     const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
     useEffect(() => {
-        socket.emit('chats:getInfo', chatId,(response) => {
-            if (response.status === 'success') {
+        socket.emit('chats:getInfo', chatId,(response) => { // получение информации о чате
+            if (response.status === 'success') { 
                 setUsers([...response.chatInfo.users]);
                 if (response.chatInfo.users.length === 2) {
                     const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
@@ -50,6 +52,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                         }
                     ])
                 })
+                setFirstUnreadMessage(response.messages.filter(message => !message.chat_messege_is_read)[0]);
             }
         });
         
@@ -93,21 +96,34 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         });
 
     }, []);
+    
+
+    const scrollToRefs = useRef(undefined); // ссылка на тег для скрола
+    const [lastMessage, setLastMessage] = useState(); // стейт для последнего пришедшего сообщения
+    const [isFirstScroll, setIsFirstScroll] = useState(true); // стейт для состояния скрола при загрузке
+    
+    useEffect(() => { // скоролл чата
+        if (messages.length > 0) { // если есть сообщения и первый скрол, то скрол либо вниз, либо к тегу непрочитанных сообщений
+            if (isFirstScroll) {
+                chatRef.current.scrollTo({top: scrollToRefs.current?.offsetTop - chatRef.current.offsetTop + 10});
+                setIsFirstScroll(false);
+            } else { // иначе скрил вниз, если последнее сообщение в поле видимости  
+                if ((chatRef.current.scrollTop + chatRef.current.offsetHeight) > (lastMessage.ref.offsetTop - chatRef.current.offsetTop)) {
+                    chatRef.current.scrollTo({top: scrollToRefs.current?.offsetTop - chatRef.current.offsetTop + 10});
+                }
+            }
+        }
+        setLastMessage(messages[messages.length-1]); // установка последнего сообщения
+    }, [messages]);
+
 
     useEffect(() => { // установка непрочитанных сообщений чата
         const newUnreadMessage = messages.filter(message => !message.message.chat_messege_is_read);
         if (!deepCompare(unreadMessage, newUnreadMessage)){ // если непрочитанные сообщения изменились
             setUnreadMessage(newUnreadMessage);
-        }
-    }, [messages])
+        } 
+    }, [messages]);
 
-    useEffect(() => {  // перемеотка вниз чата при получении обновлении списка сообщений
-        if (unreadMessage[0] && unreadMessage[0]?.message.user_id !== userId) {
-            chatRef.current.scrollTo({top: unreadMessage[0]?.ref.offsetTop - chatRef.current.offsetTop + 10, behavior: 'smooth'});
-        } else {
-            chatRef.current.scrollTop = chatRef.current.scrollHeight;
-        }
-    }, [unreadMessage]);
 
     function readMessageOnScroll(e) { // поиск непрочитанных сообщений 
         unreadMessage.filter(message => message.message.user_id !== userId).map(message => {
@@ -119,11 +135,11 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         })
     }
 
-    const [inputHeaderInfo, setInputHeaderInfo] = useState(undefined);
+    const [inputHeaderInfo, setInputHeaderInfo] = useState(undefined); // стейт для информации в шапке поля ввода
 
-    const [menuIsVisible, setMenuIsVisible] = useState(false);
-    const [menuInfo, setMenuInfo] = useState(undefined);
-    const openMenu = useCallback((messageId) => {
+    const [menuIsVisible, setMenuIsVisible] = useState(false); // стейт для показа меню сообщения
+    const [menuInfo, setMenuInfo] = useState(undefined); // стейт для информации меня сообщения
+    const openMenu = useCallback((messageId) => { // ф-ия отображения меню сообщений
         const message = messages.find(message => message.message.chat_messege_id === messageId);
         setMenuInfo({
             messageId,
@@ -135,12 +151,12 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         });
         setMenuIsVisible(true);
     }, [messages]);
-    const closeMenu = useCallback(() => {
+    const closeMenu = useCallback(() => { // ф-ия закрытия меню сообщений
         setMenuIsVisible(false);
     }, [])
 
 
-    const onEditClick = useCallback(() => {
+    const onEditClick = useCallback(() => { // ф-ия клика по кнопке редактирования
         const message = messages.find(message => message.message.chat_messege_id === menuInfo.messageId);
         setInputHeaderInfo({
             message,
@@ -151,7 +167,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         closeMenu();
     }, [menuInfo]);
 
-    const onReplyClick = useCallback(() => {
+    const onReplyClick = useCallback(() => { // ф-ия клика по кнопке ответа
         const message = messages.find(message => message.message.chat_messege_id === menuInfo.messageId);
         setInputHeaderInfo({
             message,
@@ -161,7 +177,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         closeMenu();
     }, [menuInfo]);
 
-    const onDeleteClick = useCallback(() => {
+    const onDeleteClick = useCallback(() => { // ф-ия клика по кнопке удаления
         socket.emit('messages:delete', menuInfo.messageId, (status) => {
             if (status !== 'success') console.log(status);
             closeMenu();
@@ -228,18 +244,32 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                         
                         { messages.length > 0 &&
                              messages.map(message => (
-                                <ChatMessage key={message.message.chat_messege_id}
-                                            text={message.message.chat_messege_text}
-                                            isRead={message.message.chat_messege_is_read}
-                                            isEdit={message.message.chat_messege_is_edit}
-                                            isSender={userId === message.message.user_id}
-                                            time={message.message.chat_messege_time}   
-                                            ref={thisMessage => (message.ref = thisMessage)}
-                                            replyMessage={messages.find(mess => mess.message.chat_messege_id === message.message.chat_messege_reply_id)}
-                                            replyMessageUser={users.find(user => user.user_id === message.message.user_id)?.user_login}
-                                            openMenu={() => openMenu(message.message.chat_messege_id)}
-                                />
+                                 // сделать скролл к этому месту
+                                <div className="chat-messege-conatiner" key={message.message.chat_messege_id}>
+                                    { (firstUnreadMessage?.chat_messege_id === message.message.chat_messege_id && 
+                                        firstUnreadMessage?.user_id !== userId) && 
+                                        <p ref={scrollToRefs} className="unread-title">
+                                            Непрочитанные сообщения
+                                        </p>
+                                    }
+                                    <ChatMessage
+                                                text={message.message.chat_messege_text}
+                                                isRead={message.message.chat_messege_is_read}
+                                                isEdit={message.message.chat_messege_is_edit}
+                                                isSender={userId === message.message.user_id}
+                                                time={message.message.chat_messege_time}   
+                                                ref={thisMessage => (message.ref = thisMessage)}
+                                                replyMessage={messages.find(mess => mess.message.chat_messege_id === message.message.chat_messege_reply_id)}
+                                                replyMessageUser={users.find(user => user.user_id === message.message.user_id)?.user_login}
+                                                openMenu={() => openMenu(message.message.chat_messege_id)}
+                                    />
+                                </div>
                             ))
+                        }
+
+                        { (!firstUnreadMessage || firstUnreadMessage?.user_id === userId || !isFirstScroll) && 
+                            // низ чата
+                            <p ref={scrollToRefs}></p>
                         }
                     </div>
                 </div>
