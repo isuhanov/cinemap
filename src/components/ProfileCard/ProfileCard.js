@@ -6,12 +6,12 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ProfileCard.css';
 
-const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName }) => {
+const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat }) => {
     const [locations, setLocations] = useState([]);
+    const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
 
     useEffect(() => {
         axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`).then(res => {
-            console.log(res.data);
             setLocations(res.data);
         }).catch(err => console.log(err));
     }, [user]);
@@ -30,7 +30,14 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
                     <ProfileAvatar imgSrc={user.user_img_path} otherClassName="profile-card__avatar"/>
                     <p className="profile-card__login title">{ user.user_login }</p>
                     <button className="profile-card__btn header-btn">
-                        <span className="material-symbols-outlined">edit</span>
+                        { userId === user.user_id ?
+                                <span className="material-symbols-outlined">edit</span>
+                            :
+                                <span onClick={() => {
+                                    openChat(user.user_id);
+                                    onClickClose();
+                                }} className="material-symbols-outlined">chat</span>
+                        }
                     </button>
                 </header>
                 <div className="profile-card__info">

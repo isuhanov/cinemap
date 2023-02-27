@@ -1,12 +1,62 @@
 import connection from '../db/db-service.js';
 
-async function selectChats(userId) { // ф-ия получения всех чатов пользователя
+
+async function createChat(body) { // ф-ия создания чата
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `select * from chats c inner join chats_users cu on c.chat_id = cu.chat_id where user_id = ${userId};`,
+            `INSERT INTO chats (chat_name, chat_photo_path) VALUES (${null}, ${null});`,
+            function(err, results, fields) {
+                addUsersToChat(results.insertId, body.users).then(res => {
+                    resolve(results.insertId);
+                }).catch(err => reject(err));
+            }
+        )   
+    });
+    return response;
+}
+
+async function addUsersToChat(chatId, users) { // ф-ия добавления пользователей в чат
+    let response = await new Promise((resolve, reject) => {
+        let query = 'INSERT INTO chats_users (chat_id, user_id) VALUES ';
+        users.forEach(user => query += `('${chatId}', '${user.user_id}'),`);
+        query = query.slice(0, -1) + ';';
+        connection.query(
+            query,
             function(err, results, fields) {
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
+
+async function selectChats(userId) { // ф-ия получения всех чатов пользователя
+    let response = await new Promise((resolve, reject) => {
+        connection.query(
+            `select * from chats c inner join chats_users cu on c.chat_id = cu.chat_id where user_id = ${userId} order by (select cm.chat_messege_time from chats_messeges cm where cm.chat_id = c.chat_id and cm.is_deleted = 0 order by cm.chat_messege_id desc limit 1) desc;`,
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
+
+async function selectUsersChat(user1, user2) { // дописать получения чата
+    let response = await new Promise((resolve, reject) => {
+        connection.query(
+            `SELECT cu.chat_id FROM chats_users cu where cu.user_id = ${user1} and (SELECT cu2.chat_id FROM chats_users cu2 where cu2.user_id = ${user2} and cu.chat_id = cu2.chat_id );`,
+            function(err, results, fields) {
+                if (err) reject(err);
+                else {  // отправка результата в ответ на запрос
+                    if (results.length > 0) {
+                        resolve(results[0].chat_id)
+                    } else {
+                        resolve(null);
+                    }
+                };
             }
         )   
     });
@@ -125,4 +175,4 @@ async function deleteMessage(messageId) {
     return response
 }
 
-export { selectChats, selectChatInfo, selectChatUsers, selectMessages, addMessage, editMessage, readMessage, deleteMessage };
+export { createChat, selectChats, selectUsersChat, selectChatInfo, selectChatUsers, selectMessages, addMessage, editMessage, readMessage, deleteMessage };

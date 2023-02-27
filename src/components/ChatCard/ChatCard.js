@@ -1,7 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import API_SERVER_PATH from "../../lib/api/api-path";
-import useOpen from "../../services/hooks/useOpen";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ChatCard.css';
@@ -9,9 +8,9 @@ import deepCompare from "../../services/comparing/deepCompare";
 import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
 import ChatMessage from "../ui/ChatMessage/ChatMessage";
 import MessageMenu from "../ui/MessageMenu/MessageMenu";
-import useChatScroll from "../../services/hooks/useChatScroll";
 
-const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
+const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onReload }) => {
+    const [stateChatId, setStateChatId] = useState(chatId);
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
     const [users, setUsers] = useState([]); // стейт для списка пользователей
     const [unreadMessage, setUnreadMessage] = useState([]); // стейт для списка непрочитанных сообщений
@@ -26,21 +25,29 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
 
     const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
     useEffect(() => {
-        socket.emit('chats:getInfo', chatId,(response) => { // получение информации о чате
+        socket.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
             if (response.status === 'success') { 
                 setUsers([...response.chatInfo.users]);
                 if (response.chatInfo.users.length === 2) {
                     const user = response.chatInfo.users.find(user => user.user_id !== JSON.parse(localStorage.getItem('user')).user_id);
                     setChatName(user.user_login);
                     setChatAvatar(user.user_img_path);
-                } else {
+                } else if (response.chatInfo.users.length === 0) {
+                    socket.emit('chats:getUsersInfo', openUserId, (response) => {
+                        if (response.status === 'success') {
+                            setUsers([response.user, JSON.parse(localStorage.getItem('user'))]);
+                            setChatName(response.user.user_login);
+                            setChatAvatar(response.user.user_img_path);    
+                        }
+                    });
+                }else {
                     setChatName(response.chatInfo.chat.chat_name);
                     setChatAvatar(response.chatInfo.chat.chat_photo_path);    
                 }
             }
           });
 
-        socket.emit('messages:get', chatId, (response) => { // получение списка сообщений 
+        socket.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
             setMessages([]);
             if (response.status === 'success') {
                 response.messages.map(message => {
@@ -124,7 +131,6 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
         } 
     }, [messages]);
 
-
     function readMessageOnScroll(e) { // поиск непрочитанных сообщений 
         unreadMessage.filter(message => message.message.user_id !== userId).map(message => {
             if ((e.target.scrollTop + e.target.offsetHeight) > (message.ref.offsetTop - e.target.offsetTop)) {
@@ -134,6 +140,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
             }
         })
     }
+
 
     const [inputHeaderInfo, setInputHeaderInfo] = useState(undefined); // стейт для информации в шапке поля ввода
 
@@ -186,8 +193,24 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
     }, [menuInfo]);
 
 
-    function sendMessage() { // ф-ия отправки сообщения
+
+    async function createChat() { // ф-ия создания чата
+        return new Promise((resolve, reject) => {
+            socket.emit('chats:create', { users }, (response) => {
+                console.log(response);
+                if (response.status === 'success'){
+                    console.log(response.status);
+                    setStateChatId(response.chatId);
+                    resolve(response.chatId);
+                }
+            })
+        })
+    }
+
+
+    async function sendMessage() { // ф-ия отправки сообщения
         if (sendValue.trim().length === 0) return;
+
         const body = inputHeaderInfo?.type === 'edit' ? // создание разных объектов для добавления и обновления сообщения
                 {
                     chat_messege_id: inputHeaderInfo.message.message.chat_messege_id, 
@@ -201,11 +224,12 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, onReload }) => {
                     chat_messege_is_edit: 0,
                     chat_messege_type: 'text',
                     chat_messege_reply_id: inputHeaderInfo?.message.message.chat_messege_id || null,
-                    chat_id: chatId,
+                    chat_id: stateChatId || (await createChat()),
                     user_id: userId
                 }
             
         setSendValue('');
+        console.log(body);
         socket.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
             if (status !== 'success') console.log(status);
             setMenuInfo(undefined);

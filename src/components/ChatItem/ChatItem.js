@@ -20,7 +20,7 @@ const ChatItem = memo(({ chatId, onClick }) => {
     }, [])
 
     function getChatInfo(params) { // ф-ия получения информации о чате
-        socket.emit('chats:getInfo', chatId,(response) => {
+        socket.emit('chats:getInfo', chatId, (response) => {
             if (response.status === 'success') {
                 setChatLastMess(response.chatInfo.chat); // установка последнего сообщения
                 if (response.chatInfo.users.length === 2) { // если в чате 2 пользователя, то название и фото берутся из пользователя

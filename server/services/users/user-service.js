@@ -23,6 +23,22 @@ async function addUser(body, photo) { // ф-ия добавления новог
     return response;
 }
 
+async function selectUser(userId) { // ф-ия получения информации о пользователе
+    let response = new Promise((resolve, reject) => {
+        connection.query(  // получение id пользователя 
+            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_id = ${userId};`,
+            function(err, results, fields) {
+                if (results.length === 0) { // если пользователя нет, то ошикбка
+                    reject(err);
+                } else { // иначе отправка инф-ции о пользователе
+                    resolve(results[0]); 
+                }
+            }
+        );
+    });
+    return response;
+}
+
 async function loginUser(login, password) { // ф-ия авторизации пользователя
     let response = new Promise((resolve, reject) => {
         getSalt(login).then(res => {
@@ -61,4 +77,4 @@ function  hashPass(password, salt) { // ф-ия хэширования паро�
     return hash;
 }
 
-export { addUser, loginUser };
+export { addUser, loginUser, selectUser };

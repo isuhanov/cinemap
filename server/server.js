@@ -10,14 +10,14 @@ import fs from 'fs'
 import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
-import { addUser, loginUser } from './services/users/user-service.js'
+import { addUser, loginUser, selectUser } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
 import { tokenKey } from './lib/token.js'
 
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { addPhotos } from './services/files/file-service.js'
-import { addMessage, deleteMessage, editMessage, readMessage, selectChatInfo, selectChats, selectMessages } from './services/chat/chat-services.js'
+import { addMessage, createChat, deleteMessage, editMessage, readMessage, selectChatInfo, selectChats, selectMessages, selectUsersChat } from './services/chat/chat-services.js'
 
 const app = express();
 const server = createServer(app);
@@ -45,15 +45,34 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     })
 
+    socket.on('chats:create', (body, callback) => { // создание чата
+        createChat(body).then(chatId => {
+            callback({status:'success', chatId});
+            io.sockets.emit('chat');
+        }).catch(err => callback(err));
+    });
+
     socket.on('chats:get', (userId, callback) => { // отправка списка чатов
         selectChats(userId).then(chats=> {
             callback({status:'success', chats});
         }).catch(err => callback(err));
     });
 
+    socket.on('chats:getChat', (user1, user2, callback) => { // отправка чата пользователей
+        selectUsersChat(user1, user2).then(chatId=> {
+            callback({status:'success', chatId});
+        }).catch(err => callback(err));
+    });
+
     socket.on('chats:getInfo', (userId, callback) => { // отправка информации о чате
         selectChatInfo(userId).then(chatInfo => {
             callback({status:'success', chatInfo});
+        }).catch(err => callback(err));
+    });
+
+    socket.on('chats:getUsersInfo', (userId, callback) => { // отправка информации пользователей чата
+        selectUser(userId).then(user => {
+            callback({status:'success', user});
         }).catch(err => callback(err));
     });
 

@@ -22,7 +22,8 @@ const closeCard = (card, setCard, onReload, data=undefined) => {
         setCard(prev => ({
           ...prev,
           isVisible: false,
-          current: data || card.current,
+          current: data || undefined,
+          // current: data || card.current,
         }))
         onReload();
     }, 600);

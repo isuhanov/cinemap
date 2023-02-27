@@ -102,7 +102,7 @@ function App() {
     closeCard(showsProfileCard, setShowsProfileCard, onReload)
   });
 
-  const [showsMessangers, openMessangers, closeMessangers] = useOpen('cover', onReload);
+  const [showsMessangers, openMessangers, closeMessangers] = useOpen('cover', onReload, 0);
 
   return (
       <div className="App">
@@ -118,8 +118,9 @@ function App() {
         { showsMessangers.isVisible && 
           <Messenger
             onReload={onReload}
-            onClickClose={closeMessangers}
+            onClickClose={() => closeMessangers()}
             otherClassName={showsMessangers.visibleClass}
+            otherUserId={showsMessangers.current}
           />
         }
                 
@@ -151,6 +152,7 @@ function App() {
               moveToMarker(coordMarker);
             }} 
             onClickClose={closeProfileCard} 
+            openChat={openMessangers}
             otherClassName={showsProfileCard.visibleClass}/> 
         }
 
@@ -194,7 +196,7 @@ function App() {
           </div>
           <div className="side-bar-block">
             <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
-                    onClickMessenger={openMessangers}  />
+                    onClickMessenger={() => openMessangers(undefined)}  />
           </div>
         </div>
       </div>

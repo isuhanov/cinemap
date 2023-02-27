@@ -8,19 +8,26 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './Messenger.css';
 
-const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
+const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId}) => {
     const [chats, setChats] = useState([]);
+    const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);
 
-    const { current: socket } = useRef(io(API_SERVER_PATH)  )
+    const { current: socket } = useRef(io(API_SERVER_PATH))
     useEffect(() => {
       socket.emit('chats:get', JSON.parse(localStorage.getItem('user')).user_id,(response) => {
         if (response.status === 'success') {
-            setChats(response.chats)
+            setChats(response.chats);
+            if (otherUserId) {
+                socket.emit('chats:getChat', JSON.parse(localStorage.getItem('user')).user_id, otherUserId, (response) => {
+                    if (response.status === 'success') {
+                        openChatCard({chatId: response.chatId, userId:otherUserId});
+                    }
+                });
+            }
         }
       });
     }, [])
 
-    const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);
 
     return (
         <div className={`messenger-container ${otherClassName}`}>
@@ -39,7 +46,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
                     { chats.map(chatItem => (
                             <ChatItem key={chatItem.chat_id} 
                                     chatId={chatItem.chat_id}
-                                    onClick={() => openChatCard(chatItem.chat_id)} 
+                                    onClick={() => openChatCard({chatId: chatItem.chat_id})} 
                             />
                         )
                     )}
@@ -47,7 +54,8 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload }) => {
                 { showsChatCard.isVisible && 
                     <ChatCard
                         onReload={onReload}
-                        chatId={showsChatCard.current}
+                        chatId={showsChatCard.current.chatId}
+                        openUserId={showsChatCard.current.userId}
                         onClickClose={closeChatCard}
                         otherClassName={showsChatCard.visibleClass}
                     />
