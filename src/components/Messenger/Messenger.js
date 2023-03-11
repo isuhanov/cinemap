@@ -12,11 +12,26 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
     const [chats, setChats] = useState([]);
     const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);
 
+    // СДЕЛАТЬ ПОИСК ПОЛЬЗОВАТЕЛЕЙ, 
+    // СДЕЛАТЬ СКРЫТИЕ ЧАТА, ЕСЛИ В НЕМ НЕТ СООБЩЕНИЙ    
+
     const { current: socket } = useRef(io(API_SERVER_PATH))
+    
+    async function updateChatList() {
+        return new Promise((resolve, reject) => {
+            socket.emit('chats:get', JSON.parse(localStorage.getItem('user')).user_id,(response) => {
+                if (response.status === 'success') {
+                    setChats(response.chats);
+                    resolve(response);
+                } else {
+                    reject(response);
+                }
+              });
+        });
+    }
+
     useEffect(() => {
-      socket.emit('chats:get', JSON.parse(localStorage.getItem('user')).user_id,(response) => {
-        if (response.status === 'success') {
-            setChats(response.chats);
+        updateChatList().then(res => {
             if (otherUserId) {
                 socket.emit('chats:getChat', JSON.parse(localStorage.getItem('user')).user_id, otherUserId, (response) => {
                     if (response.status === 'success') {
@@ -24,8 +39,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
                     }
                 });
             }
-        }
-      });
+        }).catch(err => console.log(err));
     }, [])
 
 
@@ -56,7 +70,10 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
                         onReload={onReload}
                         chatId={showsChatCard.current.chatId}
                         openUserId={showsChatCard.current.userId}
-                        onClickClose={closeChatCard}
+                        onClickClose={() => {
+                            closeChatCard()
+                            updateChatList();
+                        }}
                         otherClassName={showsChatCard.visibleClass}
                     />
                 }

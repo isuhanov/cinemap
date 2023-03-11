@@ -114,8 +114,8 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             if (isFirstScroll) {
                 chatRef.current.scrollTo({top: scrollToRefs.current?.offsetTop - chatRef.current.offsetTop + 10});
                 setIsFirstScroll(false);
-            } else { // иначе скрил вниз, если последнее сообщение в поле видимости  
-                if ((chatRef.current.scrollTop + chatRef.current.offsetHeight) > (lastMessage.ref.offsetTop - chatRef.current.offsetTop)) {
+            } else { // иначе скрол вниз, если последнее сообщение в поле видимости  
+                if ((chatRef.current.scrollTop + chatRef.current.offsetHeight) > (lastMessage.ref?.offsetTop - chatRef.current.offsetTop)) {
                     chatRef.current.scrollTo({top: scrollToRefs.current?.offsetTop - chatRef.current.offsetTop + 10});
                 }
             }
