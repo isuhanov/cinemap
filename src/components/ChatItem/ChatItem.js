@@ -36,25 +36,29 @@ const ChatItem = memo(({ chatId, onClick }) => {
     }
 
     return (
-        <div className="messenger-chat-item" onClick={onClick}>
-            <ProfileAvatar otherClassName="messenger__profile-userimg" imgSrc={chatAvatar}/>
-            <div className="messenger-chat__info">
-                <p className="messenger-chat__login">
-                    { chatName }
-                </p>
-                <p className="messenger-chat__text">
-                    { chatLastMess.chat_messege_text }
-                </p>
-            </div>
-            <ChatMessageDesr time={chatLastMess.chat_messege_time} 
-                            isSender={JSON.parse(localStorage.getItem('user')).user_id === chatLastMess.user_id}
-                            isRead={chatLastMess.chat_messege_is_read}
-                            containerClass={'messenger-chat__description'}
-                            timeClass={'messenger-chat__time'}
-                            statusClass={`messenger-chat__status ${chatLastMess.chat_messege_is_read ? 'read' : 'unread'}`}
-                            checkClass={'done-outlined'}
-            />
-        </div>
+        <>
+            { chatLastMess &&
+                <div className="messenger-chat-item" onClick={onClick}>
+                    <ProfileAvatar otherClassName="messenger__profile-userimg" imgSrc={chatAvatar}/>
+                    <div className="messenger-chat__info">
+                        <p className="messenger-chat__login">
+                            { chatName }
+                        </p>
+                        <p className="messenger-chat__text">
+                            { chatLastMess.chat_messege_text }
+                        </p>
+                    </div>
+                    <ChatMessageDesr time={chatLastMess.chat_messege_time} 
+                                    isSender={JSON.parse(localStorage.getItem('user')).user_id === chatLastMess.user_id}
+                                    isRead={chatLastMess.chat_messege_is_read}
+                                    containerClass={'messenger-chat__description'}
+                                    timeClass={'messenger-chat__time'}
+                                    statusClass={`messenger-chat__status ${chatLastMess.chat_messege_is_read ? 'read' : 'unread'}`}
+                                    checkClass={'done-outlined'}
+                    />
+                </div>
+            }
+        </>
     );
 });
 
