@@ -2,13 +2,13 @@ import { memo } from 'react';
 import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 import './UserBox.css'
 
-const UserBox = memo(({ user, openUser }) => {
+const UserBox = memo(({ user, openUser, otherClassName }) => {
     return (
-        <div className="location-creator__profile" onClick={() => openUser(user)}>
-            <p className="creator__profile-username">
-                { `${user.user_surname} ${user.user_name}`  }
+        <div className={`user-box ${otherClassName}`} onClick={() => openUser(user)}>
+            <p className="user-box-username">
+                { `${user.user_login}`  }
             </p>
-            <ProfileAvatar otherClassName="creator__profile-userimg" imgSrc={user.user_img_path}/>
+            <ProfileAvatar otherClassName="user-box-userimg" imgSrc={user.user_img_path}/>
         </div>
     );
 });
