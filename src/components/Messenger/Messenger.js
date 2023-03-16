@@ -8,7 +8,7 @@ import UserBox from "../UserBox/UserBox";
 
 import './Messenger.css';
 
-const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId }) => {
+const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, openUser }) => {
     const [chats, setChats] = useState([]); // стейт для списка чатов
     const [users, setUsers] = useState([]); // стейт для списка пользователей
     const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);  // стейт для чата
@@ -45,7 +45,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId }
                 });
             }
         }).catch(err => console.log(err));
-    }, [])
+    }, [otherUserId])
 
 
     const [searchValue, setSearchValue] = useState('');  // стейт для значения поля поиска
@@ -117,7 +117,13 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId }
                         <>
                             { users.map(user => (
                                     <UserBox key={user.user_id}
-                                             user={user} />
+                                             user={user}
+                                             openUser={openUser}
+                                            // openUser={(user) => {
+                                            //     onClickClose();
+                                            //     openUser(user);
+                                            // }}
+                                    />
                                 )
                             )}
                         </>
