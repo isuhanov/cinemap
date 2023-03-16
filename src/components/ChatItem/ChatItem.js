@@ -38,7 +38,10 @@ const ChatItem = memo(({ chatId, onClick }) => {
     return (
         <>
             { chatLastMess &&
-                <div className="messenger-chat-item" onClick={onClick}>
+                <div className={`${
+                        JSON.parse(localStorage.getItem('user')).user_id !== chatLastMess.user_id && !chatLastMess.chat_messege_is_read ? 'unread': ''
+                    } messenger-chat-item `} 
+                    onClick={onClick}>
                     <ProfileAvatar otherClassName="messenger__profile-userimg" imgSrc={chatAvatar}/>
                     <div className="messenger-chat__info">
                         <p className="messenger-chat__login">
