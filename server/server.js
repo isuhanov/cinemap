@@ -10,7 +10,7 @@ import fs from 'fs'
 import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
-import { addUser, loginUser, selectUser } from './services/users/user-service.js'
+import { addUser, filterUsers, loginUser, selectUser, selectUsers } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
 import { tokenKey } from './lib/token.js'
 
@@ -45,6 +45,18 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     })
 
+    socket.on('users:get', (currentUserId, callback) => { // отправка списка пользователей
+        selectUsers(currentUserId).then(users=> {
+            callback({status:'success', users});
+        }).catch(err => callback(err));
+    });
+
+    socket.on('users:filter', (currentUserId, filterParams, callback) => { // фильтрация списка пользователей
+        filterUsers(currentUserId, filterParams).then(users=> {
+            callback({status:'success', users});
+        }).catch(err => callback(err));
+    });
+
     socket.on('chats:create', (body, callback) => { // создание чата
         createChat(body).then(chatId => {
             callback({status:'success', chatId});
@@ -58,7 +70,7 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     });
 
-    socket.on('chats:filter', (userId, filterParams, callback) => { // отправка списка чатов
+    socket.on('chats:filter', (userId, filterParams, callback) => { // фильтрация списка чатов
         filterChats(userId, filterParams).then(chats=> {
             callback({status:'success', chats});
         }).catch(err => callback(err));

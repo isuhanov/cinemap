@@ -8,6 +8,7 @@ import API_SERVER_PATH from "../../lib/api/api-path";
 import './LocationCard.css'
 import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
 import { io } from "socket.io-client";
+import UserBox from "../UserBox/UserBox";
 
 const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
@@ -138,12 +139,7 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                         Сделано:
                     </p>
                     { user && 
-                        <div className="location-creator__profile" onClick={() => openUser(user)}>
-                            <p className="creator__profile-username">
-                                { `${user.user_surname} ${user.user_name}`  }
-                            </p>
-                            <ProfileAvatar otherClassName="creator__profile-userimg" imgSrc={user.user_img_path}/>
-                        </div>
+                        <UserBox user={user} openUser={openUser}/>
                     }
                 </div>
 

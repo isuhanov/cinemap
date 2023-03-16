@@ -4,20 +4,23 @@ import API_SERVER_PATH from "../../lib/api/api-path";
 import useOpen from "../../services/hooks/useOpen";
 import ChatCard from "../ChatCard/ChatCard";
 import ChatItem from "../ChatItem/ChatItem";
+import UserBox from "../UserBox/UserBox";
 
 import './Messenger.css';
 
-const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId}) => {
-    const [chats, setChats] = useState([]);
-    const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);
+const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId }) => {
+    const [chats, setChats] = useState([]); // стейт для списка чатов
+    const [users, setUsers] = useState([]); // стейт для списка пользователей
+    const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);  // стейт для чата
+    const [mode, setMode] = useState("chats");  // стейт для режима отображения
 
-    const { current: socket } = useRef(io(API_SERVER_PATH))
+    const { current: socket } = useRef(io(API_SERVER_PATH))  // стейт для сокета
     
-    async function updateChatList() {
+    async function update() {  // ф-ия обновления списков списка 
         return new Promise((resolve, reject) => {
-            socket.emit('chats:get', JSON.parse(localStorage.getItem('user')).user_id,(response) => {
+            socket.emit(`${mode}:get`, JSON.parse(localStorage.getItem('user')).user_id, (response) => {
                 if (response.status === 'success') {
-                    setChats(response.chats);
+                    response.chats ? setChats(response.chats): setUsers(response.users);
                     resolve(response);
                 } else {
                     reject(response);
@@ -26,9 +29,15 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
         });
     }
 
+
+    useEffect(() => {  // обновление списка при смене режима
+        update();
+    }, [mode]);
+
+
     useEffect(() => {
-        updateChatList().then(res => {
-            if (otherUserId) {
+        update().then(res => {
+            if (otherUserId) { // если есть id нужного пользователя, то открыть чат 
                 socket.emit('chats:getChat', JSON.parse(localStorage.getItem('user')).user_id, otherUserId, (response) => {
                     if (response.status === 'success') {
                         openChatCard({chatId: response.chatId, userId:otherUserId});
@@ -39,19 +48,19 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
     }, [])
 
 
-    const [searchValue, setSearchValue] = useState('');
-    const [isVisibleBtn, setIsVisibleBtn] = useState(false);
-    function onSearchChange(e) {
+    const [searchValue, setSearchValue] = useState('');  // стейт для значения поля поиска
+    const [isVisibleBtn, setIsVisibleBtn] = useState(false); // стейт для отображения кнопки отмены поиска
+    function onSearchChange(e) {  // ф-ия изменения поля ввода
         const value = e.target.value;
-        setSearchValue(value);
-        if (value.trim() === '') {
+        setSearchValue(value); 
+        if (value.trim() === '')  { // если значение пустое, то убрать кнопки и сбросить поиск
             setIsVisibleBtn(false);
-            updateChatList();
-        } else {
+            update();
+        } else {  // иначе отфильтровать нужный список
             setIsVisibleBtn(true);
-            socket.emit('chats:filter', JSON.parse(localStorage.getItem('user')).user_id, value.trim(), (response) => {
+            socket.emit(`${mode}:filter`, JSON.parse(localStorage.getItem('user')).user_id, value.trim(), (response) => {
                 if (response.status === 'success') {
-                    setChats(response.chats);
+                    response.chats ? setChats(response.chats): setUsers(response.users);
                 }
             });
         }
@@ -66,6 +75,12 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
                         Мессенджер
                     </p>
                     <div className="header-btn-container">
+                        <button className="header-btn" onClick={() => {
+                                                            setMode('users');
+                                                        }}
+                        >
+                            <span className="material-symbols-outlined">add_box</span>
+                        </button>
                         <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
@@ -80,7 +95,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
                         <button onClick={() => {
                             setSearchValue('');
                             setIsVisibleBtn(false);
-                            updateChatList();
+                            update();
                         }} className="subsearch-btn clean-btn">
                             <span className="material-symbols-outlined" >close</span>
                         </button>  
@@ -88,14 +103,27 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
 
                 </div>
                 <div className="messenger-main">
-                    { chats.map(chatItem => (
-                            <ChatItem key={chatItem.chat_id} 
+                    { mode === 'chats' ? 
+                        <>
+                            { chats.map(chatItem => (
+                                    <ChatItem key={chatItem.chat_id} 
                                     chatId={chatItem.chat_id}
                                     onClick={() => openChatCard({chatId: chatItem.chat_id})} 
-                            />
-                        )
-                    )}
+                                    />
+                                )
+                            )}
+                        </>
+                        :
+                        <>
+                            { users.map(user => (
+                                    <UserBox key={user.user_id}
+                                             user={user} />
+                                )
+                            )}
+                        </>
+                    }
                 </div>
+
                 { showsChatCard.isVisible && 
                     <ChatCard
                         onReload={onReload}
@@ -103,7 +131,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload,  otherUserId})
                         openUserId={showsChatCard.current.userId}
                         onClickClose={() => {
                             closeChatCard()
-                            updateChatList();
+                            update();
                         }}
                         otherClassName={showsChatCard.visibleClass}
                     />

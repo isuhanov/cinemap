@@ -118,6 +118,7 @@ function App() {
         { showsMessangers.isVisible && 
           <Messenger
             onReload={onReload}
+            openUser={openProfileCard}
             onClickClose={() => closeMessangers()}
             otherClassName={showsMessangers.visibleClass}
             otherUserId={showsMessangers.current}
