@@ -29,6 +29,14 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
         });
     }
 
+    useEffect(() => { // обновление айтем чата
+        socket.on('messages:update_list', (message) => {
+            update();
+        });
+        socket.on('messages:update_delete', (message) => {
+            update();
+        });
+    }, [])
 
     useEffect(() => {  // обновление списка при смене режима
         update();
@@ -119,10 +127,6 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                                     <UserBox key={user.user_id}
                                              user={user}
                                              openUser={openUser}
-                                            // openUser={(user) => {
-                                            //     onClickClose();
-                                            //     openUser(user);
-                                            // }}
                                     />
                                 )
                             )}

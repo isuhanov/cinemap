@@ -16,7 +16,6 @@ import { tokenKey } from './lib/token.js'
 
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { addPhotos } from './services/files/file-service.js'
 import { addMessage, createChat, deleteMessage, editMessage, filterChats, readMessage, selectChatInfo, selectChats, selectMessages, selectUsersChat } from './services/chat/chat-services.js'
 
 const app = express();
