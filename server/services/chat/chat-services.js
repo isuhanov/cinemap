@@ -59,7 +59,7 @@ async function filterChats(userId, chatName) { // ф-ия фильтрации �
     return response;
 }
 
-async function selectUsersChat(user1, user2) { // дописать получения чата
+async function selectUsersChat(user1, user2) { // ф-ия получения чата пользователя
     let response = await new Promise((resolve, reject) => {
         connection.query(
             `SELECT cu.chat_id FROM chats_users cu where cu.user_id = ${user1} and (SELECT cu2.chat_id FROM chats_users cu2 where cu2.user_id = ${user2} and cu.chat_id = cu2.chat_id );`,
@@ -118,6 +118,19 @@ async function selectMessages(chatId) { // ф-ия получения всех �
             function(err, results, fields) {
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
+            }
+        )   
+    });
+    return response;
+}
+
+async function selectReplyMessage(replyMessageId) { // ф-ия получения ответа сообщения
+    let response = await new Promise((resolve, reject) => {
+        connection.query(
+            `SELECT cm.chat_messege_text, u.user_login FROM chats_messeges cm inner join users u on cm.user_id = u.user_id WHERE cm.chat_messege_id = ${replyMessageId};`,
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results[0]); // отправка результата в ответ на запрос
             }
         )   
     });
@@ -190,4 +203,4 @@ async function deleteMessage(messageId) {
     return response
 }
 
-export { createChat, selectChats, filterChats, selectUsersChat, selectChatInfo, selectChatUsers, selectMessages, addMessage, editMessage, readMessage, deleteMessage };
+export { createChat, selectChats, filterChats, selectUsersChat, selectChatInfo, selectChatUsers, selectMessages, selectReplyMessage, addMessage, editMessage, readMessage, deleteMessage };

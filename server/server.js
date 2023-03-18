@@ -16,7 +16,7 @@ import { tokenKey } from './lib/token.js'
 
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { addMessage, createChat, deleteMessage, editMessage, filterChats, readMessage, selectChatInfo, selectChats, selectMessages, selectUsersChat } from './services/chat/chat-services.js'
+import { addMessage, createChat, deleteMessage, editMessage, filterChats, readMessage, selectChatInfo, selectChats, selectMessages, selectReplyMessage, selectUsersChat } from './services/chat/chat-services.js'
 
 const app = express();
 const server = createServer(app);
@@ -96,6 +96,12 @@ io.on("connection", (socket) => {
     socket.on('messages:get', (chatId, callback) => { // отправка списка сообщений
         selectMessages(chatId).then(messages=> {
             callback({status:'success', messages});
+        }).catch(err => callback(err));
+    });
+
+    socket.on('messages:get_reply', (replyMessageId, callback) => { // отправка ответа сообщения
+        selectReplyMessage(replyMessageId).then(message => {
+            callback({status:'success', message});
         }).catch(err => callback(err));
     });
 

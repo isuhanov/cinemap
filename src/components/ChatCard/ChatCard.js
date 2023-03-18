@@ -8,6 +8,8 @@ import deepCompare from "../../services/comparing/deepCompare";
 import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
 import ChatMessage from "../ui/ChatMessage/ChatMessage";
 import MessageMenu from "../ui/MessageMenu/MessageMenu";
+import { ClickAwayListener } from '@mui/material';
+
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onReload }) => {
     const [stateChatId, setStateChatId] = useState(chatId);
@@ -64,13 +66,15 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
         });
         
         socket.on('messages:update_list', (message) => { // изменение списка сообщений
-            setMessages(prevMess => [
-                ...prevMess,
-                {
-                    message,
-                    ref: undefined
-                }
-            ])
+            if (message.chat_id === chatId) {   
+                setMessages(prevMess => [
+                    ...prevMess,
+                    {
+                        message,
+                        ref: undefined
+                    }
+                ]);
+            }
         });
 
         socket.on('messages:update_read', (messageId) => { // изменение сообщений при чтении 
@@ -229,7 +233,6 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                 }
             
         setSendValue('');
-        console.log(body);
         socket.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
             if (status !== 'success') console.log(status);
             setMenuInfo(undefined);
@@ -257,18 +260,22 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                 <div className="chat-main" ref={chatRef} onScroll={readMessageOnScroll}>
                     <div className="chat-main__inner">
 
-                        { menuIsVisible && 
-                            <MessageMenu 
-                                messageInfo={menuInfo} 
-                                onEditClick={onEditClick}
-                                onDeleteClick={onDeleteClick}
-                                onReplyClick={onReplyClick}
-                            /> 
-                        }
+                        { menuIsVisible && (
+                            <ClickAwayListener onClickAway={closeMenu}>
+                                <div>
+                                    <MessageMenu 
+                                        messageInfo={menuInfo} 
+                                        onEditClick={onEditClick}
+                                        onDeleteClick={onDeleteClick}
+                                        onReplyClick={onReplyClick}
+                                        />
+                                </div>
+                            </ClickAwayListener>
+                        )}
                         
                         { messages.length > 0 &&
                              messages.map(message => (
-                                 // сделать скролл к этому месту
+                                 // скролл к этому месту при непрочитанных сообщениях
                                 <div className="chat-messege-conatiner" key={message.message.chat_messege_id}>
                                     { (firstUnreadMessage?.chat_messege_id === message.message.chat_messege_id && 
                                         firstUnreadMessage?.user_id !== userId) && 
@@ -283,8 +290,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                                                 isSender={userId === message.message.user_id}
                                                 time={message.message.chat_messege_time}   
                                                 ref={thisMessage => (message.ref = thisMessage)}
-                                                replyMessage={messages.find(mess => mess.message.chat_messege_id === message.message.chat_messege_reply_id)}
-                                                replyMessageUser={users.find(user => user.user_id === message.message.user_id)?.user_login}
+                                                replyMessageId={message.message.chat_messege_reply_id}
                                                 openMenu={() => openMenu(message.message.chat_messege_id)}
                                     />
                                 </div>

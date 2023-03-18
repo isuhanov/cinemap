@@ -4,7 +4,7 @@ import MessageHeader from "../MessageHeader/MessageHeader";
 
 import './ChatMessage.css'
 
-const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, openMenu, replyMessage, replyMessageUser }, ref) => {
+const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, openMenu, replyMessageId, replyMessage, replyMessageUser }, ref) => {
 
     useEffect(() => {
         // console.log(replyMessage);
@@ -15,8 +15,8 @@ const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, op
                 e.preventDefault();
                 openMenu();
             }} className={`chat-messege ${isSender ? 'messege-sender' : 'messege-recipient'}`}>
-                { replyMessage &&
-                    <MessageHeader message={replyMessage} user={replyMessageUser}/>
+                { replyMessageId && replyMessageId !== 0 &&
+                    <MessageHeader messageId={replyMessageId}/>
                 }
                 <div className="chat-messege-text">
                     {text}

@@ -1,16 +1,27 @@
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
+import API_SERVER_PATH from "../../../lib/api/api-path";
 
 import './MessageHeader.css'
 
-const MessageHeader = memo(({ message, user }) => {
+const MessageHeader = memo(({ messageId }) => {
+    const [message, setMessage] = useState(undefined); // стейт для сообщения
+    const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
+
+    useEffect(() => { // запрос на получения данных
+        socket.emit('messages:get_reply', messageId, (response) => {
+            if (response.status === 'success') setMessage(response.message);
+        })
+    }, []);
+
     return (
         <div className="message-header">
             <div className="input-header-text">
                 <p className="input-header-title">
-                    { user }
+                    { message?.user_login }
                 </p>
                 <p className="input-header-message">
-                    { message.message.chat_messege_text }
+                    { message?.chat_messege_text }
                 </p>
             </div>
         </div>
