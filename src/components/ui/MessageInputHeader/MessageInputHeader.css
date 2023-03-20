@@ -1,0 +1,36 @@
+.message-input-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0px;
+}
+
+.input-header-logo {
+    color: #458efc;
+}
+
+.input-header-text {
+    min-width: 85%;
+    border-left: 3px solid #458efc;
+    padding-left: 10px;
+}
+
+.input-header-title {
+    color: #458efc;
+    font-size: 14px;
+}
+
+.input-header-message {
+    color: rgb(72, 72, 72);
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+.input-header-btn {
+    color: #458efc;
+}
+
+.input-header-btn:hover {
+    color: #9ec5ff;
+}

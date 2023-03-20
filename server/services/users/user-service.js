@@ -14,6 +14,7 @@ async function addUser(body, photo) { // ф-ия добавления новог
             `INSERT INTO users (user_login, user_pass, user_staff, user_name, user_surname, user_img_path, user_status, user_salt) 
             VALUES ('${body.login}', '${hash}', 'user', '${body.name}', '${body.surname}', '${imgPath.replace('/img', '')}', '${body.status}', '${salt}');`,
             function(err, results, fields) {
+                console.log(err)
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
             }
@@ -21,6 +22,58 @@ async function addUser(body, photo) { // ф-ия добавления новог
     });
     return response;
 }
+
+
+async function selectUsers(currentUserId) { // ф-ия получения пользователей
+    let response = new Promise((resolve, reject) => {
+        connection.query( 
+            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_id <> ${currentUserId};`,
+            function(err, results, fields) {
+                if (results.length === 0) { // если пользователя нет, то ошикбка
+                    reject(err);
+                } else { // иначе отправка инф-ции о пользователе
+                    resolve(results); 
+                }
+            }
+        );
+    });
+    return response;
+}
+
+
+async function filterUsers(currentUserId, userLogin) { // ф-ия фильтрации пользователей
+    let response = new Promise((resolve, reject) => {
+        connection.query( 
+            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_login like '%${userLogin}%' and u.user_id <> ${currentUserId};`,
+            function(err, results, fields) {
+                if (results.length === 0) { // если пользователя нет, то ошикбка
+                    reject(err);
+                } else { // иначе отправка инф-ции о пользователе
+                    resolve(results); 
+                }
+            }
+        );
+    });
+    return response;
+}
+
+
+async function selectUser(userId) { // ф-ия получения информации о пользователе
+    let response = new Promise((resolve, reject) => {
+        connection.query(  // получение id пользователя 
+            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_id = ${userId};`,
+            function(err, results, fields) {
+                if (results.length === 0) { // если пользователя нет, то ошикбка
+                    reject(err);
+                } else { // иначе отправка инф-ции о пользователе
+                    resolve(results[0]); 
+                }
+            }
+        );
+    });
+    return response;
+}
+
 
 async function loginUser(login, password) { // ф-ия авторизации пользователя
     let response = new Promise((resolve, reject) => {
@@ -42,6 +95,7 @@ async function loginUser(login, password) { // ф-ия авторизации п
     return response;
 }
 
+
 async function getSalt(login) { // ф-ия получения соли пользователя
     let response = new Promise((resolve, reject) => {
         connection.query(
@@ -55,9 +109,11 @@ async function getSalt(login) { // ф-ия получения соли поль�
     return response;
 }
 
+
 function  hashPass(password, salt) { // ф-ия хэширования пароля
     const hash = cryptoJS.SHA256(GLOBAL_SALT + password + salt).toString();
     return hash;
 }
 
-export { addUser, loginUser };
+
+export { addUser, selectUsers, filterUsers, loginUser, selectUser };

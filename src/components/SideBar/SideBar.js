@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import '../../App.css';
 
-const SideBar = memo(({ onClickAdd, onClickFavorites }) => {
+const SideBar = memo(({ onClickAdd, onClickFavorites, onClickMessenger }) => {
     return (
         <div className="side-bar menu">
             <nav>
@@ -12,7 +12,7 @@ const SideBar = memo(({ onClickAdd, onClickFavorites }) => {
                     }
                     <li className="side-bar__item menu-item">Фильтровать<span className="material-symbols-outlined">tune</span></li>
                     { localStorage.getItem('user') &&
-                        <li className="side-bar__item menu-item">Мессенджер<span className="material-symbols-outlined">mode_comment</span></li>
+                        <li onClick={onClickMessenger} className="side-bar__item menu-item">Мессенджер<span className="material-symbols-outlined">mode_comment</span></li>
                     }
                     <li className="side-bar__item menu-item">Маршрут<span className="material-symbols-outlined">pin_drop</span></li>
                     { localStorage.getItem('user') &&

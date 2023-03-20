@@ -188,10 +188,8 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
         socket.emit('locations:add', formData, (status) => {
             if (status === 'success') {   
-                // console.log(response);
                 moveToMarker([data.location_latitude, data.location_longitude]); // установка координт нового маркера для плавного перехода
                 onClickClose(); // закрытие формы при удачном добавлении
-                // onReload(); // обновляю карту
             } else {
                 console.log(status);
             }
@@ -199,16 +197,6 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
     }
 
     function putLocation(data) { //  put-запрос на изменение локации в БД 
-        // const formData = new FormData(); // объект для хранения данных отправляемой формы
-        // usersPhoto.value.forEach(element => {
-        //     formData.append('usersPhoto', element);
-        // });        
-        // filmsPhoto.value.forEach(element => {
-        //     formData.append('filmsPhoto', element);
-        // });    
-        // for (const key in data) {
-        //     formData.append(key, data[key]);
-        // }
         const formData = {
             data: {
                 ...data,
@@ -227,28 +215,13 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
             },
         }
 
-        // const deletePhotos = locationPhotos.filter(photo => !photo.status).map(photo => photo.photo)
-        // formData.append('deletePhotos', JSON.stringify(deletePhotos));
-        // console.log(location);
-        // console.log(formData);
-
         socket.emit('locations:update', formData, (status) => {
             if (status === 'success') {   
-                // console.log(status);
-                // moveToMarker([data.location_latitude, data.location_longitude]); // установка координт нового маркера для плавного перехода
                 onClickClose(); // закрытие формы при удачном добавлении
-                // onReload(); // обновляю карту
             } else {
                 console.log(status);
             }
         })
-
-        // axios.put(`${API_SERVER_PATH}/locations?location_id=${locationPhotos[0].photo.location_id}`, formData).then(response => {
-        //     console.log(response);
-        //     onClickClose(); // закрытие формы при удачном добавлении
-        //     onReload(); // обновляю карту
-            
-        // }).catch(err => console.log(err));
     }
 
 

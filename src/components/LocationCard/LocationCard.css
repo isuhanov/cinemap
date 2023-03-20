@@ -33,41 +33,10 @@
     font-size: 13px;
 }
 
-.location-creator__profile {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 15px;
-    border-bottom: 1px solid rgb(143, 143, 143);
-}
 
-.location-creator__profile:hover,
-.location-creator__profile p,
-.location-creator__profile div {
-    cursor: pointer;
-} 
 
-.location-creator__profile:hover {
-    background-color: rgba(227, 227, 227, 0.586);
-}
 
-.location-creator__profile:active {
-    background-color: rgba(172, 172, 172, 0.637);
-}
 
-.creator__profile-username {
-    font-size: 15px;
-}
-
-.creator__profile-userimg {
-    border-radius: 50%;
-    border: 1px solid black;
-    width: 32px;
-    height: 32px;
-    background-color: rgba(221, 235, 255, 1);
-    overflow: hidden;
-}
 
 .location-films-timing span{
     margin-right: 5px;

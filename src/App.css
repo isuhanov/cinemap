@@ -238,6 +238,20 @@ body {
 }
 
 
+.btn-is-active {  
+  background-color: #3C89FC;
+  color: white;
+  padding: 2px;
+}
+
+.btn-is-active:hover {
+  color: white;  
+}
+
+.btn-is-disabled {
+  color: #c7c7c7;
+}
+
 /* ------------------------------ form --------------------------------------- */
 
 .form-conrainer {
@@ -363,4 +377,23 @@ body {
 @keyframes hide-cover-fon {
   from {background-color: rgba(0, 0, 0, 0.79); }
   to {background-color: rgba(0, 0, 0, 0); }
+}
+
+
+.showed-move-left {
+  animation: move-left 1s ease-in-out;
+}
+
+.hided-move-left {
+  animation: move-right 1s ease-in-out;
+}
+
+@keyframes move-left {
+  from {transform: translateX(100vw);}
+  to {transform: translateX(0);}
+}
+
+@keyframes move-right {
+  from {transform: translateX(0);}
+  to {transform: translateX(100vw);}
 }

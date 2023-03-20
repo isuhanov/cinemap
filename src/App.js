@@ -14,11 +14,12 @@ import SideBar from './components/SideBar/SideBar';
 import API_SERVER_PATH from './lib/api/api-path';
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 import { io } from 'socket.io-client'
+import Messenger from './components/Messenger/Messenger';
+import useOpen from './services/hooks/useOpen';
 
 function App() {
 
-  const { current: socket } = useRef(io(API_SERVER_PATH)  )
-
+  const { current: socket } = useRef(io(API_SERVER_PATH))
   useEffect(() => {
     socket.connect();
   }, [])
@@ -35,77 +36,16 @@ function App() {
   });
 
   const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
-  // const deleteLocation = useCallback((locationId) => { // ф-ия удаления 
-  //   // debugger;
-  //   // ----------------- закрываю все открытые карточки и списки -------------------------
-  //   closeLocationCard();
-  //   closeLocationList();
-  //   // ------------------------------------------------------------------------------------
 
-  //   // удаление карточки
-  //   axios.delete(`${API_SERVER_PATH}/locations?location_id=${locationId}`).then(res => {
-  //       console.log(res);
-  //       closeLocationCard();
-  //       closeLocationList();
-  //       onReload();
-  //       console.log('delete');
-  //   }).catch(err => console.log(err));
-  // });
+  const [showsLocationForm, openLocationForm, closeLocationForm] = useOpen('cover', onReload);
 
+  const [showsLoginForm, openLoginForm, closeLoginForm] = useOpen('cover', onReload);
 
-  const [showsLocationForm, setShowsLocationForm] = useState({
-    isVisible: false,
-    visibleClass: '',
-    animatioType: 'cover'
-  });
- const openLocationForm = useCallback(() => { // ф-ия для откытия формы локации
-    showCard(showsLocationForm, setShowsLocationForm);
-  });
-  const closeLocationForm = useCallback(() => { // ф-ия для закрытия формы локации
-    closeCard(showsLocationForm, setShowsLocationForm, onReload)
-  });
+  const [showsRegisterForm, openRegisterForm, closeRegisterForm] = useOpen('cover', onReload);
 
+  const [showsLocationCard, openLocationCard, closeLocationCard] = useOpen('slide', onReload, 0);
 
-  const [showsLoginForm, setShowsLoginForm] = useState({
-    isVisible: false,
-    visibleClass: '',
-    animatioType: 'cover'
-  });
- const openLoginForm = useCallback(() => { // ф-ия для откытия формы локации
-    showCard(showsLoginForm, setShowsLoginForm);
-  });
-  const closeLoginForm = useCallback(() => { // ф-ия для закрытия формы локации
-    closeCard(showsLoginForm, setShowsLoginForm, onReload)
-  });
-
-
-  const [showsRegisterForm, setShowsRegisterForm] = useState({
-    isVisible: false,
-    visibleClass: '',
-    animatioType: 'cover'
-  });
- const openRegisterForm = useCallback(() => { // ф-ия для откытия формы регистрации
-    showCard(showsRegisterForm, setShowsRegisterForm);
-  });
-  const closeRegisterForm = useCallback(() => { // ф-ия для закрытия формы регистрации
-    closeCard(showsRegisterForm, setShowsRegisterForm, onReload)
-  });
-
-
-  const [showsLocationCard, setShowsLocationCard] = useState({
-    current: 0,
-    isVisible: false,
-    visibleClass: '',
-    animatioType: 'slide'
-  });
-  function openLocationCard(data, closeOther=undefined) {
-    openCard(showsLocationCard, setShowsLocationCard, onReload, 
-            closeOther, 
-            data);
-  }
-  function closeLocationCard() {
-    closeCard(showsLocationCard, setShowsLocationCard, onReload, 0);
-  }
+  // const [showsLocationList, openLocationList, closeLocationList] = useOpenCover('', 'slide', onReload, 0);
 
 
   const [showsLocationList, setShowsLocationList] = useState({
@@ -162,20 +102,28 @@ function App() {
     closeCard(showsProfileCard, setShowsProfileCard, onReload)
   });
 
+  const [showsMessangers, openMessangers, closeMessangers] = useOpen('cover', onReload, 0);
+
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
                 onReload={onReload} setLocations={setLocations} locations={locations}
-                // onDelete={() => {
-                //   closeLocationCard();
-                //   closeLocationList();
-                // }}
                 openLocationCard={(locationId) => {
                   openLocationCard(locationId, closeLocationList);
                 }} 
                 openLocationList={(locations) => {
                   openLocationList(locations, 'Локации', closeLocationCard);
                 }} />
+
+        { showsMessangers.isVisible && 
+          <Messenger
+            onReload={onReload}
+            openUser={openProfileCard}
+            onClickClose={() => closeMessangers()}
+            otherClassName={showsMessangers.visibleClass}
+            otherUserId={showsMessangers.current}
+          />
+        }
                 
         { showsLocationForm.isVisible && 
           <LocationForm 
@@ -205,6 +153,7 @@ function App() {
               moveToMarker(coordMarker);
             }} 
             onClickClose={closeProfileCard} 
+            openChat={openMessangers}
             otherClassName={showsProfileCard.visibleClass}/> 
         }
 
@@ -247,7 +196,8 @@ function App() {
             <SearchInput onReload={onReload}/>  
           </div>
           <div className="side-bar-block">
-            <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}/>
+            <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
+                    onClickMessenger={() => openMessangers(undefined)}  />
           </div>
         </div>
       </div>
