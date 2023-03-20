@@ -4,11 +4,7 @@ import MessageHeader from "../MessageHeader/MessageHeader";
 
 import './ChatMessage.css'
 
-const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, openMenu, replyMessageId, replyMessage, replyMessageUser }, ref) => {
-
-    useEffect(() => {
-        // console.log(replyMessage);
-    }, [])
+const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, openMenu, replyMessageId, setReady }, ref) => {
 
     return (
             <div ref={ref} onContextMenu={(e) => {
@@ -16,7 +12,9 @@ const ChatMessage = forwardRef(({ text, isRead, isEdit=false, time, isSender, op
                 openMenu();
             }} className={`chat-messege ${isSender ? 'messege-sender' : 'messege-recipient'}`}>
                 { replyMessageId && replyMessageId !== 0 &&
-                    <MessageHeader messageId={replyMessageId}/>
+                    <MessageHeader messageId={replyMessageId} 
+                    setReady={setReady}
+                    />
                 }
                 <div className="chat-messege-text">
                     {text}

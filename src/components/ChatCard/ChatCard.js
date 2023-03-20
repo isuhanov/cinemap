@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import API_SERVER_PATH from "../../lib/api/api-path";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
@@ -25,9 +25,10 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
 
 
-    const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
+    const socket = useRef(null); // постоянная ссылка на сокет
     useEffect(() => {
-        socket.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
+        socket.current = io(API_SERVER_PATH);
+        socket.current.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
             if (response.status === 'success') { 
                 setUsers([...response.chatInfo.users]);
                 if (response.chatInfo.users.length === 2) {
@@ -35,7 +36,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                     setChatName(user.user_login);
                     setChatAvatar(user.user_img_path);
                 } else if (response.chatInfo.users.length === 0) {
-                    socket.emit('chats:getUsersInfo', openUserId, (response) => {
+                    socket.current.emit('chats:getUsersInfo', openUserId, (response) => {
                         if (response.status === 'success') {
                             setUsers([response.user, JSON.parse(localStorage.getItem('user'))]);
                             setChatName(response.user.user_login);
@@ -49,7 +50,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             }
           });
 
-        socket.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
+        socket.current.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
             setMessages([]);
             if (response.status === 'success') {
                 response.messages.map(message => {
@@ -65,19 +66,20 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             }
         });
         
-        socket.on('messages:update_list', (message) => { // изменение списка сообщений
+        socket.current.on('messages:update_list', (message) => { // изменение списка сообщений
             if (message.chat_id === chatId) {   
                 setMessages(prevMess => [
                     ...prevMess,
                     {
                         message,
-                        ref: undefined
+                        ref: undefined,
+                        isReady: false
                     }
                 ]);
             }
         });
 
-        socket.on('messages:update_read', (messageId) => { // изменение сообщений при чтении 
+        socket.current.on('messages:update_read', (messageId) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
                 ...prevMess.map(message => {
                     if(message.message.chat_messege_id === messageId) {
@@ -88,7 +90,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             ]);
         });
 
-        socket.on('messages:update_edit', (messageInfo) => { // изменение сообщений при чтении 
+        socket.current.on('messages:update_edit', (messageInfo) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
                 ...prevMess.map(message => {
                     if(message.message.chat_messege_id === messageInfo.chat_messege_id) {
@@ -100,20 +102,24 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             ]);
         });
 
-        socket.on('messages:update_delete', (messageId) => { // изменение сообщений при чтении 
+        socket.current.on('messages:update_delete', (messageId) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
                 ...prevMess.filter(message => message.message.chat_messege_id !== messageId)
             ]);
         });
 
+        return () => {
+            console.log('hjkl');
+            socket.current.close();
+        }
     }, []);
     
 
     const scrollToRefs = useRef(undefined); // ссылка на тег для скрола
     const [lastMessage, setLastMessage] = useState(); // стейт для последнего пришедшего сообщения
     const [isFirstScroll, setIsFirstScroll] = useState(true); // стейт для состояния скрола при загрузке
-    
-    useEffect(() => { // скоролл чата
+
+    useLayoutEffect(() => {
         if (messages.length > 0) { // если есть сообщения и первый скрол, то скрол либо вниз, либо к тегу непрочитанных сообщений
             if (isFirstScroll) {
                 chatRef.current.scrollTo({top: scrollToRefs.current?.offsetTop - chatRef.current.offsetTop + 10});
@@ -138,7 +144,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     function readMessageOnScroll(e) { // поиск непрочитанных сообщений 
         unreadMessage.filter(message => message.message.user_id !== userId).map(message => {
             if ((e.target.scrollTop + e.target.offsetHeight) > (message.ref.offsetTop - e.target.offsetTop)) {
-                socket.emit('messages:read', message.message.chat_messege_id, (status) => {
+                socket.current.emit('messages:read', message.message.chat_messege_id, (status) => {
                     if (status !== 'success') console.log(status);
                 })
             }
@@ -189,7 +195,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     }, [menuInfo]);
 
     const onDeleteClick = useCallback(() => { // ф-ия клика по кнопке удаления
-        socket.emit('messages:delete', menuInfo.messageId, (status) => {
+        socket.current.emit('messages:delete', menuInfo.messageId, (status) => {
             if (status !== 'success') console.log(status);
             closeMenu();
             setMenuInfo(undefined);
@@ -200,7 +206,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
 
     async function createChat() { // ф-ия создания чата
         return new Promise((resolve, reject) => {
-            socket.emit('chats:create', { users }, (response) => {
+            socket.current.emit('chats:create', { users }, (response) => {
                 console.log(response);
                 if (response.status === 'success'){
                     console.log(response.status);
@@ -233,7 +239,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                 }
             
         setSendValue('');
-        socket.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
+        socket.current.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
             if (status !== 'success') console.log(status);
             setMenuInfo(undefined);
             setInputHeaderInfo(undefined);
@@ -291,6 +297,17 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                                                 time={message.message.chat_messege_time}   
                                                 ref={thisMessage => (message.ref = thisMessage)}
                                                 replyMessageId={message.message.chat_messege_reply_id}
+                                                setReady={() => {
+                                                    setMessages(prevMess => [
+                                                        ...prevMess.map(prevMessage => {
+                                                            if(prevMessage.message.chat_messege_id === message.message.chat_messege_id) {
+                                                                prevMessage.isReady = true;
+                                                            } 
+                                                            return prevMessage
+                                                        })
+                                                    ]);
+                                                }}
+                                                // rescroll={setIsRescroll}
                                                 openMenu={() => openMenu(message.message.chat_messege_id)}
                                     />
                                 </div>

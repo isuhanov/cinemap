@@ -2,6 +2,7 @@
 .message-header .input-header-message {
     color: white;
     font-size: 13px;
+    overflow: hidden;
 }
 
 .message-header .input-header-title {

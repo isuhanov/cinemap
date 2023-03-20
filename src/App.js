@@ -19,7 +19,7 @@ import useOpen from './services/hooks/useOpen';
 
 function App() {
 
-  const { current: socket } = useRef(io(API_SERVER_PATH)  )
+  const { current: socket } = useRef(io(API_SERVER_PATH))
   useEffect(() => {
     socket.connect();
   }, [])
