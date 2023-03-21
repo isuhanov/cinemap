@@ -10,9 +10,8 @@ import { formIsValid, photosFieldIsValid, textFieldIsValid, timeFieldIsValid } f
 
 
 import './LocationForm.css';
-import API_SERVER_PATH from "../../lib/api/api-path";
 import FormField from "../../services/form-services/form-field";
-import { io } from "socket.io-client";
+import socket from "../../lib/socket/socket";
 
 const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToMarker, otherClassName }) => {
     // стейт для хранения данных фотографий из карточки локации (при открытии формы изменения)
@@ -137,7 +136,6 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
         if (form.usersPhoto.isTouched) photosFieldIsValid({ formItem:form.usersPhoto, isUpdate, photos:locationPhotos, typePhoto:'user' });
     }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
-    const { current: socket } = useRef(io(API_SERVER_PATH)  )
 
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения

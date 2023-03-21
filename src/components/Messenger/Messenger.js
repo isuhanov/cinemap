@@ -1,6 +1,5 @@
-import { memo, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import API_SERVER_PATH from "../../lib/api/api-path";
+import { memo, useEffect, useState } from "react";
+import socket from "../../lib/socket/socket";
 import useOpen from "../../services/hooks/useOpen";
 import ChatCard from "../ChatCard/ChatCard";
 import ChatItem from "../ChatItem/ChatItem";
@@ -14,7 +13,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
     const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);  // стейт для чата
     const [mode, setMode] = useState("chats");  // стейт для режима отображения
 
-    const { current: socket } = useRef(io(API_SERVER_PATH))  // стейт для сокета
+       // стейт для сокета
     
     async function update() {  // ф-ия обновления списков списка 
         return new Promise((resolve, reject) => {

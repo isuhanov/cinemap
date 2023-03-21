@@ -1,12 +1,10 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import API_SERVER_PATH from "../../../lib/api/api-path";
+import socket from "../../../lib/socket/socket";
 
 import './MessageHeader.css'
 
 const MessageHeader = memo(({ messageId, setReady }) => {
     const [message, setMessage] = useState(undefined); // стейт для сообщения
-    const { current: socket } = useRef(io(API_SERVER_PATH)); // постоянная ссылка на сокет
 
     useEffect(() => { // запрос на получения данных
         socket.emit('messages:get_reply', messageId, (response) => {

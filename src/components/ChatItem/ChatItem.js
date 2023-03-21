@@ -1,6 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import API_SERVER_PATH from "../../lib/api/api-path";
+import socket from "../../lib/socket/socket";
 import ChatMessageDesr from "../ui/ChatMessageDesr/ChatMessageDesr";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
@@ -10,7 +9,6 @@ const ChatItem = memo(({ chatId, onClick }) => {
     const [chatName, setChatName] = useState('');
     const [chatAvatar, setChatAvatar] = useState('');
     const [chatLastMess, setChatLastMess] = useState('');
-    const { current: socket } = useRef(io(API_SERVER_PATH)  )
     
     useEffect(() => { // обновление айтем чата
         getChatInfo();

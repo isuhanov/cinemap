@@ -16,12 +16,16 @@ import { closeCard, openCard, showCard } from './services/open-close-services/op
 import { io } from 'socket.io-client'
 import Messenger from './components/Messenger/Messenger';
 import useOpen from './services/hooks/useOpen';
+import { useDispatch } from 'react-redux';
+import { connect } from './redux/socketSlice';
 
 function App() {
+  const dispatch = useDispatch();
 
-  const { current: socket } = useRef(io(API_SERVER_PATH))
+  //  
   useEffect(() => {
-    socket.connect();
+    // socket.connect();
+    dispatch(connect());
   }, [])
 
   const [markerPos, setMarkerPos] = useState(undefined); // стейт для позиции маркера при добавлении

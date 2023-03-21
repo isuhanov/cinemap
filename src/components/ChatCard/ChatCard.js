@@ -1,6 +1,4 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import API_SERVER_PATH from "../../lib/api/api-path";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ChatCard.css';
@@ -9,6 +7,7 @@ import MessageInputHeader from "../ui/MessageInputHeader/MessageInputHeader";
 import ChatMessage from "../ui/ChatMessage/ChatMessage";
 import MessageMenu from "../ui/MessageMenu/MessageMenu";
 import { ClickAwayListener } from '@mui/material';
+import socket from "../../lib/socket/socket";
 
 
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onReload }) => {
@@ -25,10 +24,9 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
 
 
-    const socket = useRef(null); // постоянная ссылка на сокет
+    // const socket = useRef(null); // постоянная ссылка на сокет
     useEffect(() => {
-        socket.current = io(API_SERVER_PATH);
-        socket.current.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
+        socket.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
             if (response.status === 'success') { 
                 setUsers([...response.chatInfo.users]);
                 if (response.chatInfo.users.length === 2) {
@@ -36,7 +34,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                     setChatName(user.user_login);
                     setChatAvatar(user.user_img_path);
                 } else if (response.chatInfo.users.length === 0) {
-                    socket.current.emit('chats:getUsersInfo', openUserId, (response) => {
+                    socket.emit('chats:getUsersInfo', openUserId, (response) => {
                         if (response.status === 'success') {
                             setUsers([response.user, JSON.parse(localStorage.getItem('user'))]);
                             setChatName(response.user.user_login);
@@ -50,7 +48,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             }
           });
 
-        socket.current.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
+        socket.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
             setMessages([]);
             if (response.status === 'success') {
                 response.messages.map(message => {
@@ -66,7 +64,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             }
         });
         
-        socket.current.on('messages:update_list', (message) => { // изменение списка сообщений
+        socket.on('messages:update_list', (message) => { // изменение списка сообщений
             if (message.chat_id === chatId) {   
                 setMessages(prevMess => [
                     ...prevMess,
@@ -79,7 +77,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             }
         });
 
-        socket.current.on('messages:update_read', (messageId) => { // изменение сообщений при чтении 
+        socket.on('messages:update_read', (messageId) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
                 ...prevMess.map(message => {
                     if(message.message.chat_messege_id === messageId) {
@@ -90,7 +88,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             ]);
         });
 
-        socket.current.on('messages:update_edit', (messageInfo) => { // изменение сообщений при чтении 
+        socket.on('messages:update_edit', (messageInfo) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
                 ...prevMess.map(message => {
                     if(message.message.chat_messege_id === messageInfo.chat_messege_id) {
@@ -102,16 +100,11 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             ]);
         });
 
-        socket.current.on('messages:update_delete', (messageId) => { // изменение сообщений при чтении 
+        socket.on('messages:update_delete', (messageId) => { // изменение сообщений при чтении 
             setMessages(prevMess => [
                 ...prevMess.filter(message => message.message.chat_messege_id !== messageId)
             ]);
         });
-
-        return () => {
-            console.log('hjkl');
-            socket.current.close();
-        }
     }, []);
     
 
@@ -195,7 +188,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     }, [menuInfo]);
 
     const onDeleteClick = useCallback(() => { // ф-ия клика по кнопке удаления
-        socket.current.emit('messages:delete', menuInfo.messageId, (status) => {
+        socket.emit('messages:delete', menuInfo.messageId, (status) => {
             if (status !== 'success') console.log(status);
             closeMenu();
             setMenuInfo(undefined);
@@ -206,7 +199,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
 
     async function createChat() { // ф-ия создания чата
         return new Promise((resolve, reject) => {
-            socket.current.emit('chats:create', { users }, (response) => {
+            socket.emit('chats:create', { users }, (response) => {
                 console.log(response);
                 if (response.status === 'success'){
                     console.log(response.status);
@@ -239,7 +232,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                 }
             
         setSendValue('');
-        socket.current.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
+        socket.emit(inputHeaderInfo?.type === 'edit' ? 'messages:edit' : 'messages:add', body, (status) => {
             if (status !== 'success') console.log(status);
             setMenuInfo(undefined);
             setInputHeaderInfo(undefined);
