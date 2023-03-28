@@ -137,7 +137,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     function readMessageOnScroll(e) { // поиск непрочитанных сообщений 
         unreadMessage.filter(message => message.message.user_id !== userId).map(message => {
             if ((e.target.scrollTop + e.target.offsetHeight) > (message.ref.offsetTop - e.target.offsetTop)) {
-                socket.current.emit('messages:read', message.message.chat_messege_id, (status) => {
+                socket.emit('messages:read', message.message.chat_messege_id, (status) => {
                     if (status !== 'success') console.log(status);
                 })
             }

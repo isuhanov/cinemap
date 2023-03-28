@@ -13,8 +13,6 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
     const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);  // стейт для чата
     const [mode, setMode] = useState("chats");  // стейт для режима отображения
 
-       // стейт для сокета
-    
     async function update() {  // ф-ия обновления списков списка 
         return new Promise((resolve, reject) => {
             socket.emit(`${mode}:get`, JSON.parse(localStorage.getItem('user')).user_id, (response) => {

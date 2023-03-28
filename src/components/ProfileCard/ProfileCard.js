@@ -10,7 +10,7 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
     const [locations, setLocations] = useState([]);
     const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
 
-    useEffect(() => {
+    useEffect(() => { // выборка локаций пользователя из БД
         axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`).then(res => {
             setLocations(res.data);
         }).catch(err => console.log(err));

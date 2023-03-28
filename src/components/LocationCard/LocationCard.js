@@ -1,21 +1,22 @@
 import axios from "axios";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
+import socket from "../../lib/socket/socket";
+import { useSelector } from "react-redux";
+
 import LocationForm from "../LocationForm/LocationForm";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
-import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
-
-import API_SERVER_PATH from "../../lib/api/api-path";
-import './LocationCard.css'
-import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
 import UserBox from "../UserBox/UserBox";
-import socket from "../../lib/socket/socket";
 
-const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
+import './LocationCard.css'
+import API_SERVER_PATH from "../../lib/api/api-path";
+import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
+
+const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
-    // const [isOpenLocationForm, setIsOpenLocationForm] = useState(false); // стейт для состояния формы
     const [localReload, setLocalReload] = useState(false); // стейт для локальной перезагрузки карточки
     const [isFavorite, setIsFavorite] = useState(false); // стейт для состояния избранного
+    const location = useSelector((state) => state.locations.value.find(location => location.location_id === locationId));
 
 
     const [showsLocationForm, setShowsLocationForm] = useState({
@@ -59,11 +60,6 @@ const LocationCard = memo(({ otherClassName, location, onClose, onReload, onDele
                 } else console.log(status);
             })
         }, 600)
-        // axios.delete(`${API_SERVER_PATH}/locations?location_id=${location.location_id}`).then(res => {
-        //     console.log(res);
-        //     onDelete();
-        //     console.log('delete');
-        // }).catch(err => console.log(err));
     }
 
     function onFavoritesBtnClick() { // ф-ия обработки нажатия флажка избранного

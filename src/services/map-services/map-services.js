@@ -50,23 +50,4 @@ function addListMarker(setMarkers, map, marker, callback) { // ф-ия доба�
       });
 }
 
-// function updateListMarker(setMarkers, map, marker, callback) { // ф-ия добавления маркера 
-//   setMarkers(prevMarkers => { // добавляю маркера
-//       if (prevMarkers.find(prevMarker => ( // если такой маркер есть на карте, то ничего не меняю (сохраняю то же самое), иначе добавляю на карту маркер
-//             prevMarker.getLatLng().lat === marker.getLatLng().lat 
-//             && 
-//             prevMarker.getLatLng().lng === marker.getLatLng().lng
-//           ))
-//       ) {
-//         return prevMarkers;
-//       } else {
-//         // ------ прикрепления маркера к карте ------
-//         // map.addLayer(marker); 
-//         marker.dispatchEvent(new Event("click"));
-//         marker.addEventListener('click', callback);
-//         return [...prevMarkers, marker] // добавляю маркер в стейт массив
-//       }
-//     });
-// }
-
 export { createMarker, addMarker, addListMarker, removeMarker };

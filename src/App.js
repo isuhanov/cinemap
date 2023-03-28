@@ -1,5 +1,8 @@
 import axios from 'axios';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { connect } from './redux/socketSlice';
+
 import './App.css';
 import BGMap from './components/BGMap/BGMap';
 import LocationCard from './components/LocationCard/LocationCard';
@@ -11,20 +14,17 @@ import ProfileCard from './components/ProfileCard/ProfileCard';
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import SearchInput from './components/SearchInput/SearchInput';
 import SideBar from './components/SideBar/SideBar';
-import API_SERVER_PATH from './lib/api/api-path';
-import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
-import { io } from 'socket.io-client'
 import Messenger from './components/Messenger/Messenger';
+
+import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 import useOpen from './services/hooks/useOpen';
-import { useDispatch } from 'react-redux';
-import { connect } from './redux/socketSlice';
+import API_SERVER_PATH from './lib/api/api-path';
+
 
 function App() {
   const dispatch = useDispatch();
 
-  //  
   useEffect(() => {
-    // socket.connect();
     dispatch(connect());
   }, [])
 
@@ -39,8 +39,6 @@ function App() {
     console.log('reload');
   });
 
-  const [locations, setLocations] = useState([]);  // стейт для массива локаций (для получения информации при клике на маркер)
-
   const [showsLocationForm, openLocationForm, closeLocationForm] = useOpen('cover', onReload);
 
   const [showsLoginForm, openLoginForm, closeLoginForm] = useOpen('cover', onReload);
@@ -48,9 +46,6 @@ function App() {
   const [showsRegisterForm, openRegisterForm, closeRegisterForm] = useOpen('cover', onReload);
 
   const [showsLocationCard, openLocationCard, closeLocationCard] = useOpen('slide', onReload, 0);
-
-  // const [showsLocationList, openLocationList, closeLocationList] = useOpenCover('', 'slide', onReload, 0);
-
 
   const [showsLocationList, setShowsLocationList] = useState({
     current: 0,
@@ -111,7 +106,7 @@ function App() {
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
-                onReload={onReload} setLocations={setLocations} locations={locations}
+                onReload={onReload} 
                 openLocationCard={(locationId) => {
                   openLocationCard(locationId, closeLocationList);
                 }} 
@@ -164,7 +159,7 @@ function App() {
         { showsLocationCard.isVisible &&
           <LocationCard  
             otherClassName={`shadow-block ${showsLocationCard.visibleClass}`}
-            location={locations.find(location => location.location_id === showsLocationCard.current)}
+            locationId={showsLocationCard.current}
             onClose={() => {
               closeLocationCard();
             }}
