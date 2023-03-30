@@ -1,38 +1,35 @@
 import { memo, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import '../../App.css';
+import { setFilter } from '../../redux/locationsSlice';
 import './SearchInput.css';
 
 
 const SearchInput = memo(({ onReload }) => {
     const [searchValue, setSearchValue] = useState(''); // стейт для значения поля поиска
     const [visibleBtn, setVisibleBtn] = useState(true); // стейт состояния кнопки поиска (лупа/крест)
+    const dispatch = useDispatch(); 
 
-    useEffect(() => { // очистка фильтра локаций при перезагрузке 
-        localStorage.removeItem('locationFilter');
-    }, [])
-
+    
     function onSearchBtnClick() { // ф-ия для кнопки поиска
         if (searchValue.trim() !== '') {
-            localStorage.setItem('locationFilter', JSON.stringify({'film': searchValue.trim()}));
+            dispatch(setFilter({'film': searchValue.trim()}));
             setVisibleBtn(false);
-            onReload();
         }
     }
 
     function onCloseBtnClick() {  // ф-ия для кнопки очистки
         setVisibleBtn(true);
         setSearchValue('');
-        localStorage.removeItem('locationFilter');
-        onReload();
+        dispatch(setFilter(null));
     }
 
     function onSearchBlur() {  // ф-ия для расфокуса поля ввода
         if (searchValue.trim() === '') { // если фокус потерян и поле поустое, то очищается фильтр
-            localStorage.removeItem('locationFilter');
+            dispatch(setFilter(null));
             setSearchValue('');
             setVisibleBtn(true);
-            onReload();
         }
     }
 

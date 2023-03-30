@@ -15,7 +15,44 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте
   const locations = useSelector((state) => state.locations.value);
   const action = useSelector((state) => state.locations.action);
+  const filterOptions = useSelector((state) => state.locations.filterOptions);
   const dispatch = useDispatch();
+
+  function setLocationsMarker() {
+    let query = `${API_SERVER_PATH}/locations?`;
+    for (const key in filterOptions) {
+      query += `${key}=${filterOptions[key]}&`;
+    } 
+    axios.get(query).then(res => {  // запрос на сервер для получения данных
+      dispatch(setLocations(res.data));
+      for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
+        map.removeLayer(marker);
+      }
+      setMarkers([]);
+      // ----------- очищаю маркеры ------------------
+      for (const location of res.data) {
+        const lat = location.location_latitude; 
+        const lng = location.location_longitude; 
+  
+        const marker = createMarker(lat, lng);
+  
+        
+        const filterLocations = res.data.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
+        if (filterLocations.length > 1) {
+          addListMarker(setMarkers, map, marker, () => {
+            openLocationList(filterLocations)
+          }) 
+          continue;
+        }
+  
+        addMarker(setMarkers, map, marker, () => {
+          openLocationCard(location.location_id)
+        });
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
 
   useEffect(() => {
     setMap(new Map('map-container', {  // стейт карты
@@ -43,37 +80,10 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
 
   useEffect(() => {
     if (map) {
-      axios.get(`${API_SERVER_PATH}/locations`).then(res => {  // запрос на сервер для получения данных
-        dispatch(setLocations(res.data));
-        for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
-          map.removeLayer(marker);
-        }
-        setMarkers([]);
-        // ----------- очищаю маркеры ------------------
-        for (const location of res.data) {
-          const lat = location.location_latitude; 
-          const lng = location.location_longitude; 
-    
-          const marker = createMarker(lat, lng);
-    
-          
-          const filterLocations = res.data.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
-          if (filterLocations.length > 1) {
-            addListMarker(setMarkers, map, marker, () => {
-              openLocationList(filterLocations)
-            }) 
-            continue;
-          }
-    
-          addMarker(setMarkers, map, marker, () => {
-            openLocationCard(location.location_id)
-          });
-        }
-      }).catch(err => {
-        console.log(err);
-      })
+      console.log(filterOptions);
+      setLocationsMarker();
     }
-  }, [map]);
+  }, [map, filterOptions]);
   
   const [currentLocation, setCurrentLocation] = useState(undefined);
   useEffect(() => {

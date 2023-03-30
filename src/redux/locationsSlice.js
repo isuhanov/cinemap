@@ -16,11 +16,15 @@ export const locationsSlice = createSlice({
   name: 'locations',
   initialState: {
     value: [],
-    action: ''
+    action: '',
+    filterOptions: undefined
   },
   reducers: {
     setLocations: (state, action) => {
         state.value = action.payload;  
+    },
+    setFilter: (state, action) => {
+      state.filterOptions = action.payload;
     },
     setActions: (state, action) => {
         state.action = action.payload;
@@ -44,6 +48,6 @@ export const locationsSlice = createSlice({
 //   }
 })
 
-export const { setLocations, setActions, addLocations, deleteLocations, updateLocations } = locationsSlice.actions;
+export const { setLocations, setFilter, setActions, addLocations, deleteLocations, updateLocations } = locationsSlice.actions;
 
 export default locationsSlice.reducer;
