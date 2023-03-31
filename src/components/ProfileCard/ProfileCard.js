@@ -1,5 +1,6 @@
 import axios from "axios";
 import { memo, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import API_SERVER_PATH from "../../lib/api/api-path";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
@@ -7,14 +8,15 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 import './ProfileCard.css';
 
 const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat }) => {
-    const [locations, setLocations] = useState([]);
+    // const [locations, setLocations] = useState([]);
     const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
+    const locations = useSelector((state) => state.locations.value.filter((location) => location.user_id === user.user_id));
 
-    useEffect(() => { // выборка локаций пользователя из БД
-        axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`).then(res => {
-            setLocations(res.data);
-        }).catch(err => console.log(err));
-    }, [user]);
+    // useEffect(() => { // выборка локаций пользователя из БД
+    //     // axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`).then(res => {
+    //     //     setLocations(res.data);
+    //     // }).catch(err => console.log(err));
+    // }, [user]);
 
     return (
         <div className={`profile-container ${otherClassName}`}>

@@ -24,6 +24,7 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
       query += `${key}=${filterOptions[key]}&`;
     } 
     axios.get(query).then(res => {  // запрос на сервер для получения данных
+      console.log(res.data);
       dispatch(setLocations(res.data));
       for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
         map.removeLayer(marker);

@@ -159,9 +159,9 @@ const LocationForm = memo(({ onClickClose, onReload, isUpdate, location, moveToM
 
         // получение координат и адреса от OSM 
         axios.get(`https://nominatim.openstreetmap.org/search?q=${osmQuery}&format=json&limit=1`).then(res => {  
-            queryLocationObj['location_address'] = res.data[0].display_name;
-            queryLocationObj['location_latitude'] = res.data[0].lat;
-            queryLocationObj['location_longitude'] = res.data[0].lon;
+            queryLocationObj['location_address'] = res.data[0]?.display_name;
+            queryLocationObj['location_latitude'] = res.data[0]?.lat;
+            queryLocationObj['location_longitude'] = res.data[0]?.lon;
         }).then(res => {
             queryFunc(queryLocationObj); // добавление локации в БД
         }).catch(err => console.log(err));

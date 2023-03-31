@@ -36,7 +36,7 @@ const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDe
         const locationId =  location.location_id;
 
         setUser(null);
-        axios.get(`${API_SERVER_PATH}/users?location_id=${locationId}`).then(res => {
+        axios.get(`${API_SERVER_PATH}/users?user_id=${location.user_id}`).then(res => {
             setUser(u => res.data);
         })
         .catch(err => console.log(err));

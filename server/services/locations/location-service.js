@@ -54,16 +54,16 @@ async function selectSearchLocations(params) { // ф-ия фильтрации �
 async function addLocations(body, files) { // ф-ия добавления локации
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing) 
-            VALUES ('${body.location_name}', '${body.location_film}', '${body.location_address}', '${body.location_latitude}', '${body.location_longitude}', '${body.location_route}', '${body.location_timing}');`,
+            `INSERT INTO locations (location_name, location_film, location_address, location_latitude, location_longitude, location_route, location_timing, user_id) 
+            VALUES ('${body.location_name}', '${body.location_film}', '${body.location_address}', '${body.location_latitude}', '${body.location_longitude}', '${body.location_route}', '${body.location_timing}', '${body.user_id}');`,
             function(err, results, fields) {
                 if (err) {
                     reject(err);
                 } else {
                     let fail = addPhotos(results.insertId, files.usersPhoto, files.filmsPhoto); // добавление картинок
         
-                    // создание связи между пользователем и локацией
-                    fail = insertUserLocation(body.user_id, results.insertId);
+                    // // создание связи между пользователем и локацией
+                    // fail = insertUserLocation(body.user_id, results.insertId);
         
                     if (fail) {
                         reject(fail); // отправка ошибки в ответ на запрос при неудачном добавлении 
@@ -138,11 +138,11 @@ async function deleteLocation(locationId) { // ф-ия удаления лока
             function(err, results, fields) {
                 if (err) reject(err); // отправка ошибки, если она есть
                 else {
-                    connection.query(
-                        `DELETE FROM users_locations WHERE (location_id = '${locationId}');`, // удаление связи между пользователем и локацией из БД
-                        function(err, results, fields) {
-                            if (err) reject(err); // отправка ошибки, если она есть
-                            else {
+                    // connection.query(
+                    //     `DELETE FROM users_locations WHERE (location_id = '${locationId}');`, // удаление связи между пользователем и локацией из БД
+                    //     function(err, results, fields) {
+                    //         if (err) reject(err); // отправка ошибки, если она есть
+                    //         else {
                                 deleteAllFavourites(locationId).then(response => { // удаление из избранного
                                     connection.query(
                                         `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
@@ -152,9 +152,9 @@ async function deleteLocation(locationId) { // ф-ия удаления лока
                                         }
                                     ); 
                                 }).catch(err => reject(err));
-                            }
-                        }
-                    );
+                            // }
+                        // }
+                    // );
                 }    
             }
         );
@@ -163,28 +163,28 @@ async function deleteLocation(locationId) { // ф-ия удаления лока
 }
 
 
-async function selectUsersLocations(userId) {
-    let response = await new Promise((resolve, reject) => {
-        connection.query( // получаю данные из БД
-            `SELECT * FROM locations l INNER JOIN users_locations ul ON l.location_id = ul.location_id INNER JOIN users u ON ul.user_id = u.user_id WHERE u.user_id = ${userId};`,            
-            function(err, results, fields) {
-                if (err) reject(err);
-                else resolve(results); // отправка результата в ответ на запрос
-            }
-        ) 
-    });
-    return response
-}
+// async function selectUsersLocations(userId) {
+//     let response = await new Promise((resolve, reject) => {
+//         connection.query( // получаю данные из БД
+//             `SELECT * FROM locations l INNER JOIN users_locations ul ON l.location_id = ul.location_id INNER JOIN users u ON ul.user_id = u.user_id WHERE u.user_id = ${userId};`,            
+//             function(err, results, fields) {
+//                 if (err) reject(err);
+//                 else resolve(results); // отправка результата в ответ на запрос
+//             }
+//         ) 
+//     });
+//     return response
+// }
 
 
-function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
-    connection.query(
-        `INSERT INTO users_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
-        function(err, results, fields) {
-            if (err) return err;
-        }
-    )
-}
+// function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
+//     connection.query(
+//         `INSERT INTO users_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
+//         function(err, results, fields) {
+//             if (err) return err;
+//         }
+//     )
+// }
 
 
-export { selectAllLocations, selectLocation, selectSearchLocations, addLocations, updateLocations, deleteLocation, selectUsersLocations };
+export { selectAllLocations, selectLocation, selectSearchLocations, addLocations, updateLocations, deleteLocation };

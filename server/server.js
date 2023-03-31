@@ -8,7 +8,7 @@ import jwt from'jsonwebtoken'
 
 import fs from 'fs'
 import { nanoid } from "nanoid";
-import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, selectUsersLocations, updateLocations } from './services/locations/location-service.js'
+import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 import { addUser, filterUsers, loginUser, selectUser, selectUsers } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
@@ -176,11 +176,12 @@ server.prependListener("request", (req, res) => {
 //---------------------------------------------- locations ---------------------------------------------- 
 
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-    if (req.query.user_id) {
-        selectUsersLocations(req.query.user_id).then(response => {
-            res.send(response);  // отправка результата в ответ на запрос
-        }).catch(err => res.status(500).send(err));
-    } else if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
+    // if (req.query.user_id) {
+    //     selectUsersLocations(req.query.user_id).then(response => {
+    //         res.send(response);  // отправка результата в ответ на запрос
+    //     }).catch(err => res.status(500).send(err));
+    // } else
+     if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
         selectAllLocations().then(response => {
             res.send(response);  // отправка результата в ответ на запрос
         }).catch(err => res.status(500).send(err));
@@ -223,22 +224,22 @@ app.delete('/locations/favorites', function(req, res){ // удаление ло�
 //---------------------------------------------- users ---------------------------------------------- 
 
 app.get('/users', function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
-    if (req.query.location_id) {
-        connection.query(  // получение id пользователя 
-            `SELECT * FROM users_locations WHERE location_id = ${req.query.location_id};`,
-            function(err, results, fields) {
-                if (results.length === 0) {
-                    res.status(404).send('Not found');
-                } else {
+    if (req.query.user_id) {
+        // connection.query(  // получение id пользователя 
+        //     `SELECT * FROM users_locations WHERE location_id = ${req.query.location_id};`,
+        //     function(err, results, fields) {
+        //         if (results.length === 0) {
+        //             res.status(404).send('Not found');
+        //         } else {
                     connection.query(  // получение пользователя 
-                        `SELECT * FROM users WHERE user_id=${results[0].user_id};`,
+                        `SELECT * FROM users WHERE user_id=${req.query.user_id};`,
                         function(err, results, fields) {
                             res.send(results[0]); // отправка результата
                        }
                     );
-                }
-            }
-        );
+        //         }
+        //     }
+        // );
     } 
 });
 
