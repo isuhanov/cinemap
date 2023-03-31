@@ -1,6 +1,5 @@
-import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { connect } from './redux/socketSlice';
 
 import './App.css';
@@ -18,11 +17,11 @@ import Messenger from './components/Messenger/Messenger';
 
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 import useOpen from './services/hooks/useOpen';
-import API_SERVER_PATH from './lib/api/api-path';
 
 
 function App() {
   const dispatch = useDispatch();
+  const locations = useSelector((state) => state.locations.value);
 
   useEffect(() => {
     dispatch(connect());
@@ -67,23 +66,8 @@ function App() {
   function closeLocationList() {
     closeCard(showsLocationList, setShowsLocationList, onReload, []);
   }
-  const getFavoriteList = useCallback(async () => { //  // ф-ия заполнения списка избранного
-    const user = JSON.parse(localStorage.getItem('user'));
-    let response = await axios.get(`${API_SERVER_PATH}/locations/favorites?user_id=${user.user_id}`)
-                              .then(res => {
-                                  setShowsLocationList(prev => ({
-                                    ...prev,
-                                    current: res.data
-                                  }))
-                                  // setCurrentLocationList(res.data);
-                                  return res.data})
-                              .catch(err => console.log(err));
-    return response;
-  })
   const openFavoritesList = useCallback(() => { // ф-ия открытия списка избранного
-    getFavoriteList().then(res => {
-      openLocationList(res, 'Избранное', closeLocationCard);
-    }).catch(err => console.log(err));
+    openLocationList(locations.filter(location => location.favourite_id), 'Избранное', closeLocationCard);
   });
 
 
@@ -169,7 +153,6 @@ function App() {
               closeLocationCard();
               closeLocationList();
             }}
-            setFavoriteList={(showsLocationList.isVisible && showsLocationList.title === "Избранное")? getFavoriteList : undefined} // если открыт список избранного, то передать ф-ия
           />
         } 
 

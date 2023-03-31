@@ -10,7 +10,7 @@ const loginUser = (userData) => { // ф-ия сохранения пользва
     localStorage.setItem('user', JSON.stringify(userData));
 };
 
-const logoutUser = () => { // ф-ия сохранения пользвателя при авторизации
+const logoutUser = () => { // ф-ия удаления пользвателя при логауте
     localStorage.removeItem('user');
 };
 

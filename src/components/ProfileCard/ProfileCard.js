@@ -1,22 +1,36 @@
-import axios from "axios";
-import { memo, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import API_SERVER_PATH from "../../lib/api/api-path";
-import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
+import { memo } from "react";
+import socket from "../../lib/socket/socket";
+import { useDispatch, useSelector } from "react-redux";
+import { setFavouriteId } from "../../redux/locationsSlice";
 
+import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ProfileCard.css';
 
 const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat }) => {
-    // const [locations, setLocations] = useState([]);
     const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
     const locations = useSelector((state) => state.locations.value.filter((location) => location.user_id === user.user_id));
+    const dispatch = useDispatch();
 
-    // useEffect(() => { // выборка локаций пользователя из БД
-    //     // axios.get(`${API_SERVER_PATH}/locations?user_id=${user.user_id}`).then(res => {
-    //     //     setLocations(res.data);
-    //     // }).catch(err => console.log(err));
-    // }, [user]);
+    function onFavoritesBtnClick(locationId, favouriteId) { // ф-ия обработки нажатия флажка избранного
+        const data = {
+            userId,
+            locationId
+        };
+        favouriteId ? removeFromFavorites(data) : addToFavorites(data);        
+    }
+
+    function addToFavorites(data) { // ф-ия добавления в "Избранное"
+        socket.emit('locations:addFavourite', data.userId, data.locationId, (response) => {
+            if (response.status === 'success') dispatch(setFavouriteId({locationId: data.locationId, favouriteId: response.favouriteId}));
+        });
+    }
+
+    function removeFromFavorites(data) { // ф-ия удаления из "Избранное"
+        socket.emit('locations:removeFavourite', data.userId, data.locationId, (response) => {
+            if (response === 'success') dispatch(setFavouriteId({locationId: data.locationId, favouriteId: null}));
+        });
+    }
 
     return (
         <div className={`profile-container ${otherClassName}`}>
@@ -63,12 +77,13 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
                                         <p className="profile-card__address">{ location.location_name }</p>
                                     </div>
                                     <div className="header-btn-container profile-card__btn-container">
-                                        <button className="header-btn">
-                                            <span className="material-symbols-outlined">info</span>
-                                        </button>
-                                        <button className="header-btn">
-                                            <span className="material-symbols-outlined">bookmark</span>
-                                        </button>
+                                        { userId &&
+                                            <button className={`header-btn ${location.favourite_id && 'btn-is-favorite'}`} onClick={() => onFavoritesBtnClick(location.location_id, location.favourite_id)}>
+                                                <span className="material-symbols-outlined">
+                                                    { location.favourite_id ? 'bookmark_added' : 'bookmark'}
+                                                </span>
+                                            </button>
+                                        }
                                         <button className="header-btn" onClick={() =>{
                                                     onClickOpenLocation(location.location_id, [location.location_latitude, location.location_longitude]);
                                                     onClickClose();

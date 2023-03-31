@@ -32,7 +32,7 @@ async function addFavourite(userId, locationId) {
             `INSERT INTO users_favourites_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
             function(err, results, fields) {
                 if (err) reject(err); // отправка ошибки, если она есть
-                else resolve(results); // отправка результата в ответ на запрос
+                else resolve(results.insertId); // отправка результата в ответ на запрос
             }
         )
     });

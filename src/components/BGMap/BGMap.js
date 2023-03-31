@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { LatLng, Map, TileLayer } from 'leaflet';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import '../../App.css';
 import './BGMap.css';
@@ -16,13 +16,18 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const locations = useSelector((state) => state.locations.value);
   const action = useSelector((state) => state.locations.action);
   const filterOptions = useSelector((state) => state.locations.filterOptions);
+  const withFavoutites = useSelector((state) => state.locations.withFavoutites);
   const dispatch = useDispatch();
 
   function setLocationsMarker() {
     let query = `${API_SERVER_PATH}/locations?`;
+    if (JSON.parse(localStorage.getItem('user'))?.user_id) {
+      query+=`current_user=${JSON.parse(localStorage.getItem('user'))?.user_id}&`
+    }
     for (const key in filterOptions) {
       query += `${key}=${filterOptions[key]}&`;
     } 
+    console.log(query);
     axios.get(query).then(res => {  // запрос на сервер для получения данных
       console.log(res.data);
       dispatch(setLocations(res.data));
@@ -84,7 +89,7 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
       console.log(filterOptions);
       setLocationsMarker();
     }
-  }, [map, filterOptions]);
+  }, [map, filterOptions, withFavoutites]);
   
   const [currentLocation, setCurrentLocation] = useState(undefined);
   useEffect(() => {

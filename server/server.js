@@ -6,8 +6,6 @@ import cors from 'cors'
 
 import jwt from'jsonwebtoken'
 
-import fs from 'fs'
-import { nanoid } from "nanoid";
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
 import { addUser, filterUsers, loginUser, selectUser, selectUsers } from './services/users/user-service.js'
@@ -23,26 +21,45 @@ const server = createServer(app);
 const io = new Server(server);
 
 io.on("connection", (socket) => {
+    // socket.on('locations:get', (callback) => {
+    //     selectAllLocations().then(response => {
+    //         console.log('jk');
+    //         callback({status: 'succes', res: response});  // отправка результата в ответ на запрос
+    //     }).catch(err => console.log(err));
+    // })
+
     socket.on('locations:add', (data, callback) => { // при добавлении локации запрос в БД и поднятие события обновления карты
         addLocations(data.data, data.files).then(location => {
             callback('success');
             io.sockets.emit('map:add', location);
         }).catch(err => callback(err));
-    })
+    });
 
     socket.on('locations:update', (data, callback) => {
         updateLocations(data.data, data.files).then(location => {
             callback('success');
             io.sockets.emit('map:update', location);
         }).catch(err => callback(err));
-    })
+    });
 
     socket.on('locations:delete', (locationId, callback) => { // при удалении локации запрос в БД и поднятие события обновления карты
         deleteLocation(locationId).then(response => {
             callback('success');
             io.sockets.emit('map:delete', locationId);
         }).catch(err => callback(err));
-    })
+    });
+
+    socket.on('locations:addFavourite', (userId, locationId, callback) => {
+        addFavourite(userId, locationId).then(response => {
+            callback({status: 'success', favouriteId: response}); // отправка результата в ответ на запрос
+        }).catch(err => callback(err));
+    });
+
+    socket.on('locations:removeFavourite', (userId, locationId, callback) => {
+        deleteFavourite(userId, locationId).then(response => {
+            callback('success'); // отправка результата в ответ на запрос
+        }).catch(err => callback(err));
+    });
 
     socket.on('users:get', (currentUserId, callback) => { // отправка списка пользователей
         selectUsers(currentUserId).then(users=> {
@@ -176,12 +193,11 @@ server.prependListener("request", (req, res) => {
 //---------------------------------------------- locations ---------------------------------------------- 
 
 app.get('/locations', function(req, res){ // обработка GET запроса на выборку из таблицы Locations
-    // if (req.query.user_id) {
-    //     selectUsersLocations(req.query.user_id).then(response => {
-    //         res.send(response);  // отправка результата в ответ на запрос
-    //     }).catch(err => res.status(500).send(err));
-    // } else
-     if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
+    if (req.query.current_user) {
+        selectAllLocations(req.query.current_user).then(response => {
+            res.send(response);  // отправка результата в ответ на запрос
+        }).catch(err => res.status(500).send(err));   
+    } else if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
         selectAllLocations().then(response => {
             res.send(response);  // отправка результата в ответ на запрос
         }).catch(err => res.status(500).send(err));
@@ -225,21 +241,12 @@ app.delete('/locations/favorites', function(req, res){ // удаление ло�
 
 app.get('/users', function(req, res){ // обработка GET запроса на выборку из таблицы Users для локации 
     if (req.query.user_id) {
-        // connection.query(  // получение id пользователя 
-        //     `SELECT * FROM users_locations WHERE location_id = ${req.query.location_id};`,
-        //     function(err, results, fields) {
-        //         if (results.length === 0) {
-        //             res.status(404).send('Not found');
-        //         } else {
-                    connection.query(  // получение пользователя 
-                        `SELECT * FROM users WHERE user_id=${req.query.user_id};`,
-                        function(err, results, fields) {
-                            res.send(results[0]); // отправка результата
-                       }
-                    );
-        //         }
-        //     }
-        // );
+        connection.query(  // получение пользователя 
+            `SELECT * FROM users WHERE user_id=${req.query.user_id};`,
+            function(err, results, fields) {
+                res.send(results[0]); // отправка результата
+            }
+        );
     } 
 });
 

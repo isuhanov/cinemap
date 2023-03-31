@@ -1,7 +1,7 @@
 import axios from "axios";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import socket from "../../lib/socket/socket";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import LocationForm from "../LocationForm/LocationForm";
 import PhotoContainer from "../ui/PhotoContainer/PhotoContainer";
@@ -10,14 +10,15 @@ import UserBox from "../UserBox/UserBox";
 import './LocationCard.css'
 import API_SERVER_PATH from "../../lib/api/api-path";
 import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
+import { setFavouriteId } from "../../redux/locationsSlice";
 
-const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDelete, setFavoriteList, openUser }) => {
+const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDelete, openUser }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
     const [localReload, setLocalReload] = useState(false); // стейт для локальной перезагрузки карточки
-    const [isFavorite, setIsFavorite] = useState(false); // стейт для состояния избранного
     const location = useSelector((state) => state.locations.value.find(location => location.location_id === locationId));
 
+    const dispatch = useDispatch();
 
     const [showsLocationForm, setShowsLocationForm] = useState({
         isVisible: false,
@@ -45,10 +46,6 @@ const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDe
             setLocationPhoto(res.data);
         }).catch(err => console.log(err));
 
-        axios.get(`${API_SERVER_PATH}/locations/favorites/isexist?user_id=${userId}&location_id=${locationId}`).then(res => {
-            setIsFavorite(res.data);            
-        }).catch(err => console.log(err));
-
     }, [JSON.stringify(location), localReload])
 
     function onDeleteClick() { // ф-ия удаления локации
@@ -67,21 +64,19 @@ const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDe
             userId: JSON.parse(localStorage.getItem('user'))?.user_id,
             locationId: location.location_id
         };
-        isFavorite ? removeFromFavorites(data) : addToFavorites(data);        
+        location.favourite_id ? removeFromFavorites(data) : addToFavorites(data);        
     }
 
     function addToFavorites(data) { // ф-ия добавления в "Избранное"
-        axios.post(`${API_SERVER_PATH}/locations/favorites`, data).then(res => {
-            setLocalReload(prev => !prev); // перезагрузка карточки
-            if (setFavoriteList) setFavoriteList();  // обновление списка избранного, если он открыт
-        }).catch(err => console.log(err));
+        socket.emit('locations:addFavourite', data.userId, data.locationId, (response) => {
+            if (response.status === 'success') dispatch(setFavouriteId({locationId: location.location_id, favouriteId: response.favouriteId}));
+        });
     }
 
     function removeFromFavorites(data) { // ф-ия удаления из "Избранное"
-        axios.delete(`${API_SERVER_PATH}/locations/favorites?user_id=${data.userId}&location_id=${data.locationId}`).then(res => {
-            setLocalReload(prev => !prev); // перезагрузка карточки
-            if (setFavoriteList) setFavoriteList();  // обновление списка избранного, если он открыт
-        }).catch(err => console.log(err));
+        socket.emit('locations:removeFavourite', data.userId, data.locationId, (response) => {
+            if (response === 'success') dispatch(setFavouriteId({locationId: location.location_id, favouriteId: null}));
+        });
     }
 
     return (
@@ -93,9 +88,9 @@ const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDe
                 </p>
                 <div className="header-btn-container">
                 { localStorage.getItem('user') &&
-                    <button className={`header-btn ${isFavorite && 'btn-is-favorite'}`} onClick={onFavoritesBtnClick}>
+                    <button className={`header-btn ${location.favourite_id && 'btn-is-favorite'}`} onClick={onFavoritesBtnClick}>
                         <span className="material-symbols-outlined">
-                            { isFavorite ? 'bookmark_added' : 'bookmark'}
+                            { location.favourite_id ? 'bookmark_added' : 'bookmark'}
                         </span>
                     </button>
                 }

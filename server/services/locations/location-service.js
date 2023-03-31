@@ -2,10 +2,12 @@ import connection from '../db/db-service.js';
 import { deleteAllFavourites } from '../favourites-locations/favourites-location-service.js';
 import { addPhotos, addPhotosToDir, removeDir, removeFile } from '../files/file-service.js';
 
-async function selectAllLocations() { // ф-ия поиска всех локаций
+async function selectAllLocations(userId=undefined) { // ф-ия поиска всех локаций
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `SELECT * FROM locations;`,
+            userId ?
+            `select ml.*, (select lf.users_fav_location_id from locations l inner join users_favourites_locations lf on l.location_id = lf.location_id where lf.user_id = ${userId} and l.location_id = ml.location_id) as favourite_id from locations ml;`
+            : `SELECT * FROM locations;`,
             function(err, results, fields) {
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос
@@ -61,9 +63,6 @@ async function addLocations(body, files) { // ф-ия добавления ло�
                     reject(err);
                 } else {
                     let fail = addPhotos(results.insertId, files.usersPhoto, files.filmsPhoto); // добавление картинок
-        
-                    // // создание связи между пользователем и локацией
-                    // fail = insertUserLocation(body.user_id, results.insertId);
         
                     if (fail) {
                         reject(fail); // отправка ошибки в ответ на запрос при неудачном добавлении 
@@ -138,53 +137,21 @@ async function deleteLocation(locationId) { // ф-ия удаления лока
             function(err, results, fields) {
                 if (err) reject(err); // отправка ошибки, если она есть
                 else {
-                    // connection.query(
-                    //     `DELETE FROM users_locations WHERE (location_id = '${locationId}');`, // удаление связи между пользователем и локацией из БД
-                    //     function(err, results, fields) {
-                    //         if (err) reject(err); // отправка ошибки, если она есть
-                    //         else {
-                                deleteAllFavourites(locationId).then(response => { // удаление из избранного
-                                    connection.query(
-                                        `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
-                                        function(err, results, fields) {
-                                            if (err) reject(err); // отправка ошибки, если она есть
-                                            else resolve(results); // отправка результата в ответ на запрос
-                                        }
-                                    ); 
-                                }).catch(err => reject(err));
-                            // }
-                        // }
-                    // );
+                    deleteAllFavourites(locationId).then(response => { // удаление из избранного
+                        connection.query(
+                            `DELETE FROM locations WHERE (location_id = '${locationId}');`, // удаление локации из БД
+                            function(err, results, fields) {
+                                if (err) reject(err); // отправка ошибки, если она есть
+                                else resolve(results); // отправка результата в ответ на запрос
+                            }
+                        ); 
+                    }).catch(err => reject(err));
                 }    
             }
         );
     });
     return response;
 }
-
-
-// async function selectUsersLocations(userId) {
-//     let response = await new Promise((resolve, reject) => {
-//         connection.query( // получаю данные из БД
-//             `SELECT * FROM locations l INNER JOIN users_locations ul ON l.location_id = ul.location_id INNER JOIN users u ON ul.user_id = u.user_id WHERE u.user_id = ${userId};`,            
-//             function(err, results, fields) {
-//                 if (err) reject(err);
-//                 else resolve(results); // отправка результата в ответ на запрос
-//             }
-//         ) 
-//     });
-//     return response
-// }
-
-
-// function insertUserLocation(userId, locationId) { // ф-ия создания связи между пользователем и локацией
-//     connection.query(
-//         `INSERT INTO users_locations (user_id, location_id) VALUES ('${userId}', '${locationId}');`,
-//         function(err, results, fields) {
-//             if (err) return err;
-//         }
-//     )
-// }
 
 
 export { selectAllLocations, selectLocation, selectSearchLocations, addLocations, updateLocations, deleteLocation };

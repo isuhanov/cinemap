@@ -6,12 +6,11 @@ import './LoginForm.css';
 import API_SERVER_PATH from "../../lib/api/api-path";
 import { loginUser } from "../../services/user-services/user-service";
 import FormField from "../../services/form-services/form-field";
+import { useDispatch } from "react-redux";
+import { setWithFavoutites } from "../../redux/locationsSlice";
 
 const LoginForm = memo(({ onClickClose, otherClassName }) => {
-    // -------------------- ссылка на родительские блоки полей -------------------
-    const loginParentRef = useRef();
-    const passwordParentRef = useRef();
-    // ---------------------------------------------------------------------------
+    const dispatch = useDispatch();
 
     const onLoginChange = (login) => { // обработка значения поля login
         setLogin(prev => ({
@@ -40,6 +39,7 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
         } else {
             axios.post(`${API_SERVER_PATH}/users/login`, {login: login.value, password: password.value}).then(res => {
                 loginUser(res.data) // сохранение данных пользователя
+                dispatch(setWithFavoutites());
                 onClickClose(); // закрытие формы
             })
             .catch(err => {

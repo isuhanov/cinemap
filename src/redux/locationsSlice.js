@@ -17,7 +17,8 @@ export const locationsSlice = createSlice({
   initialState: {
     value: [],
     action: '',
-    filterOptions: undefined
+    filterOptions: undefined,
+    withFavoutites: localStorage.getItem('user') ? true : false
   },
   reducers: {
     setLocations: (state, action) => {
@@ -28,6 +29,16 @@ export const locationsSlice = createSlice({
     },
     setActions: (state, action) => {
         state.action = action.payload;
+    },
+    setFavouriteId: (state, action) => {
+      for (const key in state.value) {
+        if (state.value[key].location_id === action.payload.locationId) {
+          state.value[key] = {...state.value[key], favourite_id: action.payload.favouriteId}
+        }
+      }
+    },
+    setWithFavoutites: (state) => {
+      state.withFavoutites = localStorage.getItem('user') ? true : false;
     },
     addLocations: (state, action) => {
         state.value = [...state.value, action.payload];
@@ -48,6 +59,6 @@ export const locationsSlice = createSlice({
 //   }
 })
 
-export const { setLocations, setFilter, setActions, addLocations, deleteLocations, updateLocations } = locationsSlice.actions;
+export const { setLocations, setFilter, setActions, setFavouriteId, setWithFavoutites, addLocations, deleteLocations, updateLocations } = locationsSlice.actions;
 
 export default locationsSlice.reducer;
