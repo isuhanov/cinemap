@@ -17,6 +17,7 @@ import Messenger from './components/Messenger/Messenger';
 
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 import useOpen from './services/hooks/useOpen';
+import Filter from './components/Filter/Filter';
 
 
 function App() {
@@ -168,6 +169,7 @@ function App() {
         } 
 
 
+
         <div className="container">
           <div className="profile-block">
             <Profile user={JSON.parse(localStorage.getItem('user'))}
@@ -178,6 +180,7 @@ function App() {
             <SearchInput onReload={onReload}/>  
           </div>
           <div className="side-bar-block">
+            <Filter />
             <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
                     onClickMessenger={() => openMessangers(undefined)}  />
           </div>

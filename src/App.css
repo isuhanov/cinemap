@@ -84,6 +84,13 @@ body {
   margin-top: 40px;
 }
 
+.side-bar-block {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+
 .shadow-block {
   box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
 }
@@ -145,6 +152,7 @@ body {
 
 .form-btn-container {
   justify-content: center;
+  gap: 10px;
 }
 
 
@@ -286,6 +294,9 @@ body {
   height: 30px;
   padding: 0 10px;
   font-size: 13px;
+}
+.mini-field {
+  height: 25px;
 }
 
 .field-textarea {

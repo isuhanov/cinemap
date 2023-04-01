@@ -1,0 +1,16 @@
+.filter-container {
+    padding: 2px;
+}
+
+.filter-label {
+    font-size: 13px;
+}
+
+.filter-btn {
+    min-width: 50px;
+    padding: 5px 7px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all .2s ease-out;
+}
