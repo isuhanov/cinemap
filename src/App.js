@@ -88,6 +88,8 @@ function App() {
 
   const [showsMessangers, openMessangers, closeMessangers] = useOpen('cover', onReload, 0);
 
+  const [showsFilter, openFilter, closeFilter] = useOpen('slide', onReload);
+
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
@@ -180,9 +182,14 @@ function App() {
             <SearchInput onReload={onReload}/>  
           </div>
           <div className="side-bar-block">
-            <Filter />
+            {showsFilter.isVisible && 
+              <Filter 
+                  otherClassName={showsFilter.visibleClass}
+                  onClickClose={closeFilter}
+              />
+            }
             <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
-                    onClickMessenger={() => openMessangers(undefined)}  />
+                    onClickMessenger={() => openMessangers(undefined)}  openFilter={openFilter}/>
           </div>
         </div>
       </div>

@@ -1,11 +1,10 @@
 import { memo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import socket from '../../lib/socket/socket';
 import { setFilter } from '../../redux/locationsSlice';
 
 import './Filter.css';
 
-const Filter = memo(() => {
+const Filter = memo(({ otherClassName, onClickClose }) => {
     const [name, setName] = useState('');
     const [film, setFilm] = useState('');
     const [country, setCountry] = useState('');
@@ -13,15 +12,12 @@ const Filter = memo(() => {
 
     const dispatch = useDispatch();
 
-    function onClickCancel() {
-        setName('');
-        setFilm('');
-        setCountry('');
-        setCity('');
+    function onClickCancel() { // ф-ия обнуления фильтра при клике на кнопку
         dispatch(setFilter(null));
+        onClickClose();
     }
 
-    function onClickSearch() {
+    function onClickSearch() { // ф-ия поиска по клику на кнопку
         console.log({name, film, country, city});
         if (name.trim().length === 0 && film.trim().length === 0 && country.trim().length === 0 && city.trim().length === 0) {
             console.log('empty');
@@ -38,7 +34,7 @@ const Filter = memo(() => {
     }
   
     return (
-        <div className="filter-container menu">
+        <div className={`filter-container menu ${otherClassName}`}>
             <div className="field-block">
                 <label htmlFor="filter-location-name" className="filter-label">
                     Локация:

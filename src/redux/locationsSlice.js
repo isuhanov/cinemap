@@ -17,7 +17,7 @@ export const locationsSlice = createSlice({
   initialState: {
     value: [],
     action: '',
-    filterOptions: undefined,
+    filterOptions: null,
     withFavoutites: localStorage.getItem('user') ? true : false
   },
   reducers: {
