@@ -19,45 +19,31 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const withFavoutites = useSelector((state) => state.locations.withFavoutites);
   const dispatch = useDispatch();
 
-  function setLocationsMarker() {
-    let query = `${API_SERVER_PATH}/locations?`;
-    if (JSON.parse(localStorage.getItem('user'))?.user_id) {
-      query+=`current_user=${JSON.parse(localStorage.getItem('user'))?.user_id}&`
+  function setLocationsMarker(locations) {
+    for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
+      map.removeLayer(marker);
     }
-    for (const key in filterOptions) {
-      query += `${key}=${filterOptions[key]}&`;
-    } 
-    console.log(query);
-    axios.get(query).then(res => {  // запрос на сервер для получения данных
-      console.log(res.data);
-      dispatch(setLocations(res.data));
-      for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
-        map.removeLayer(marker);
+    setMarkers([]);
+    // ----------- очищаю маркеры ------------------
+    for (const location of locations) {
+      const lat = location.location_latitude; 
+      const lng = location.location_longitude; 
+
+      const marker = createMarker(lat, lng);
+
+      
+      const filterLocations = locations.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
+      if (filterLocations.length > 1) {
+        addListMarker(setMarkers, map, marker, () => {
+          openLocationList(filterLocations)
+        }) 
+        continue;
       }
-      setMarkers([]);
-      // ----------- очищаю маркеры ------------------
-      for (const location of res.data) {
-        const lat = location.location_latitude; 
-        const lng = location.location_longitude; 
-  
-        const marker = createMarker(lat, lng);
-  
-        
-        const filterLocations = res.data.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
-        if (filterLocations.length > 1) {
-          addListMarker(setMarkers, map, marker, () => {
-            openLocationList(filterLocations)
-          }) 
-          continue;
-        }
-  
-        addMarker(setMarkers, map, marker, () => {
-          openLocationCard(location.location_id)
-        });
-      }
-    }).catch(err => {
-      console.log(err);
-    })
+
+      addMarker(setMarkers, map, marker, () => {
+        openLocationCard(location.location_id)
+      });
+    }
   }
 
   useEffect(() => {
@@ -86,8 +72,34 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
 
   useEffect(() => {
     if (map) {
-      console.log(filterOptions);
-      setLocationsMarker();
+      if (filterOptions) {
+        let filterLocations = 
+        [
+          ...locations.filter(location => (
+              location.location_address.toLowerCase().includes(filterOptions.country.toLowerCase()) 
+                &&
+              location.location_address.toLowerCase().includes(filterOptions.city.toLowerCase())
+                &&
+              location.location_name.toLowerCase().includes(filterOptions.name.toLowerCase())
+                &&
+              location.location_film.toLowerCase().includes(filterOptions.film.toLowerCase())
+            ))
+        ];
+        setLocationsMarker(filterLocations);
+
+      } else {
+        let query = `${API_SERVER_PATH}/locations?`;
+        if (JSON.parse(localStorage.getItem('user'))?.user_id) {
+          query+=`current_user=${JSON.parse(localStorage.getItem('user'))?.user_id}`
+        }
+        axios.get(query).then(res => {  // запрос на сервер для получения данных
+          console.log(res.data);
+          dispatch(setLocations(res.data));
+          setLocationsMarker(res.data);
+        }).catch(err => {
+          console.log(err);
+        })
+      }
     }
   }, [map, filterOptions, withFavoutites]);
   

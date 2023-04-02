@@ -21,13 +21,6 @@ const server = createServer(app);
 const io = new Server(server);
 
 io.on("connection", (socket) => {
-    // socket.on('locations:get', (callback) => {
-    //     selectAllLocations().then(response => {
-    //         console.log('jk');
-    //         callback({status: 'succes', res: response});  // отправка результата в ответ на запрос
-    //     }).catch(err => console.log(err));
-    // })
-
     socket.on('locations:add', (data, callback) => { // при добавлении локации запрос в БД и поднятие события обновления карты
         addLocations(data.data, data.files).then(location => {
             callback('success');
@@ -197,12 +190,8 @@ app.get('/locations', function(req, res){ // обработка GET запрос
         selectAllLocations(req.query.current_user).then(response => {
             res.send(response);  // отправка результата в ответ на запрос
         }).catch(err => res.status(500).send(err));   
-    } else if (Object.keys(req.query).length === 0) { // если req.query пустой, то поиск всех локаций, иначе фильтрация
-        selectAllLocations().then(response => {
-            res.send(response);  // отправка результата в ответ на запрос
-        }).catch(err => res.status(500).send(err));
     } else {
-        selectSearchLocations(req.query).then(response => {
+        selectAllLocations().then(response => {
             res.send(response);  // отправка результата в ответ на запрос
         }).catch(err => res.status(500).send(err));
     }

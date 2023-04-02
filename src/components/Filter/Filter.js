@@ -1,18 +1,33 @@
 import { memo, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import socket from '../../lib/socket/socket';
+import { setFilter } from '../../redux/locationsSlice';
 
 import './Filter.css';
 
 const Filter = memo(() => {
-    const [location, setLocation] = useState('');
+    const [name, setName] = useState('');
     const [film, setFilm] = useState('');
     const [country, setCountry] = useState('');
     const [city, setCity] = useState('');
 
+    const dispatch = useDispatch();
+
     function onClickCancel() {
-        setLocation('');
+        setName('');
         setFilm('');
         setCountry('');
         setCity('');
+        dispatch(setFilter(null));
+    }
+
+    function onClickSearch() {
+        console.log({name, film, country, city});
+        if (name.trim().length === 0 && film.trim().length === 0 && country.trim().length === 0 && city.trim().length === 0) {
+            console.log('empty');
+        } else {
+            dispatch(setFilter({name, film, country, city}));
+        }
     }
   
     return (
@@ -21,8 +36,8 @@ const Filter = memo(() => {
                 <label htmlFor="filter-location-name" className="filter-label">
                     Локация:
                 </label>
-                <input  value={location} 
-                        onChange={(e) =>  setLocation(e.target.value)}
+                <input  value={name} 
+                        onChange={(e) =>  setName(e.target.value)}
                         id="filter-location-name" className="field mini-field"
                 />
             </div>
@@ -61,7 +76,7 @@ const Filter = memo(() => {
                         Отмена
                     </button>
                     <button type="button" 
-                            // onClick={onClickSave}
+                            onClick={onClickSearch}
                             className="filter-btn btn-blue">
                         Поиск
                     </button>
