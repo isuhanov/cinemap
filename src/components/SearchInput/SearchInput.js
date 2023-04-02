@@ -14,7 +14,14 @@ const SearchInput = memo(({ onReload }) => {
     
     function onSearchBtnClick() { // ф-ия для кнопки поиска
         if (searchValue.trim() !== '') {
-            dispatch(setFilter({'film': searchValue.trim()}));
+            dispatch(setFilter(
+                {
+                    name: '',
+                    film: searchValue.trim(),
+                    country: '',
+                    city: ''
+                }
+            ));
             setVisibleBtn(false);
         }
     }

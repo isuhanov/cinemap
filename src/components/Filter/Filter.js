@@ -26,7 +26,14 @@ const Filter = memo(() => {
         if (name.trim().length === 0 && film.trim().length === 0 && country.trim().length === 0 && city.trim().length === 0) {
             console.log('empty');
         } else {
-            dispatch(setFilter({name, film, country, city}));
+            dispatch(setFilter(
+                {
+                    name: name.trim(),
+                    film: film.trim(),
+                    country: country.trim(),
+                    city: city.trim()
+                }
+            ));
         }
     }
   
