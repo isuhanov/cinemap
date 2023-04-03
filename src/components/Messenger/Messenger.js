@@ -12,17 +12,20 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
     const [users, setUsers] = useState([]); // стейт для списка пользователей
     const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);  // стейт для чата
     const [mode, setMode] = useState("chats");  // стейт для режима отображения
+    const userId = JSON.parse(localStorage.getItem('user'))?.user_id;
 
     async function update() {  // ф-ия обновления списков списка 
         return new Promise((resolve, reject) => {
-            socket.emit(`${mode}:get`, JSON.parse(localStorage.getItem('user')).user_id, (response) => {
-                if (response.status === 'success') {
-                    response.chats ? setChats(response.chats): setUsers(response.users);
-                    resolve(response);
-                } else {
-                    reject(response);
-                }
-              });
+            if (userId) {
+                socket.emit(`${mode}:get`, userId, (response) => {
+                    if (response.status === 'success') {
+                        response.chats ? setChats(response.chats): setUsers(response.users);
+                        resolve(response);
+                    } else {
+                        reject(response);
+                    }
+                  });
+            }
         });
     }
 
@@ -43,7 +46,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
     useEffect(() => {
         update().then(res => {
             if (otherUserId) { // если есть id нужного пользователя, то открыть чат 
-                socket.emit('chats:getChat', JSON.parse(localStorage.getItem('user')).user_id, otherUserId, (response) => {
+                socket.emit('chats:getChat', userId, otherUserId, (response) => {
                     if (response.status === 'success') {
                         openChatCard({chatId: response.chatId, userId:otherUserId});
                     }
@@ -63,7 +66,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
             update();
         } else {  // иначе отфильтровать нужный список
             setIsVisibleBtn(true);
-            socket.emit(`${mode}:filter`, JSON.parse(localStorage.getItem('user')).user_id, value.trim(), (response) => {
+            socket.emit(`${mode}:filter`, userId, value.trim(), (response) => {
                 if (response.status === 'success') {
                     response.chats ? setChats(response.chats): setUsers(response.users);
                 }
@@ -91,45 +94,53 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                         </button>
                     </div>
                 </header>
-                <div className="user-search">
-                    <input onChange={e => {
-                                onSearchChange(e);
-                            }} value={searchValue} 
-                    placeholder="Поиск..." className="subsearch-input"/>
-                    { isVisibleBtn &&
-                        <button onClick={() => {
-                            setSearchValue('');
-                            setIsVisibleBtn(false);
-                            update();
-                        }} className="subsearch-btn clean-btn">
-                            <span className="material-symbols-outlined" >close</span>
-                        </button>  
-                    }
+                { userId ?
+                    <>
+                    <div className="user-search">
+                        <input onChange={e => {
+                                    onSearchChange(e);
+                                }} value={searchValue} 
+                        placeholder="Поиск..." className="subsearch-input"/>
+                        { isVisibleBtn &&
+                            <button onClick={() => {
+                                setSearchValue('');
+                                setIsVisibleBtn(false);
+                                update();
+                            }} className="subsearch-btn clean-btn">
+                                <span className="material-symbols-outlined" >close</span>
+                            </button>  
+                        }
 
-                </div>
-                <div className="messenger-main">
-                    { mode === 'chats' ? 
-                        <>
-                            { chats.map(chatItem => (
-                                    <ChatItem key={chatItem.chat_id} 
-                                    chatId={chatItem.chat_id}
-                                    onClick={() => openChatCard({chatId: chatItem.chat_id})} 
-                                    />
-                                )
-                            )}
-                        </>
-                        :
-                        <>
-                            { users.map(user => (
-                                    <UserBox key={user.user_id}
-                                             user={user}
-                                             openUser={openUser}
-                                    />
-                                )
-                            )}
-                        </>
-                    }
-                </div>
+                    </div>
+                    <div className="messenger-main">
+                        { mode === 'chats' ? 
+                            <>
+                                { chats.map(chatItem => (
+                                        <ChatItem key={chatItem.chat_id} 
+                                        chatId={chatItem.chat_id}
+                                        onClick={() => openChatCard({chatId: chatItem.chat_id})} 
+                                        />
+                                    )
+                                )}
+                            </>
+                            :
+                            <>
+                                { users.map(user => (
+                                        <UserBox key={user.user_id}
+                                                user={user}
+                                                openUser={openUser}
+                                        />
+                                    )
+                                )}
+                            </>
+                        }
+                    </div>
+                </>
+                :
+                    <p className="asking-text">
+                        Пожалуйста, войдите в свой профиль
+                    </p>
+                }
 
                 { showsChatCard.isVisible && 
                     <ChatCard

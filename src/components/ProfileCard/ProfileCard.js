@@ -45,20 +45,16 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
                 <header className="profile-card__header">
                     <ProfileAvatar imgSrc={user.user_img_path} otherClassName="profile-card__avatar"/>
                     <p className="profile-card__login title">{ user.user_login }</p>
-                    { userId ?
-                        <button className="profile-card__btn header-btn">
-                            { userId === user.user_id ?
-                                    <span className="material-symbols-outlined">edit</span>
-                                :
-                                    <span onClick={() => {
-                                        openChat(user.user_id);
-                                        onClickClose();
-                                    }} className="material-symbols-outlined">chat</span>
-                            }
-                        </button>
-                        :
-                        <div></div>
-                    }
+                    <button className="profile-card__btn header-btn">
+                        { userId === user.user_id ?
+                                <span className="material-symbols-outlined">edit</span>
+                            :
+                                <span onClick={() => {
+                                    openChat(user.user_id);
+                                    onClickClose();
+                                }} className="material-symbols-outlined">chat</span>
+                        }
+                    </button>
                 </header>
                 <div className="profile-card__info">
                     <p>{ user.user_surname }</p>

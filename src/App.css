@@ -1,6 +1,14 @@
 body {
   overflow: hidden;
 }
+
+.asking-text {
+  text-align: center;
+  padding: 20px;
+  color: #5c9dff;
+  font-size: 16px;
+}
+
 /* ------------------------------ menu --------------------------------------- */
 
 .menu {
