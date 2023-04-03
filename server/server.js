@@ -60,6 +60,13 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     });
 
+    socket.on('users:add', (data, callback) => {
+        // console.log(data);
+        addUser(data.body, data.files[0]).then(response => {
+            callback({status: 'success', response}); // отправка результата в ответ на запрос
+        }).catch(err => callback(err));
+    });
+
     socket.on('users:filter', (currentUserId, filterParams, callback) => { // фильтрация списка пользователей
         filterUsers(currentUserId, filterParams).then(users=> {
             callback({status:'success', users});

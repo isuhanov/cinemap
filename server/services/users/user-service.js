@@ -6,6 +6,10 @@ import { nanoid } from 'nanoid';
 const GLOBAL_SALT = '8a5de7913eb300716c6ba28ac3958624'; // глобальная соль
 
 async function addUser(body, photo) { // ф-ия добавления нового пользователя
+
+    console.log(body);
+    console.log(photo);
+
     const salt = cryptoJS.SHA256(nanoid(8)).toString(); // генерирую соль для пользователя
     const hash = hashPass(body.password, salt); // хэш пароля
     let response = await new Promise((resolve, reject) => {

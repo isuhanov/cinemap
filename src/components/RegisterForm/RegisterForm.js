@@ -1,9 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import axios from "axios";
 
 
 import './RegisterForm.css';
-import API_SERVER_PATH from "../../lib/api/api-path";
 import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import { addUser } from "../../services/user-services/user-service";
 import FormField from "../../services/form-services/form-field";
@@ -106,13 +104,20 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
     }
 
     function post() {
-        const formData = new FormData(); // объект для хранения данных отправляемой формы
-        photo.value.forEach(element => {
-            formData.append('photo', element);
-        }); 
-        for (const key in form) {
-            formData.append(key, form[key].value);
+        const formData = {
+            body: {
+                login: login.value,
+                password: password.value,
+                name: name.value,
+                surname: surname.value,
+                status: status.value,
+            },
+            files: photo.value.map(photoItem => ({
+                name: photoItem.name,
+                photo: photoItem
+            }))
         }
+        console.log(formData);
         addUser(formData).then(res => onClickClose())
     }
 
