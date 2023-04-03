@@ -1,12 +1,21 @@
 import { ClickAwayListener } from '@mui/material';
 import { memo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../services/user-services/user-service';
+import { setWithFavoutites } from "../../redux/locationsSlice";
 import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 
 import './Profile.css'
 
 const Profile = memo(({ user, onClickOpenLoginForm, onClickOpenRegisterForm, onClickOpenProfileCard }) => {
     const [menuIsVisible, setMenuVisible] = useState(false);
+    const dispatch = useDispatch();
+
+    function onClickLogout() {
+        logoutUser();
+        dispatch(setWithFavoutites());
+        setMenuVisible(false);
+    }
     
     return (
         <>
@@ -22,13 +31,23 @@ const Profile = memo(({ user, onClickOpenLoginForm, onClickOpenRegisterForm, onC
                             <ul>
                                 { user ? 
                                     <>
-                                        <li onClick={() => onClickOpenProfileCard(JSON.parse(localStorage.getItem('user')))} className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
-                                        <li onClick={logoutUser} className="profile__menu__item menu-item">Выход<span className="material-symbols-outlined">logout</span></li>
+                                        <li onClick={() => {
+                                                onClickOpenProfileCard(JSON.parse(localStorage.getItem('user')));
+                                                setMenuVisible(false);
+                                            }} 
+                                            className="profile__menu__item menu-item">Профиль<span className="material-symbols-outlined">account_box</span></li>
+                                        <li onClick={onClickLogout} className="profile__menu__item menu-item">Выход<span className="material-symbols-outlined">logout</span></li>
                                     </>
                                     :
                                     <>
-                                        <li onClick={onClickOpenLoginForm} className="profile__menu__item menu-item">Вход<span className="material-symbols-outlined">login</span></li>
-                                        <li onClick={onClickOpenRegisterForm} className="profile__menu__item menu-item">Регистрация<span className="material-symbols-outlined">person_add</span></li>
+                                        <li onClick={() => {
+                                                onClickOpenLoginForm();
+                                                setMenuVisible(false);
+                                            }} className="profile__menu__item menu-item">Вход<span className="material-symbols-outlined">login</span></li>
+                                        <li onClick={() => {
+                                                onClickOpenRegisterForm();
+                                                setMenuVisible(false);
+                                            }} className="profile__menu__item menu-item">Регистрация<span className="material-symbols-outlined">person_add</span></li>
                                     </>
                                 }
                             </ul>
