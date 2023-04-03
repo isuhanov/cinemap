@@ -119,6 +119,16 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
         }
         console.log(formData);
         addUser(formData).then(res => onClickClose())
+        .catch(err => {
+            if (err === 'user exist') {
+                login.parent.current.classList.add('error');
+                login.set({
+                    error: 'Пользователь с таким логином существует',
+                })
+            } else {
+                console.log(err);
+            }
+        })
     }
 
 

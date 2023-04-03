@@ -5,30 +5,39 @@ import { nanoid } from 'nanoid';
 
 const GLOBAL_SALT = '8a5de7913eb300716c6ba28ac3958624'; // глобальная соль
 
-async function addUser(body, photo) { // ф-ия добавления нового пользователя
 
-    console.log(body);
-    console.log(photo);
-
-    const salt = cryptoJS.SHA256(nanoid(8)).toString(); // генерирую соль для пользователя
-    const hash = hashPass(body.password, salt); // хэш пароля
-    let response = await new Promise((resolve, reject) => {
-        let imgPath = addUserPhoto(photo, `./img/photo/userphoto/${body.login}/`); // сохранение фото пользователя
-        connection.query(
-            `INSERT INTO users (user_login, user_pass, user_staff, user_name, user_surname, user_img_path, user_status, user_salt) 
-            VALUES ('${body.login}', '${hash}', 'user', '${body.name}', '${body.surname}', '${imgPath.replace('/img', '')}', '${body.status}', '${salt}');`,
+async function selectUserById(userId) { // ф-ия получения информации о пользователе по id
+    let response = new Promise((resolve, reject) => {
+        connection.query(  // получение id пользователя 
+            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_id = ${userId};`,
             function(err, results, fields) {
-                console.log(err)
-                if (err) reject(err);
-                else resolve(results); // отправка результата в ответ на запрос
+                if (results.length === 0) { // если пользователя нет, то ошикбка
+                    reject(err);
+                } else { // иначе отправка инф-ции о пользователе
+                    resolve(results[0]); 
+                }
             }
-        ); 
+        );
     });
     return response;
 }
 
 
-async function selectUsers(currentUserId) { // ф-ия получения пользователей
+async function selectUserByLogin(login) { // ф-ия получения информации о пользователе по id
+    let response = new Promise((resolve, reject) => {
+        connection.query(  // получение id пользователя 
+            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_login = '${login}';`,
+            function(err, results, fields) {
+                if (err) reject(err);
+                else resolve(results); // отправка результата в ответ на запрос
+            }
+        );
+    });
+    return response;
+}
+
+
+async function selectOtherUsers(currentUserId) { // ф-ия получения пользователей без учета текующего
     let response = new Promise((resolve, reject) => {
         connection.query( 
             `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_id <> ${currentUserId};`,
@@ -62,18 +71,27 @@ async function filterUsers(currentUserId, userLogin) { // ф-ия фильтра
 }
 
 
-async function selectUser(userId) { // ф-ия получения информации о пользователе
-    let response = new Promise((resolve, reject) => {
-        connection.query(  // получение id пользователя 
-            `select u.user_id, u.user_login, u.user_name, u.user_surname, u.user_img_path, u.user_status from users u where u.user_id = ${userId};`,
-            function(err, results, fields) {
-                if (results.length === 0) { // если пользователя нет, то ошикбка
-                    reject(err);
-                } else { // иначе отправка инф-ции о пользователе
-                    resolve(results[0]); 
-                }
+async function addUser(body, photo) { // ф-ия добавления нового пользователя
+    let response = await new Promise((resolve, reject) => {
+        selectUserByLogin(body.login).then(user => {
+            console.log(user);
+            if (user.length === 0) { // если пользователя с таким логином нет, то добавление, иначе отправка сообщения с ошибкой
+                const salt = cryptoJS.SHA256(nanoid(8)).toString(); // генерирую соль для пользователя
+                const hash = hashPass(body.password, salt); // хэш пароля
+                let imgPath = addUserPhoto(photo, `./img/photo/userphoto/${body.login}/`); // сохранение фото пользователя
+                connection.query(
+                    `INSERT INTO users (user_login, user_pass, user_staff, user_name, user_surname, user_img_path, user_status, user_salt) 
+                    VALUES ('${body.login}', '${hash}', 'user', '${body.name}', '${body.surname}', '${imgPath.replace('/img', '')}', '${body.status}', '${salt}');`,
+                    function(err, results, fields) {
+                        console.log(err)
+                        if (err) reject(err);
+                        else resolve(results); // отправка результата в ответ на запрос
+                    }
+                ); 
+            } else {
+                resolve('user exist');
             }
-        );
+        }).catch(err => reject(err));
     });
     return response;
 }
@@ -120,4 +138,4 @@ function  hashPass(password, salt) { // ф-ия хэширования паро�
 }
 
 
-export { addUser, selectUsers, filterUsers, loginUser, selectUser };
+export { addUser, selectOtherUsers, filterUsers, loginUser, selectUserById };
