@@ -8,7 +8,7 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 import './ProfileCard.css';
 
 const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat }) => {
-    const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
+    const userId = JSON.parse(localStorage.getItem('user'))?.user_id; // стейт для id текущего пользователя
     const locations = useSelector((state) => state.locations.value.filter((location) => location.user_id === user.user_id));
     const dispatch = useDispatch();
 
@@ -45,16 +45,20 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
                 <header className="profile-card__header">
                     <ProfileAvatar imgSrc={user.user_img_path} otherClassName="profile-card__avatar"/>
                     <p className="profile-card__login title">{ user.user_login }</p>
-                    <button className="profile-card__btn header-btn">
-                        { userId === user.user_id ?
-                                <span className="material-symbols-outlined">edit</span>
-                            :
-                                <span onClick={() => {
-                                    openChat(user.user_id);
-                                    onClickClose();
-                                }} className="material-symbols-outlined">chat</span>
-                        }
-                    </button>
+                    { userId ?
+                        <button className="profile-card__btn header-btn">
+                            { userId === user.user_id ?
+                                    <span className="material-symbols-outlined">edit</span>
+                                :
+                                    <span onClick={() => {
+                                        openChat(user.user_id);
+                                        onClickClose();
+                                    }} className="material-symbols-outlined">chat</span>
+                            }
+                        </button>
+                        :
+                        <div></div>
+                    }
                 </header>
                 <div className="profile-card__info">
                     <p>{ user.user_surname }</p>
