@@ -140,6 +140,7 @@ function App() {
             }} 
             onClickClose={closeProfileCard} 
             openChat={openMessangers}
+            onReload={onReload}
             otherClassName={showsProfileCard.visibleClass}/> 
         }
 

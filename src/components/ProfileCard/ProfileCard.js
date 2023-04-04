@@ -6,10 +6,13 @@ import { setFavouriteId } from "../../redux/locationsSlice";
 import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ProfileCard.css';
+import EditUserInfoForm from "../EditUserInfoForm/EditUserInfoForm";
+import useOpen from "../../services/hooks/useOpen";
 
-const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat }) => {
+const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat, onReload }) => {
     const userId = JSON.parse(localStorage.getItem('user'))?.user_id; // стейт для id текущего пользователя
     const locations = useSelector((state) => state.locations.value.filter((location) => location.user_id === user.user_id));
+    const [showsEditInfoForm, openEditInfoForm, closeEditInfoForm] = useOpen('move-left', onReload);  // стейт формы
     const dispatch = useDispatch();
 
     function onFavoritesBtnClick(locationId, favouriteId) { // ф-ия обработки нажатия флажка избранного
@@ -47,7 +50,7 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
                     <p className="profile-card__login title">{ user.user_login }</p>
                     <button className="profile-card__btn header-btn">
                         { userId === user.user_id ?
-                                <span className="material-symbols-outlined">edit</span>
+                                <span onClick={openEditInfoForm} className="material-symbols-outlined">edit</span>
                             :
                                 <span onClick={() => {
                                     openChat(user.user_id);
@@ -98,7 +101,14 @@ const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassN
                     </div>
 
                 </div>
+            { showsEditInfoForm.isVisible && 
+                <EditUserInfoForm 
+                    otherClassName={showsEditInfoForm.visibleClass}
+                    onClickClose={closeEditInfoForm}
+                />
+            }
             </div>
+            
         </div>
     );
 });

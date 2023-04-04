@@ -73,7 +73,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
     const [surname, setSurname] = useState(new FormField('', useRef(), onSurnameChange));
     // стейт для статуса
     const [status, setStatus] = useState(new FormField('', useRef(), onStatusChange));
-    // стейт для статуса
+    // стейт для фото
     const [photo, setPhoto] = useState(new FormField([], useRef(), onDropPhoto));
 
     // объект для хранения полей формы

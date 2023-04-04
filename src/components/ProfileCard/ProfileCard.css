@@ -10,10 +10,14 @@
 }
 
 .profile-card {
-  background-color: white;
-  width: 550px;
-  height: 670px;
-  border-radius: 10px;
+    position: relative;
+    top: 0;
+    z-index: 100;
+    background-color: white;
+    width: 550px;
+    height: 670px;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .profile-card__btn-header {

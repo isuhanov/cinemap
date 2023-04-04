@@ -87,7 +87,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                             <span className="material-symbols-outlined">chat_bubble</span>
                         </button>
                         <button className={`${mode === 'users' ? 'btn-is-active': 'btn-is-disabled'} header-btn `} onClick={() => setMode('users')}>
-                            <span className="material-symbols-outlined">person</span>
+                            <span className="material-symbols-outlined">person_search</span>
                         </button>
                         <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>

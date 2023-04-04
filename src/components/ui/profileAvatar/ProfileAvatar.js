@@ -10,7 +10,7 @@ const ProfileAvatar = memo(({imgSrc, otherClassName}) => {
                     <img className="profile-avatar__img" src={imgSrc} alt="Аватар"/>
                     :
                     <span className="material-symbols-outlined">
-                        person
+                        { JSON.parse(localStorage.getItem('user')) ? 'person' : 'person_off' }
                     </span>
                 }
             </div>
