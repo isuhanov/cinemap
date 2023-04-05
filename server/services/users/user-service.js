@@ -97,6 +97,28 @@ async function addUser(body, photo) { // ф-ия добавления новог
 }
 
 
+async function editUserInfo(body) { // ф-ия добавления нового пользователя
+    let response = await new Promise((resolve, reject) => {
+        selectUserByLogin(body.login).then(user => {
+            console.log(user);
+            if (user.length === 0 || user[0].user_id === body.userId) { // если пользователя с таким логином нет или это тот же самый пользователь, то изменение, иначе отправка сообщения с ошибкой
+                connection.query(
+                    `UPDATE users SET user_login = '${body.login}', user_name = '${body.name}', user_surname = '${body.surname}', user_status = '${body.status}' WHERE (user_id = '${body.userId}');`,
+                    function(err, results, fields) {
+                        console.log(err)
+                        if (err) reject(err);
+                        else resolve(results); // отправка результата в ответ на запрос
+                    }
+                ); 
+            } else {
+                resolve('user exist');
+            }
+        }).catch(err => reject(err));
+    });
+    return response;
+}
+
+
 async function loginUser(login, password) { // ф-ия авторизации пользователя
     let response = new Promise((resolve, reject) => {
         getSalt(login).then(res => {
@@ -138,4 +160,4 @@ function  hashPass(password, salt) { // ф-ия хэширования паро�
 }
 
 
-export { addUser, selectOtherUsers, filterUsers, loginUser, selectUserById };
+export { addUser, editUserInfo, selectOtherUsers, filterUsers, loginUser, selectUserById };

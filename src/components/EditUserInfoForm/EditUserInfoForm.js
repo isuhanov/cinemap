@@ -1,9 +1,17 @@
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../redux/userSlice";
 import FormField from "../../services/form-services/form-field";
+import { formIsValid, loginFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
+import { editUserInfo } from "../../services/user-services/user-service";
 
 import './EditUserInfoForm.css' 
 
 const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
+    const user = useSelector((state) => state.user.value);
+    const dispatch = useDispatch();
+
+
     const onLoginChange = (login) => { // обработка значения поля login
         setLogin(prev => ({
             ...prev,
@@ -33,13 +41,13 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
     }
 
        // стейт для логина
-       const [login, setLogin] = useState(new FormField('', useRef(), onLoginChange)); 
+       const [login, setLogin] = useState(new FormField(user?.user_login, useRef(), onLoginChange)); 
        // стейт для имени
-       const [name, setName] = useState(new FormField('', useRef(), onNameChange));
+       const [name, setName] = useState(new FormField(user?.user_name, useRef(), onNameChange));
        // стейт для фамилии
-       const [surname, setSurname] = useState(new FormField('', useRef(), onSurnameChange));
+       const [surname, setSurname] = useState(new FormField(user?.user_surname, useRef(), onSurnameChange));
        // стейт для статуса
-       const [status, setStatus] = useState(new FormField('', useRef(), onStatusChange));
+       const [status, setStatus] = useState(new FormField(user?.user_status, useRef(), onStatusChange));
    
        // объект для хранения полей формы
        const form = {
@@ -48,6 +56,48 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
            surname,
            status,
        }
+
+       useEffect(() => {
+            // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
+            if (form.login.isTouched) loginFieldIsValid(form.login, 100);
+            if (form.name.isTouched) textFieldIsValid(form.name, 100);
+            if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
+            if (form.status.isTouched) textFieldIsValid(form.status, 200, null);
+        }, [login.value, name.value, surname.value, status.value])
+
+
+        function onClickSave() { //  post-запрос на добавление локации в БД 
+            if (!formIsValid(form, false, ['status'])) return
+            post();
+        }
+
+        function post() {
+            const formData = {
+                body: {
+                    userId: user.user_id,
+                    login: login.value,
+                    name: name.value,
+                    surname: surname.value,
+                    status: status.value,
+                }
+            }
+            console.log(formData);
+            editUserInfo(formData).then(res => {
+                dispatch(setUser(res));
+                onClickClose()
+            }).catch(err => {
+                if (err === 'user exist') {
+                    login.parent.current.classList.add('error');
+                    login.set({
+                        error: 'Логин занят',
+                    })
+                } else {
+                    console.log(err);
+                }
+            })
+        }
+
+       
     return (
         <div className={`profile-card profile-form form ${otherClassName}`}>
             <header className="user-info-form__header header-card">
@@ -119,14 +169,15 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                             <label htmlFor="location-name">
                                 Статус:
                             </label>
-                            <input type="text" 
+                            <textarea type="text" 
                                     value={status.value} 
                                     onChange={(e) => onStatusChange({
                                         value: e.target.value,
                                         isTouched: true
                                     })}
                                     className="field-textarea"
-                            />
+                            ></textarea>
+                            
                             { status.error && 
                                 <p>
                                     { status.error }
@@ -137,7 +188,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                 </div>
                 <footer>
                     <div className="btn-container form-btn-container">
-                        <button type="button" className="location-form-btn-edit btn btn-blue">
+                        <button onClick={onClickSave} type="button" className="location-form-btn-edit btn btn-blue">
                             Сохранить
                         </button>
                     </div>

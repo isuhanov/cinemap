@@ -8,7 +8,7 @@ import jwt from'jsonwebtoken'
 
 import { addLocations, deleteLocation, selectAllLocations, selectSearchLocations, updateLocations } from './services/locations/location-service.js'
 import { addFavourite, deleteFavourite, favouriteIsExist, selectFavourites } from './services/favourites-locations/favourites-location-service.js'
-import { addUser, filterUsers, loginUser, selectOtherUsers, selectUserById } from './services/users/user-service.js'
+import { addUser, editUserInfo, filterUsers, loginUser, selectOtherUsers, selectUserById } from './services/users/user-service.js'
 import checkJwt from './services/users/user-auth-service.js'
 import { tokenKey } from './lib/token.js'
 
@@ -62,6 +62,16 @@ io.on("connection", (socket) => {
 
     socket.on('users:add', (data, callback) => {
         addUser(data.body, data.files[0]).then(response => {
+            if (response === 'user exist') {
+                callback({status: response});
+            } else {
+                callback({status: 'success', response}); // отправка результата в ответ на запрос
+            }
+        }).catch(err => callback(err));
+    });
+
+    socket.on('users:editInfo', (data, callback) => {
+        editUserInfo(data.body).then(response => {
             if (response === 'user exist') {
                 callback({status: response});
             } else {

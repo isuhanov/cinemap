@@ -1,5 +1,5 @@
-function textFieldIsValid(formItem, max = undefined) { // ф-ия для валидации текстовых полей
-    if (formItem.value.length === 0) {
+function textFieldIsValid(formItem, max = undefined, min=0) { // ф-ия для валидации текстовых полей
+    if (formItem.value.length === min) {
         formItem.parent.current.classList.add('error');
         formItem.set({
             error: 'Пустое поле',
@@ -156,12 +156,12 @@ function photosFieldIsValid({ formItem, maxWidth=undefined, isUpdate=false, phot
     }
 }
 
-function formIsValid(form, isUpdate=false) {
+function formIsValid(form, isUpdate=false, optionalField=[]) {
     let isValid = true;
     for (const key in form) {
         if (!isUpdate) {
             // если значение поля формы пустое, то вывести сообщение об ошибке
-            if (form[key].value.length === 0) {
+            if (form[key].value.length === 0 && !optionalField.includes(key)) {
                 form[key].set({
                     error: 'Пустое поле'
                 });

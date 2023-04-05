@@ -15,6 +15,28 @@ async function addUser(user) { // ф-ия добавления пользова�
     return response;
 }
 
+async function editUserInfo(user) { // ф-ия изменения информации о пользователе пользователя
+    let response = new Promise((resolve, reject) => {
+        socket.emit('users:editInfo', user, (res => {
+            if (res.status === 'success') {
+                let currentUser = JSON.parse(localStorage.getItem('user'));
+                currentUser = {
+                    ...currentUser,
+                    user_login: user.body.login,
+                    user_name: user.body.name,
+                    user_status: user.body.status, 
+                    user_surname: user.body.surname
+                }
+                localStorage.setItem('user', JSON.stringify(currentUser))
+                resolve(currentUser);
+            } else if (res.status === 'user exist') {
+                reject(res.status);
+            }
+        }))
+    });
+    return response;
+}
+
 const loginUser = (userData) => { // ф-ия сохранения пользвателя при авторизации
     localStorage.setItem('user', JSON.stringify(userData));
 };
@@ -23,4 +45,4 @@ const logoutUser = () => { // ф-ия удаления пользвателя п
     localStorage.removeItem('user');
 };
 
-export { addUser, loginUser, logoutUser };
+export { addUser, editUserInfo, loginUser, logoutUser };

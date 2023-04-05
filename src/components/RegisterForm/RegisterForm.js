@@ -92,14 +92,14 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
         if (form.password.isTouched) passswordFieldIsValid(form.password);
         if (form.name.isTouched) textFieldIsValid(form.name, 100);
         if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
-        if (form.status.isTouched) textFieldIsValid(form.status, 200);
+        if (form.status.isTouched) textFieldIsValid(form.status, 200, null);
         if (form.photo.isTouched) photosFieldIsValid({ formItem: form.photo, maxWidth: 1 });
     }, [login.value, password.value, name.value, surname.value, status.value, JSON.stringify(photo.value)])
 
 
 
     function onClickSave() { //  post-запрос на добавление локации в БД 
-        if (!formIsValid(form)) return
+        if (!formIsValid(form, false, ['status'])) return
         post();
     }
 
@@ -123,7 +123,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
             if (err === 'user exist') {
                 login.parent.current.classList.add('error');
                 login.set({
-                    error: 'Пользователь с таким логином существует',
+                    error: 'Логин занят',
                 })
             } else {
                 console.log(err);

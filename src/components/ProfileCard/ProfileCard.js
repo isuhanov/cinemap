@@ -9,12 +9,14 @@ import './ProfileCard.css';
 import EditUserInfoForm from "../EditUserInfoForm/EditUserInfoForm";
 import useOpen from "../../services/hooks/useOpen";
 
-const ProfileCard = memo(({ user, onClickClose, onClickOpenLocation, otherClassName, openChat, onReload }) => {
-    const userId = JSON.parse(localStorage.getItem('user'))?.user_id; // стейт для id текущего пользователя
-    const locations = useSelector((state) => state.locations.value.filter((location) => location.user_id === user.user_id));
+const ProfileCard = memo(({ onClickClose, onClickOpenLocation, otherClassName, openChat, onReload }) => {
     const [showsEditInfoForm, openEditInfoForm, closeEditInfoForm] = useOpen('move-left', onReload);  // стейт формы
+    const userId = JSON.parse(localStorage.getItem('user'))?.user_id; // стейт для id текущего пользователя
+    
+    const user = useSelector((state) => state.user.value);
+    const locations = useSelector((state) => state.locations.value.filter((location) => location.user_id === user.user_id));
     const dispatch = useDispatch();
-
+    
     function onFavoritesBtnClick(locationId, favouriteId) { // ф-ия обработки нажатия флажка избранного
         const data = {
             userId,

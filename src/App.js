@@ -18,6 +18,7 @@ import Messenger from './components/Messenger/Messenger';
 import { closeCard, openCard, showCard } from './services/open-close-services/open-close-services';
 import useOpen from './services/hooks/useOpen';
 import Filter from './components/Filter/Filter';
+import { setUser } from './redux/userSlice';
 
 
 function App() {
@@ -72,17 +73,16 @@ function App() {
   });
 
 
-  const [profileUser, setProfileUser] = useState(undefined); // стейт для пользователя профиля
   const [showsProfileCard, setShowsProfileCard] = useState({
     isVisible: false,
     visibleClass: '',
     animatioType: 'cover'
   });
-  const openProfileCard = useCallback((user) => { // ф-ия для откытия формы локации
-    setProfileUser(user);
+  const openProfileCard = useCallback((user) => { // ф-ия для откытия профиля
+    dispatch(setUser(user));
     showCard(showsProfileCard, setShowsProfileCard);
   });
-  const closeProfileCard = useCallback(() => { // ф-ия для закрытия формы локации
+  const closeProfileCard = useCallback(() => { // ф-ия для закрытия профиля
     closeCard(showsProfileCard, setShowsProfileCard, onReload)
   });
 
@@ -133,7 +133,6 @@ function App() {
 
         { showsProfileCard.isVisible && 
           <ProfileCard 
-            user={profileUser} 
             onClickOpenLocation={(locationId, coordMarker) => {
               openLocationCard(locationId);
               moveToMarker(coordMarker);
