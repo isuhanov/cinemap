@@ -2,25 +2,22 @@ import { memo } from "react";
 
 import './PhotoContainer.css'
 
-const PhotoContainer = memo(({ photos, isUpdate, onRemovePhotos }) => {
-    function onClickRemove(photoId, e) {
-        onRemovePhotos(photoId);
-        document.getElementById(`removed${photoId}`).classList.toggle('isActive'); // помечаем элемент как удаляемый
-    }
+const PhotoContainer = memo(({ photos = [], isUpdate, onClickRemove }) => {
+
 
     return (
         <div className="photo-container">
             { photos.map((photo) => (
-                        <div className="photo-item" key={photo.locations_photo_id}>
-                            <img src={photo.locations_photo_path}/>
+                        <div className="photo-item" key={photo.id}>
+                            <img src={photo.path} alt={photo.id}/>
                             { isUpdate && // отобража кнопку удаления, если открыта форма добавления
                                 <>
-                                    <button onClick={(e) => onClickRemove(photo.locations_photo_id, e)} type="button" className="photo-remove-btn">
+                                    <button onClick={(e) => onClickRemove(photo.id)} type="button" className="photo-remove-btn">
                                         <span className="material-symbols-outlined">
                                             close
                                         </span>
                                     </button>
-                                    <div className="removed" id={`removed${photo.locations_photo_id}`}></div>
+                                    <div className={`removed ${photo.isRemove ? 'isActive' : ''}`}></div>
                                 </>
                             }
                         </div>

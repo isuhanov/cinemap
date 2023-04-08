@@ -1,9 +1,10 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../redux/userSlice";
 import FormField from "../../services/form-services/form-field";
 import { formIsValid, loginFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 import { editUserInfo } from "../../services/user-services/user-service";
+import ImgPicker from "../ui/ImgPicker/ImgPicker";
 
 import './EditUserInfoForm.css' 
 
@@ -40,63 +41,90 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
         }))
     }
 
-       // стейт для логина
-       const [login, setLogin] = useState(new FormField(user?.user_login, useRef(), onLoginChange)); 
-       // стейт для имени
-       const [name, setName] = useState(new FormField(user?.user_name, useRef(), onNameChange));
-       // стейт для фамилии
-       const [surname, setSurname] = useState(new FormField(user?.user_surname, useRef(), onSurnameChange));
-       // стейт для статуса
-       const [status, setStatus] = useState(new FormField(user?.user_status, useRef(), onStatusChange));
-   
-       // объект для хранения полей формы
-       const form = {
-           login,
-           name,
-           surname,
-           status,
-       }
+    const onPhotosChange = useCallback((photos) => {
+        setPhotos(prev => ({
+            ...prev,
+            ...photos
+        }));
+    }, []);
 
-       useEffect(() => {
-            // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
-            if (form.login.isTouched) loginFieldIsValid(form.login, 100);
-            if (form.name.isTouched) textFieldIsValid(form.name, 100);
-            if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
-            if (form.status.isTouched) textFieldIsValid(form.status, 200, null);
-        }, [login.value, name.value, surname.value, status.value])
-
-
-        function onClickSave() { //  post-запрос на добавление локации в БД 
-            if (!formIsValid(form, false, ['status'])) return
-            post();
-        }
-
-        function post() {
-            const formData = {
-                body: {
-                    userId: user.user_id,
-                    login: login.value,
-                    name: name.value,
-                    surname: surname.value,
-                    status: status.value,
-                }
-            }
-            console.log(formData);
-            editUserInfo(formData).then(res => {
-                dispatch(setUser(res));
-                onClickClose()
-            }).catch(err => {
-                if (err === 'user exist') {
-                    login.parent.current.classList.add('error');
-                    login.set({
-                        error: 'Логин занят',
-                    })
-                } else {
-                    console.log(err);
-                }
+    const setPhotoIsRemove = useCallback((id) => {
+        setPhotos(prev => ({
+            ...prev,
+            value: prev.value.map(photo => {
+                if (photo.id === id) return {
+                    ...photo,
+                    isRemove: !photo.isRemove 
+                };
+                return photo;
             })
-        }
+        }));
+    }, []);
 
+    // стейт для логина
+    const [login, setLogin] = useState(new FormField(user?.user_login, useRef(), onLoginChange)); 
+    // стейт для имени
+    const [name, setName] = useState(new FormField(user?.user_name, useRef(), onNameChange));
+    // стейт для фамилии
+    const [surname, setSurname] = useState(new FormField(user?.user_surname, useRef(), onSurnameChange));
+    // стейт для статуса
+    const [status, setStatus] = useState(new FormField(user?.user_status, useRef(), onStatusChange));
+    // стейт для статуса
+    const [photos, setPhotos] = useState(new FormField([{
+        id: user.user_id,
+        path: user?.user_img_path,
+        isRemove: false
+    }], useRef(), onPhotosChange));
+
+    // объект для хранения полей формы
+    const form = {
+        login,
+        name,
+        surname,
+        status,
+    }
+
+    useEffect(() => {
+        // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
+        if (form.login.isTouched) loginFieldIsValid(form.login, 100);
+        if (form.name.isTouched) textFieldIsValid(form.name, 100);
+        if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
+        if (form.status.isTouched) textFieldIsValid(form.status, 200, null);
+    }, [login.value, name.value, surname.value, status.value])
+
+
+    function onClickSave() { //  post-запрос на добавление локации в БД 
+        if (!formIsValid(form, false, ['status'])) return
+        post();
+    }
+
+    function post() {
+        const formData = {
+            body: {
+                userId: user.user_id,
+                login: login.value,
+                name: name.value,
+                surname: surname.value,
+                status: status.value,
+            }
+        }
+        console.log(formData);
+        editUserInfo(formData).then(res => {
+            dispatch(setUser(res));
+            onClickClose()
+        }).catch(err => {
+            if (err === 'user exist') {
+                login.parent.current.classList.add('error');
+                login.set({
+                    error: 'Логин занят',
+                })
+            } else {
+                console.log(err);
+            }
+        })
+    }
+
+    
        
     return (
         <div className={`profile-card profile-form form ${otherClassName}`}>
@@ -183,6 +211,12 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                                     { status.error }
                                 </p>
                             }
+                        </div>
+                        <div className="field-block" ref={status.parent}>
+                            <label htmlFor="location-name">
+                                Фото:
+                            </label>
+                            <ImgPicker photos={photos.value} onChange={onPhotosChange} setIsRemove={setPhotoIsRemove}/>
                         </div>
                     </form>
                 </div>

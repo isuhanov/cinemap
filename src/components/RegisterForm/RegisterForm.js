@@ -242,12 +242,6 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                             <label>
                                 Фото из профиля:                              
                             </label>
-                            {/* { isUpdate &&
-                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} 
-                                photos={locationPhotos.filter(photo => photo.photo.locations_photo_status === 'film')
-                                                    .map(photo => photo.photo)} 
-                                />
-                            } */}
                             <DragAndDropFiles photoList={photo.value} onDropFiles={onDropPhoto} />
                             { photo.error && 
                                 <p>
