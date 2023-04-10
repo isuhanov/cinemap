@@ -8,6 +8,7 @@ import { loginUser } from "../../services/user-services/user-service";
 import FormField from "../../services/form-services/form-field";
 import { useDispatch } from "react-redux";
 import { setWithFavoutites } from "../../redux/locationsSlice";
+import { setCurrentUser } from "../../redux/userSlice";
 
 const LoginForm = memo(({ onClickClose, otherClassName }) => {
     const dispatch = useDispatch();
@@ -39,6 +40,7 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
         } else {
             axios.post(`${API_SERVER_PATH}/users/login`, {login: login.value, password: password.value}).then(res => {
                 loginUser(res.data) // сохранение данных пользователя
+                dispatch(setCurrentUser(res.data));
                 dispatch(setWithFavoutites());
                 onClickClose(); // закрытие формы
             })

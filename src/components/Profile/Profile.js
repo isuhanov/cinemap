@@ -1,18 +1,26 @@
 import { ClickAwayListener } from '@mui/material';
-import { memo, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { memo, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../services/user-services/user-service';
 import { setWithFavoutites } from "../../redux/locationsSlice";
 import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 
 import './Profile.css'
+import { setCurrentUser } from '../../redux/userSlice';
 
-const Profile = memo(({ user, onClickOpenLoginForm, onClickOpenRegisterForm, onClickOpenProfileCard }) => {
+const Profile = memo(({ onClickOpenLoginForm, onClickOpenRegisterForm, onClickOpenProfileCard }) => {
     const [menuIsVisible, setMenuVisible] = useState(false);
     const dispatch = useDispatch();
+    const currentUser = useSelector((state) => state.user.currentUser);
+
+
+    useEffect(() => {
+        console.log(currentUser);
+    }, [currentUser]);
 
     function onClickLogout() {
         logoutUser();
+        dispatch(setCurrentUser(undefined));
         dispatch(setWithFavoutites());
         setMenuVisible(false);
     }
@@ -21,7 +29,7 @@ const Profile = memo(({ user, onClickOpenLoginForm, onClickOpenRegisterForm, onC
         <>
         <div className="profile">
             <button className="profile__avatar-btn" onClick={() => setMenuVisible(true)}>
-                <ProfileAvatar imgSrc={user ? user.user_img_path : null} otherClassName="profile__avatar-circle"/>
+                <ProfileAvatar imgSrc={currentUser ? currentUser.user_img_path : null} otherClassName="profile__avatar-circle" isProfile={true}/>
                 <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
             </button>
             { menuIsVisible && (
@@ -29,7 +37,7 @@ const Profile = memo(({ user, onClickOpenLoginForm, onClickOpenRegisterForm, onC
                     <div className="profile__menu menu">
                         <nav>
                             <ul>
-                                { user ? 
+                                { currentUser ? 
                                     <>
                                         <li onClick={() => {
                                                 onClickOpenProfileCard(JSON.parse(localStorage.getItem('user')));
