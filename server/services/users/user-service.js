@@ -1,5 +1,5 @@
 import connection from '../db/db-service.js';
-import { addUserPhoto, createFile, removeDir, removeFile } from '../files/file-service.js';
+import { createDir, createFile, removeDir, removeFile } from '../files/file-service.js';
 import cryptoJS from 'crypto-js';
 import { nanoid } from 'nanoid';
 
@@ -78,14 +78,18 @@ async function addUser(body, photo) { // ф-ия добавления новог
             if (user.length === 0) { // если пользователя с таким логином нет, то добавление, иначе отправка сообщения с ошибкой
                 const salt = cryptoJS.SHA256(nanoid(8)).toString(); // генерирую соль для пользователя
                 const hash = hashPass(body.password, salt); // хэш пароля
-                let imgPath = addUserPhoto(photo, `./img/photo/userphoto/${body.login}/`); // сохранение фото пользователя
                 connection.query(
                     `INSERT INTO users (user_login, user_pass, user_staff, user_name, user_surname, user_img_path, user_status, user_salt) 
-                    VALUES ('${body.login}', '${hash}', 'user', '${body.name}', '${body.surname}', '${imgPath.replace('/img', '')}', '${body.status}', '${salt}');`,
+                    VALUES ('${body.login}', '${hash}', 'user', '${body.name}', '${body.surname}', NULL, '${body.status}', '${salt}');`,
                     function(err, results, fields) {
                         console.log(err)
                         if (err) reject(err);
-                        else resolve(results); // отправка результата в ответ на запрос
+                        else {
+                            createDir(`./img/photo/userphoto/${results.insertId}/`);
+                            updateUserPhoto(createFile(`./img/photo/userphoto/${results.insertId}/`, photo), results.insertId)
+                                                .catch(err => reject(err));
+                            resolve(results); // отправка результата в ответ на запрос
+                        }
                     }
                 ); 
             } else {
@@ -114,7 +118,8 @@ async function editUserInfo(body, photos) { // ф-ия добавления но
                                 removeFile(`./img/${photo.slice(22)}`);
                             }
                             for (const photo of photos) {
-                                updateUserPhoto(createFile(`./img/photo/userphoto/${body.userId}/`, photo), body.userId);
+                                updateUserPhoto(createFile(`./img/photo/userphoto/${body.userId}/`, photo), body.userId)
+                                                .catch(err => reject(err));
                             }
                             resolve(results); // отправка результата в ответ на запрос
                         }

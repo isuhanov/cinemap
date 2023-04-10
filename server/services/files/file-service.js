@@ -71,9 +71,5 @@ function createFile(path, file) {
   return `${API_PATH}${path.slice(5)}${fileName}`;
 }
 
-function addUserPhoto(photo, path, id) { // ф-ия добавления фотографий пользователя в папке сервера
-	    
-    return photoPath;
-}
 
-export { removeDir, removeFile, createDir, createFile, addPhotos, addPhotosToDir, addUserPhoto };
+export { removeDir, removeFile, createDir, createFile, addPhotos, addPhotosToDir };

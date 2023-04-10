@@ -69,7 +69,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
     const [surname, setSurname] = useState(new FormField(user?.user_surname, useRef(), onSurnameChange));
     // стейт для статуса
     const [status, setStatus] = useState(new FormField(user?.user_status, useRef(), onStatusChange));
-    // стейт для статуса
+    // стейт для фото
     const [photos, setPhotos] = useState(new FormField(user?.user_img_path ? [{
         id: user.user_id,
         path: user?.user_img_path,
