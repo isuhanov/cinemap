@@ -121,7 +121,7 @@ async function editUserInfo(body, photos) { // ф-ия добавления но
                                 updateUserPhoto(createFile(`./img/photo/userphoto/${body.userId}/`, photo), body.userId)
                                                 .catch(err => reject(err));
                             }
-                            resolve(results); // отправка результата в ответ на запрос
+                            resolve(selectUserById(body.userId)); // отправка результата в ответ на запрос
                         }
                     }
                 ); 

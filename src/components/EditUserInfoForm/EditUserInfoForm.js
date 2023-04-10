@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../../redux/userSlice";
+import { setCurrentUser, setUser } from "../../redux/userSlice";
 import FormField from "../../services/form-services/form-field";
 import { formIsValid, loginFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 import { editUserInfo } from "../../services/user-services/user-service";
@@ -116,6 +116,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
         console.log(formData);
         editUserInfo(formData).then(res => {
             dispatch(setUser(res));
+            dispatch(setCurrentUser(res));
             onClickClose()
         }).catch(err => {
             if (err === 'user exist') {

@@ -18,17 +18,18 @@ async function addUser(user) { // ф-ия добавления пользова�
 async function editUserInfo(user) { // ф-ия изменения информации о пользователе пользователя
     let response = new Promise((resolve, reject) => {
         socket.emit('users:editInfo', user, (res => {
+            console.log(res);
             if (res.status === 'success') {
-                let currentUser = JSON.parse(localStorage.getItem('user'));
-                currentUser = {
-                    ...currentUser,
-                    user_login: user.body.login,
-                    user_name: user.body.name,
-                    user_status: user.body.status, 
-                    user_surname: user.body.surname
-                }
-                localStorage.setItem('user', JSON.stringify(currentUser))
-                resolve(currentUser);
+                // let currentUser = JSON.parse(localStorage.getItem('user'));
+                // currentUser = {
+                //     ...currentUser,
+                //     user_login: user.body.login,
+                //     user_name: user.body.name,
+                //     user_status: user.body.status, 
+                //     user_surname: user.body.surname
+                // }
+                localStorage.setItem('user', JSON.stringify(res.response))
+                resolve(res.response);
             } else if (res.status === 'user exist') {
                 reject(res.status);
             }
