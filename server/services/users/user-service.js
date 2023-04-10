@@ -1,5 +1,5 @@
 import connection from '../db/db-service.js';
-import { addUserPhoto } from '../files/file-service.js';
+import { addUserPhoto, createFile, removeDir, removeFile } from '../files/file-service.js';
 import cryptoJS from 'crypto-js';
 import { nanoid } from 'nanoid';
 
@@ -97,17 +97,27 @@ async function addUser(body, photo) { // ф-ия добавления новог
 }
 
 
-async function editUserInfo(body) { // ф-ия добавления нового пользователя
+async function editUserInfo(body, photos) { // ф-ия добавления нового пользователя
     let response = await new Promise((resolve, reject) => {
         selectUserByLogin(body.login).then(user => {
             console.log(user);
             if (user.length === 0 || user[0].user_id === body.userId) { // если пользователя с таким логином нет или это тот же самый пользователь, то изменение, иначе отправка сообщения с ошибкой
                 connection.query(
-                    `UPDATE users SET user_login = '${body.login}', user_name = '${body.name}', user_surname = '${body.surname}', user_status = '${body.status}' WHERE (user_id = '${body.userId}');`,
+                    `UPDATE users SET user_login = '${body.login}', user_name = '${body.name}', user_surname = '${body.surname}', user_status = '${body.status}' 
+                    ${body.deletePhoto.length > 0 ? ', user_img_path = NULL' : ''} 
+                    WHERE (user_id = '${body.userId}');`,
                     function(err, results, fields) {
                         console.log(err)
                         if (err) reject(err);
-                        else resolve(results); // отправка результата в ответ на запрос
+                        else {
+                            for (const photo of body.deletePhoto) {
+                                removeFile(`./img/${photo.slice(22)}`);
+                            }
+                            for (const photo of photos) {
+                                updateUserPhoto(createFile(`./img/photo/userphoto/${body.userId}/`, photo), body.userId);
+                            }
+                            resolve(results); // отправка результата в ответ на запрос
+                        }
                     }
                 ); 
             } else {
@@ -116,6 +126,18 @@ async function editUserInfo(body) { // ф-ия добавления нового
         }).catch(err => reject(err));
     });
     return response;
+}
+
+function updateUserPhoto(path, userId) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE users SET user_img_path = '${path}' WHERE (user_id = '${userId}');`, // удаление фотографии из БД
+            function(err, results, fields) {
+                if (err) reject(err); // отправка ошибки, если она есть
+                else resolve(results);    
+            }
+        );
+    })
 }
 
 

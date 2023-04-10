@@ -8,7 +8,7 @@ import connection from '../db/db-service.js';
 
 const API_PATH = 'http://localhost:8000';
 
-function removeDir(dir) { // ф-ия удалеения файлов 
+function removeDir(dir) { // ф-ия удалеения папки 
   let files = fs.readdirSync(dir)
   for(var i=0;i<files.length;i++){
     let newPath = path.join(dir, files[i]);
@@ -24,7 +24,7 @@ function removeDir(dir) { // ф-ия удалеения файлов
   fs.rmdirSync(dir)// Если папка пуста, удаляем себя
 }
 
-function removeFile(dir) {
+function removeFile(dir) { // удаление файла
   fs.unlinkSync(dir);
 }
 
@@ -59,16 +59,21 @@ function addPhotosToDir(photos, path, status, locationId) { // ф-ия доба�
   }
 }
 
-function addUserPhoto(photo, path) { // ф-ия добавления фотографий пользователя в папке сервера
+function createDir(path) {
   fs.mkdir(path, (err) => console.log(err)); // создание директории
-  const photoName = nanoid(10) + '.' + photo.name.split('.').pop();
-  fs.writeFile(path + photoName, photo.photo, (err) => {
+}
+
+function createFile(path, file) {
+  const fileName = nanoid(10) + '.' + file.name.split('.').pop();
+  fs.writeFile(path + fileName, file.file, (err) => {
       console.log(err);
   });
-    // let photoName = nanoid(10) + '.' + photo.name.split('.').pop();        
-    // photo.mv(path + photoName); // добавление фото
-    let photoPath = `${API_PATH}${path.slice(1)}${photoName}`; // сохранение ссылки на фото
+  return `${API_PATH}${path.slice(5)}${fileName}`;
+}
+
+function addUserPhoto(photo, path, id) { // ф-ия добавления фотографий пользователя в папке сервера
+	    
     return photoPath;
 }
 
-export { removeDir, removeFile, addPhotos, addPhotosToDir, addUserPhoto };
+export { removeDir, removeFile, createDir, createFile, addPhotos, addPhotosToDir, addUserPhoto };

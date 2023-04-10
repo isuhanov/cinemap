@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on('users:editInfo', (data, callback) => {
-        editUserInfo(data.body).then(response => {
+        editUserInfo(data.body, data.files).then(response => {
             if (response === 'user exist') {
                 callback({status: response});
             } else {

@@ -100,7 +100,7 @@ async function updateLocations(body, files) {
                                 }
                             }
                         );
-                        removeFile(`./img/${photo.locations_photo_path.slice(22)}`)
+                        removeFile(`./img/${photo.locations_photo_path.slice(22)}`);
                     }                    
                     // добавляю новые фотографии, если они имеются
                     let fail;

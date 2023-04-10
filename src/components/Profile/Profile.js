@@ -13,11 +13,6 @@ const Profile = memo(({ onClickOpenLoginForm, onClickOpenRegisterForm, onClickOp
     const dispatch = useDispatch();
     const currentUser = useSelector((state) => state.user.currentUser);
 
-
-    useEffect(() => {
-        console.log(currentUser);
-    }, [currentUser]);
-
     function onClickLogout() {
         logoutUser();
         dispatch(setCurrentUser(undefined));
