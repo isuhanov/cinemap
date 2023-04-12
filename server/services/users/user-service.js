@@ -108,15 +108,17 @@ async function editUserInfo(body, photos) { // ф-ия добавления но
             if (user.length === 0 || user[0].user_id === body.userId) { // если пользователя с таким логином нет или это тот же самый пользователь, то изменение, иначе отправка сообщения с ошибкой
                 connection.query(
                     `UPDATE users SET user_login = '${body.login}', user_name = '${body.name}', user_surname = '${body.surname}', user_status = '${body.status}' 
-                    ${body.deletePhoto.length > 0 ? ', user_img_path = NULL' : ''} 
+                    ${body.deletePhotos.length > 0 ? ', user_img_path = NULL' : ''} 
                     WHERE (user_id = '${body.userId}');`,
                     function(err, results, fields) {
                         console.log(err)
                         if (err) reject(err);
                         else {
-                            for (const photo of body.deletePhoto) {
+                            // удаление строй фотографи пользователя
+                            for (const photo of body.deletePhotos) {
                                 removeFile(`./img/${photo.slice(22)}`);
                             }
+                            // добавление фотографий пользователя
                             for (const photo of photos) {
                                 updateUserPhoto(createFile(`./img/photo/userphoto/${body.userId}/`, photo), body.userId)
                                                 .catch(err => reject(err));
@@ -133,7 +135,7 @@ async function editUserInfo(body, photos) { // ф-ия добавления но
     return response;
 }
 
-function updateUserPhoto(path, userId) {
+function updateUserPhoto(path, userId) { // ф-ия добавление фотографий пользователя в БД
     return new Promise((resolve, reject) => {
         connection.query(
             `UPDATE users SET user_img_path = '${path}' WHERE (user_id = '${userId}');`, // удаление фотографии из БД

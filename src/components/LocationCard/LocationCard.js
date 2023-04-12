@@ -138,7 +138,14 @@ const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDe
                         Фото из фильма:
                     </p>
                     { locationPhoto &&
-                        <PhotoContainer photos={locationPhoto.filter(photo => photo.locations_photo_status === 'film')}/>
+                        <PhotoContainer photos={locationPhoto
+                                                .filter(photo => photo.locations_photo_status === 'film')
+                                                .map(photo => ({
+                                                    id: photo.locations_photo_id,
+                                                    path: photo.locations_photo_path
+                                                }))
+                                            }
+                        />
                     }
                 </div>     
 
@@ -154,7 +161,13 @@ const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDe
                         Фото пользователя:
                     </p>
                     { locationPhoto &&
-                        <PhotoContainer photos={locationPhoto.filter(photo => photo.locations_photo_status === 'user')}/>
+                        <PhotoContainer photos={locationPhoto
+                            .filter(photo => photo.locations_photo_status === 'user')
+                            .map(photo => ({
+                                id: photo.locations_photo_id,
+                                path: photo.locations_photo_path
+                            }))
+                        }/>
                     }
                 </div>            
 

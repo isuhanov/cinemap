@@ -1,10 +1,6 @@
-// const path = require('path');
 import path from 'path'
-// const fs = require('fs');
 import fs from 'fs'
-// const nanoid = require('nanoid')
 import { nanoid } from "nanoid";
-import connection from '../db/db-service.js';
 
 const API_PATH = 'http://localhost:8000';
 
@@ -24,46 +20,15 @@ function removeDir(dir) { // ф-ия удалеения папки
   fs.rmdirSync(dir)// Если папка пуста, удаляем себя
 }
 
-function removeFile(dir) { // удаление файла
+function removeFile(dir) { // ф-ия удаления файла
   fs.unlinkSync(dir);
 }
 
-function addPhotos(id, usersPhoto, filmsPhoto) {  // функция добавления фото
-  fs.mkdir(`./img/photo/locationphoto/${id}`, (err) => console.log(err));
-  fs.mkdir(`./img/photo/locationphoto/${id}/film`, (err) => console.log(err));
-  fs.mkdir(`./img/photo/locationphoto/${id}/user`, (err) => console.log(err));
-  
-  let fail = addPhotosToDir(usersPhoto, `./img/photo/locationphoto/${id}/user/`, 'user', id); 
-  fail = addPhotosToDir(filmsPhoto, `./img/photo/locationphoto/${id}/film/`, 'film', id);
-
-  return fail;
+function createDir(path) { // ф-ия создания директории
+  fs.mkdir(path, (err) => console.log(err));
 }
 
-function addPhotosToDir(photos, path, status, locationId) { // ф-ия добавления фото в папку сервера
-  let photoPath;
-  let photoName;
-  for (const photo of photos) {
-      photoName = nanoid(10) + '.' + photo.name.split('.').pop();
-      fs.writeFile(path + photoName, photo.photo, (err) => {
-          console.log(err);
-      });
-      photoPath = `${API_PATH}${path.slice(5)}${photoName}`;
-      connection.query(
-          `INSERT INTO locations_photos (locations_photo_path, locations_photo_status, location_id) VALUES ('${photoPath}', '${status}', '${locationId}');`,
-          function(err, results, fields) {
-              if (err) {
-                  return err;
-              }
-          }
-      ); 
-  }
-}
-
-function createDir(path) {
-  fs.mkdir(path, (err) => console.log(err)); // создание директории
-}
-
-function createFile(path, file) {
+function createFile(path, file) { // ф-ия создания файла
   const fileName = nanoid(10) + '.' + file.name.split('.').pop();
   fs.writeFile(path + fileName, file.file, (err) => {
       console.log(err);
@@ -72,4 +37,4 @@ function createFile(path, file) {
 }
 
 
-export { removeDir, removeFile, createDir, createFile, addPhotos, addPhotosToDir };
+export { removeDir, removeFile, createDir, createFile };

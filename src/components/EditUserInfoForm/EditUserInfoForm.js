@@ -9,7 +9,7 @@ import ImgPicker from "../ui/ImgPicker/ImgPicker";
 import './EditUserInfoForm.css' 
 
 const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
-    const user = useSelector((state) => state.user.value);
+    const user = useSelector((state) => state.user.currentUser); // получение текущего пользователя
     const dispatch = useDispatch();
 
 
@@ -41,14 +41,14 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
         }))
     }
 
-    const onPhotosChange = useCallback((photos) => {
+    const onPhotosChange = useCallback((photos) => { // обработка значения поля photo
         setPhotos(prev => ({
             ...prev,
             ...photos
         }));
     }, []);
 
-    const setPhotoIsRemove = useCallback((id) => {
+    const setPhotoIsRemove = useCallback((id) => { // изменение статуса фотографии
         setPhotos(prev => ({
             ...prev,
             value: prev.value.map(photo => {
@@ -106,7 +106,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                 name: name.value,
                 surname: surname.value,
                 status: status.value,
-                deletePhoto: photos.value.filter(photo => photo.isRemove && !photo.file).map(photo => photo.path) 
+                deletePhotos: photos.value.filter(photo => photo.isRemove && !photo.file).map(photo => photo.path) 
             },
             files: photos.value.filter(photo => !photo.isRemove && photo.file).map(photo => ({
                 name: photo.file.name,

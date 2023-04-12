@@ -22,14 +22,14 @@ const io = new Server(server);
 
 io.on("connection", (socket) => {
     socket.on('locations:add', (data, callback) => { // при добавлении локации запрос в БД и поднятие события обновления карты
-        addLocations(data.data, data.files).then(location => {
+        addLocations(data.body, data.files).then(location => {
             callback('success');
             io.sockets.emit('map:add', location);
         }).catch(err => callback(err));
     });
 
     socket.on('locations:update', (data, callback) => {
-        updateLocations(data.data, data.files).then(location => {
+        updateLocations(data.body, data.files).then(location => {
             callback('success');
             io.sockets.emit('map:update', location);
         }).catch(err => callback(err));
