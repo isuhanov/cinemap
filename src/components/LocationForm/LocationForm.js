@@ -61,6 +61,7 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
     const setFilmsPhotoIsRemove = useCallback((id) => {  // изменение статуса фотографий фильма
         setFilmsPhoto(prev => ({
             ...prev,
+            isTouched: true,
             value: prev.value.map(photo => {
                 if (photo.id === id) return {
                     ...photo,
@@ -74,6 +75,7 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
     const onFilmsPhotoChange = useCallback((photos) => { // обработка значения поля filmsPhoto
         setFilmsPhoto(prev => ({
             ...prev,
+            isTouched: true,
             ...photos
         }));
     }, []);
@@ -82,6 +84,7 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
     const setUsersPhotoIsRemove = useCallback((id) => {  // изменение статуса фотографии пользователя
         setUsersPhoto(prev => ({
             ...prev,
+            isTouched: true,
             value: prev.value.map(photo => {
                 if (photo.id === id) return {
                     ...photo,
@@ -95,6 +98,7 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
     const onUsersPhotoChange = useCallback((photos) => { // обработка значения поля usersPhoto
         setUsersPhoto(prev => ({
             ...prev,
+            isTouched: true,
             ...photos
         }));
     }, []);
@@ -137,21 +141,21 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
         usersPhoto
     }
 
-    // useEffect(() => {
-    //     // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
-    //     if (form.name.isTouched) textFieldIsValid(form.name, 200);
-    //     if (form.filmName.isTouched) textFieldIsValid(form.filmName, 150);
-    //     if (form.address.isTouched) textFieldIsValid(form.address);
-    //     if (form.route.isTouched) textFieldIsValid(form.route);
-    //     if (form.timing.isTouched) timeFieldIsValid(form.timing);
-    //     if (form.filmsPhoto.isTouched) photosFieldIsValid({ formItem:form.filmsPhoto, isUpdate, photos:locationPhotos, typePhoto:'film' });
-    //     if (form.usersPhoto.isTouched) photosFieldIsValid({ formItem:form.usersPhoto, isUpdate, photos:locationPhotos, typePhoto:'user' });
-    // }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
+    useEffect(() => {
+        // валидация полей формы (работает только при попытке ввода данных в поле из-за isTouched)
+        if (form.name.isTouched) textFieldIsValid(form.name, 200);
+        if (form.filmName.isTouched) textFieldIsValid(form.filmName, 150);
+        if (form.address.isTouched) textFieldIsValid(form.address);
+        if (form.route.isTouched) textFieldIsValid(form.route);
+        if (form.timing.isTouched) timeFieldIsValid(form.timing);
+        if (form.filmsPhoto.isTouched) photosFieldIsValid({ formItem:form.filmsPhoto, minWidth:1 });
+        if (form.usersPhoto.isTouched) photosFieldIsValid({ formItem:form.usersPhoto, minWidth:1 });
+    }, [name.value, filmName.value, address.value, route.value, timing.value, JSON.stringify(filmsPhoto.value), JSON.stringify(usersPhoto.value)])
 
 
 
     function onClickSave() { // обработчик нажатия на кнопку сохранения
-        // if (!formIsValid(form, isUpdate)) return
+        if (!formIsValid(form, isUpdate)) return
         generationData(isUpdate ? putLocation : postLocation);
     }
 

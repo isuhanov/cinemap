@@ -2,7 +2,6 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 
 import './RegisterForm.css';
-import DragAndDropFiles from "../ui/DragAndDropFiles/DragAndDropFiles";
 import { addUser } from "../../services/user-services/user-service";
 import FormField from "../../services/form-services/form-field";
 import { formIsValid, loginFieldIsValid, passswordFieldIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
@@ -45,28 +44,10 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
         }))
     }
 
-
-
-    // const onDropPhoto = useCallback((photos) => { // обработка значения поля photo
-    //     changePhotos(photos, setPhoto);
-    // })
-
-    // function changePhotos(photos, setPhoto) {
-    //     let photosObj;
-    //     if (Array.isArray(photos)) {
-    //         photosObj = {value: photos, isTouched: true};
-    //     } else if (typeof photos === 'object' && photos !== null) {
-    //         photosObj = {...photos};    
-    //     }
-    //     setPhoto(prev => ({
-    //         ...prev,
-    //         ...photosObj
-    //     }))
-    // }
-
     const onPhotosChange = useCallback((photos) => {
         setPhotos(prev => ({
             ...prev,
+            isTouched: true,
             ...photos
         }));
     }, []);
@@ -74,6 +55,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
     const setPhotoIsRemove = useCallback((id) => {
         setPhotos(prev => ({
             ...prev,
+            isTouched: true,
             value: prev.value.map(photo => {
                 if (photo.id === id) return {
                     ...photo,
@@ -114,7 +96,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
         if (form.name.isTouched) textFieldIsValid(form.name, 100);
         if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
         if (form.status.isTouched) textFieldIsValid(form.status, 200, null);
-        if (form.photos.isTouched) photosFieldIsValid({ formItem: form.photos, maxWidth: 1 });
+        if (form.photos.isTouched) photosFieldIsValid({ formItem: form.photos, maxWidth: 1});
     }, [login.value, password.value, name.value, surname.value, status.value, JSON.stringify(photos.value)])
 
 
@@ -264,7 +246,6 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                                 Фото из профиля:                              
                             </label>
                             <ImgPicker photos={photos.value} onChange={onPhotosChange} setIsRemove={setPhotoIsRemove}/>
-                            {/* <DragAndDropFiles photoList={photo.value} onDropFiles={onDropPhoto} /> */}
                             { photos.error && 
                                 <p>
                                     { photos.error }

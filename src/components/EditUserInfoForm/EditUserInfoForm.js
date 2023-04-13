@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentUser, setUser } from "../../redux/userSlice";
 import FormField from "../../services/form-services/form-field";
-import { formIsValid, loginFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
+import { formIsValid, loginFieldIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 import { editUserInfo } from "../../services/user-services/user-service";
 import ImgPicker from "../ui/ImgPicker/ImgPicker";
 
@@ -44,6 +44,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
     const onPhotosChange = useCallback((photos) => { // обработка значения поля photo
         setPhotos(prev => ({
             ...prev,
+            isTouched: true,
             ...photos
         }));
     }, []);
@@ -51,6 +52,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
     const setPhotoIsRemove = useCallback((id) => { // изменение статуса фотографии
         setPhotos(prev => ({
             ...prev,
+            isTouched: true,
             value: prev.value.map(photo => {
                 if (photo.id === id) return {
                     ...photo,
@@ -82,6 +84,7 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
         name,
         surname,
         status,
+        photos
     }
 
     useEffect(() => {
@@ -90,7 +93,8 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
         if (form.name.isTouched) textFieldIsValid(form.name, 100);
         if (form.surname.isTouched) textFieldIsValid(form.surname, 100);
         if (form.status.isTouched) textFieldIsValid(form.status, 200, null);
-    }, [login.value, name.value, surname.value, status.value])
+        if (form.photos.isTouched) photosFieldIsValid({ formItem:form.photos, maxWidth:1 });
+    }, [login.value, name.value, surname.value, status.value, , JSON.stringify(photos.value)])
 
 
     function onClickSave() { //  post-запрос на добавление локации в БД 
@@ -218,11 +222,16 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                                 </p>
                             }
                         </div>
-                        <div className="field-block" ref={status.parent}>
+                        <div className="field-block" ref={photos.parent}>
                             <label htmlFor="location-name">
                                 Фото:
                             </label>
                             <ImgPicker photos={photos.value} onChange={onPhotosChange} setIsRemove={setPhotoIsRemove}/>
+                            { photos.error && 
+                                <p>
+                                    { photos.error }
+                                </p>
+                            }
                         </div>
                     </form>
                 </div>

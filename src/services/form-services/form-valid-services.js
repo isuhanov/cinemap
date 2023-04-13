@@ -17,6 +17,7 @@ function textFieldIsValid(formItem, max = undefined, min=0) { // ф-ия для 
     }
 }
 
+
 function loginFieldIsValid(formItem) {
     if (formItem.value.length === 0) {
         formItem.parent.current.classList.add('error');
@@ -46,6 +47,7 @@ function loginFieldIsValid(formItem) {
     }
 }
 
+
 function passswordFieldIsValid(formItem) {
     if (formItem.value.length < 8) {
         formItem.parent.current.classList.add('error');
@@ -74,6 +76,7 @@ function passswordFieldIsValid(formItem) {
         })
     }
 }
+
 
 function timeFieldIsValid(formItem, max = undefined) { // ф-ия для валидации полей времени
     if (formItem.value.length === 0) {
@@ -107,54 +110,26 @@ function timeFieldIsValid(formItem, max = undefined) { // ф-ия для вал�
     }
 }
 
-function photosFieldIsValid({ formItem, maxWidth=undefined, isUpdate=false, photos=undefined, typePhoto=undefined }) { // ф-ия для валидации полей фотографий
-    let fieldIsValid = true;
-    if (formItem.value.length === 0 && !isUpdate) {
-    // if (formItem.value.length === 0) {
+
+function photosFieldIsValid({formItem, maxWidth=undefined, minWidth=0}) {
+    if (formItem.value.filter(photo => !photo.isRemove).length < minWidth) {
         formItem.parent.current.classList.add('error');
         formItem.set({
-            error: 'Пустое поле'
-        })
-        fieldIsValid = false;
-    } else if (formItem.value.length > maxWidth) {
-        formItem.parent.current.classList.add('error');
-        formItem.set({
-            error: 'Можно внести только 1 элемент'
-        })
-        fieldIsValid = false;
-    } else {
-        const extentions = ['jpg', 'jpeg', 'png']
-        formItem.value.forEach(file => {
-            if (!extentions.includes(file.name.split('.').pop().toLowerCase())) {
-                formItem.parent.current.classList.add('error');
-                formItem.set({
-                    error: 'Разрешены только файлы с расширениеми: jpg, jpeg, png'
-                })
-                fieldIsValid = false;
-            }                    
+            error: `Минимальная длина - ${minWidth}`
         });
-    }
-
-    if (isUpdate) {
-        const countPhoto = photos.filter(photo => photo.photo.locations_photo_status === typePhoto).length;
-        const countRemovedPhoto = photos.filter(photo => (photo.photo.locations_photo_status === typePhoto && photo.status === false)).length;
-
-        if (formItem.value.length === 0 && countPhoto === countRemovedPhoto) {
-            formItem.parent.current.classList.add('error');
-            formItem.set({
-                error: 'Должна иметься хотя бы одна фотография'
-            });
-            fieldIsValid = false;
-        } 
-    }
-    
-    if (fieldIsValid) {
+    } else if (formItem.value.filter(photo => !photo.isRemove).length > maxWidth) {
+        formItem.parent.current.classList.add('error');
+        formItem.set({
+            error: `Максимальная длина - ${maxWidth}`
+        });
+    } else {
         formItem.parent.current.classList.remove('error');
         formItem.set({
             error: '',
-        })
+        });
     }
 }
+
 
 function formIsValid(form, isUpdate=false, optionalField=[]) {
     let isValid = true;
