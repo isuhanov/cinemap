@@ -6,6 +6,7 @@ import ChatItem from "../ChatItem/ChatItem";
 import UserBox from "../UserBox/UserBox";
 
 import './Messenger.css';
+import ChatCreateForm from "../../ChatCreateForm/ChatCreateForm";
 
 const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, openUser }) => {
     const [chats, setChats] = useState([]); // стейт для списка чатов
@@ -13,6 +14,8 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
     const [showsChatCard, openChatCard, closeChatCard] = useOpen('move-left', onReload, 0);  // стейт для чата
     const [mode, setMode] = useState("chats");  // стейт для режима отображения
     const userId = JSON.parse(localStorage.getItem('user'))?.user_id;
+
+    const [showsChatCreate, openChatCreate, closeChatCreate] = useOpen('move-left', onReload);  // стейт для формы создание ячата
 
     async function update() {  // ф-ия обновления списков списка 
         return new Promise((resolve, reject) => {
@@ -89,6 +92,9 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                         <button className={`${mode === 'users' ? 'btn-is-active': 'btn-is-disabled'} header-btn `} onClick={() => setMode('users')}>
                             <span className="material-symbols-outlined">person_search</span>
                         </button>
+                        <button className="header-btn" onClick={openChatCreate}>
+                            <span className="material-symbols-outlined">add</span>
+                        </button>
                         <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
@@ -154,6 +160,13 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                         otherClassName={showsChatCard.visibleClass}
                     />
                 }
+
+                { showsChatCreate.isVisible && 
+                    <ChatCreateForm 
+                        onClickClose={closeChatCreate}
+                        otherClassName={showsChatCreate.visibleClass}/>
+                }
+
             </div>
 
             

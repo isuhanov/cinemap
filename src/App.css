@@ -106,7 +106,7 @@ body {
 
 /* ------------------------------ error form --------------------------------------- */
 
-.error p{
+.error > p{
   color: red;
   font-size: 13px;
   padding: 2px 10px 0;
@@ -144,9 +144,14 @@ body {
 .location-card__main {
     height: 510px;
 }
+.chat-create-form__main,
 .location-form__main {
     height: 600px;
+    max-height: 600px;
+    overflow: auto;
 }
+
+ 
 
 
 /* ------------------------------ btn-container in footer --------------------------------------- */
@@ -317,6 +322,39 @@ body {
   background-color: rgba(221, 235, 255, 1);
   resize: none;
 }
+
+
+.checkbox-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
 
 
 /* ------------------------------ show/hide animations --------------------------------------- */

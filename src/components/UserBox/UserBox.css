@@ -7,7 +7,8 @@
     padding: 5px 15px;
 }
 
-.messenger-main .user-box {
+.messenger-main .user-box,
+.select-user .user-box {
     border-bottom: none;
     flex-direction: row-reverse;
     justify-content: flex-end;
@@ -27,6 +28,10 @@
 
 .user-box:active {
     background-color: rgba(172, 172, 172, 0.637);
+}
+
+.user-checkbox:hover {
+    background-color: initial;
 }
 
 .user-box-username {

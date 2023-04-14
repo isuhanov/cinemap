@@ -4,7 +4,7 @@ import './UserBox.css'
 
 const UserBox = memo(({ user, openUser, otherClassName }) => {
     return (
-        <div className={`user-box ${otherClassName}`} onClick={() => openUser(user)}>
+        <div className={`user-box ${otherClassName}`} onClick={() => (openUser && openUser(user))}>
             <p className="user-box-username">
                 { `${user.user_login}`  }
             </p>

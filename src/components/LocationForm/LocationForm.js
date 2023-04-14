@@ -354,13 +354,6 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
                             <label>
                                 Фото из фильма:                              
                             </label>
-                            {/* { isUpdate &&
-                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} 
-                                photos={locationPhotos.filter(photo => photo.photo.locations_photo_status === 'film')
-                                                    .map(photo => photo.photo)} 
-                                />
-                            }
-                            <DragAndDropFiles photoList={filmsPhoto.value} onDropFiles={onDropFilmsPhoto} /> */}
                             <ImgPicker photos={filmsPhoto.value} onChange={onFilmsPhotoChange} setIsRemove={setFilmsPhotoIsRemove}/>
                             { filmsPhoto.error && 
                                 <p>
@@ -379,18 +372,6 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
                                     { usersPhoto.error }
                                 </p>
                             }
-                            {/* { isUpdate &&
-                                <PhotoContainer isUpdate={isUpdate} onRemovePhotos={onRemovePhotos} 
-                                photos={locationPhotos.filter(photo => photo.photo.locations_photo_status === 'user')
-                                                    .map(photo => photo.photo)} 
-                                />
-                            }
-                            <DragAndDropFiles photoList={usersPhoto.value} onDropFiles={onDropUsersPhoto} />
-                            { usersPhoto.error && 
-                                <p>
-                                    { usersPhoto.error }
-                                </p>
-                            } */}
                         </div>
                     </form>
                 </div>

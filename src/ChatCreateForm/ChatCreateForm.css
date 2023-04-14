@@ -1,0 +1,23 @@
+.select-user-conatiner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    overflow: auto;
+    padding: 10px;
+    max-height: 150px;
+}
+
+.select-user {
+    padding: 0 20px;
+}
+
+.select-user .user-search {
+    margin: 0;
+}
+
+.users-list {
+    max-height: 300px;
+    overflow: auto;
+}
