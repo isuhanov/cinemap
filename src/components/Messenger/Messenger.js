@@ -4,9 +4,9 @@ import useOpen from "../../services/hooks/useOpen";
 import ChatCard from "../ChatCard/ChatCard";
 import ChatItem from "../ChatItem/ChatItem";
 import UserBox from "../UserBox/UserBox";
+import ChatCreateForm from "../ChatCreateForm/ChatCreateForm";
 
 import './Messenger.css';
-import ChatCreateForm from "../../ChatCreateForm/ChatCreateForm";
 
 const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, openUser }) => {
     const [chats, setChats] = useState([]); // стейт для списка чатов

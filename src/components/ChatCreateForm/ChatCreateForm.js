@@ -1,12 +1,12 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import FormField from "../services/form-services/form-field";
-import ImgPicker from "../components/ui/ImgPicker/ImgPicker";
-import UserBox from "../components/UserBox/UserBox";
-import socket from "../lib/socket/socket";
-import SelectedUserItem from "../components/ui/SelectedUserItem/SelectedUserItem";
-import { formIsValid, photosFieldIsValid, textFieldIsValid } from "../services/form-services/form-valid-services";
+import FormField from "../../services/form-services/form-field";
+import ImgPicker from "../ui/ImgPicker/ImgPicker";
+import UserBox from "../UserBox/UserBox";
+import socket from "../../lib/socket/socket";
+import SelectedUserItem from "../ui/SelectedUserItem/SelectedUserItem";
+import { formIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 
 import './ChatCreateForm.css';
 
