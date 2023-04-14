@@ -164,6 +164,7 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                 { showsChatCreate.isVisible && 
                     <ChatCreateForm 
                         onClickClose={closeChatCreate}
+                        openChatCard={openChatCard}
                         otherClassName={showsChatCreate.visibleClass}/>
                 }
 

@@ -6,13 +6,13 @@ import ImgPicker from "../components/ui/ImgPicker/ImgPicker";
 import UserBox from "../components/UserBox/UserBox";
 import socket from "../lib/socket/socket";
 import SelectedUserItem from "../components/ui/SelectedUserItem/SelectedUserItem";
-import { photosFieldIsValid, textFieldIsValid } from "../services/form-services/form-valid-services";
+import { formIsValid, photosFieldIsValid, textFieldIsValid } from "../services/form-services/form-valid-services";
 
 import './ChatCreateForm.css';
 
-const ChatCreateForm = memo(({ onClickClose, otherClassName }) => {
-    const [users, setUsers] = useState([]);
-    const currentUser = useSelector((state) => state.user.currentUser);
+const ChatCreateForm = memo(({ onClickClose, openChatCard, otherClassName }) => {
+    const [users, setUsers] = useState([]); // стейт для списка пользователей
+    const currentUser = useSelector((state) => state.user.currentUser); // стейт для текущего пользователя
 
     const [searchValue, setSearchValue] = useState('');  // стейт для значения поля поиска
     const [isVisibleBtn, setIsVisibleBtn] = useState(false); // стейт для отображения кнопки отмены поиска
@@ -33,19 +33,16 @@ const ChatCreateForm = memo(({ onClickClose, otherClassName }) => {
     }
 
 
-    async function update() {  // ф-ия обновления списков списка 
+    async function update() {  // ф-ия обновления списка пользователей 
         socket.emit(`users:get`, currentUser.user_id, (response) => {
             if (response.status === 'success') setUsers(response.users);
-            console.log(response.users);
         });
     }
 
-    useEffect(() => {
-        socket.emit(`users:get`, currentUser.user_id, (response) => {
-            if (response.status === 'success') setUsers(response.users);
-            console.log(response.users);
-        });
+    useEffect(() => { // получение пользователей
+        update();
     }, []);
+
 
     const onNameChange = (name) => { // обработка значения поля названия локации
         setName(prev => ({
@@ -76,15 +73,15 @@ const ChatCreateForm = memo(({ onClickClose, otherClassName }) => {
         }));
     }, []);
 
-    const onSelectedUsersChange = (users) => { // обработка значения поля usersPhoto
+    const onSelectedUsersChange = (users) => { // обработка значения поля selectedUsers
         setSelectedUsers(prev => ({
             ...prev,
             ...users
         }));
     };
 
-    const setSelectedUsersChecked = (user) => {
-        selectedUsers.value.find(selectedUser => selectedUser.id === user.id) ? 
+    const setSelectedUsersChecked = (user) => { // ф-ия изменения выбора пользователя
+        selectedUsers.value.find(selectedUser => selectedUser.id === user.id) ?  // если пользователь выбран, то список фильтруется, иначе пользователь добавляется
             onSelectedUsersChange({value: selectedUsers.value.filter(selectedUser => selectedUser.id !== user.id), isTouched: true})
         :
             onSelectedUsersChange({value: [...selectedUsers.value, user], isTouched: true});
@@ -112,6 +109,44 @@ const ChatCreateForm = memo(({ onClickClose, otherClassName }) => {
         if (form.name.isTouched) textFieldIsValid(form.name, 200);
         if (form.photo.isTouched) photosFieldIsValid({ formItem:form.photo, maxWidth:1 });
     }, [name.value, JSON.stringify(photo.value)])
+
+
+    function onClickCreate() { //  post-запрос на добавление локации в БД 
+        if (!formIsValid(form, false)) return;
+        post();
+    }
+
+    function post() {
+        const formData = {
+            name: name.value,
+            photo: photo.value.filter(photo => !photo.isRemove).map(photo => ({
+                name: photo.file.name,
+                file: photo.file
+            }))[0],
+            users: [...selectedUsers.value.map(user => ({user_id: user.id})), {user_id: currentUser.user_id}]
+        }
+
+        socket.emit('chats:create', formData, (response) => { // создание чата
+            if (response.status === 'success'){
+                const body = {
+                    chat_messege_text: `${currentUser.user_login} начал чат ${name.value}`,
+                    chat_messege_is_read: 0,
+                    chat_messege_is_edit: 0,
+                    chat_messege_type: 'info',
+                    chat_messege_reply_id: null,
+                    chat_id: response.chatId,
+                    user_id: currentUser.user_id
+                }
+                socket.emit('messages:add', body, (status) => { // добавление сообщения о начале чата
+                    if (status !== 'success') console.log(status);
+                    else {
+                        onClickClose();
+                        openChatCard({chatId: response.chatId});
+                    }
+                });
+            }
+        })
+    }
 
     return (
         <div className={`location-card chat-card ${otherClassName}`}>
@@ -220,7 +255,7 @@ const ChatCreateForm = memo(({ onClickClose, otherClassName }) => {
                 </div>
                 <footer>
                     <div className="btn-container form-btn-container">
-                        <button type="button" className="location-form-btn-edit btn btn-blue">
+                        <button onClick={onClickCreate} type="button" className="location-form-btn-edit btn btn-blue">
                             Создать
                         </button>
                     </div>

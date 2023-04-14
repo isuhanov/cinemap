@@ -1,14 +1,21 @@
 import connection from '../db/db-service.js';
+import { createDir, createFile } from '../files/file-service.js';
 
 
 async function createChat(body) { // ф-ия создания чата
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `INSERT INTO chats (chat_name, chat_photo_path) VALUES (${null}, ${null});`,
+            `INSERT INTO chats (chat_name, chat_photo_path) VALUES ('${body.name}', NULL);`,
             function(err, results, fields) {
-                addUsersToChat(results.insertId, body.users).then(res => {
-                    resolve(results.insertId);
-                }).catch(err => reject(err));
+                if (err) reject(err);
+                else {
+                    addUsersToChat(results.insertId, body.users).then(res => {
+                        createDir(`./img/photo/chatphoto/${results.insertId}/`);
+                        updateChatPhoto(createFile(`./img/photo/chatphoto/${results.insertId}/`, body.photo), results.insertId)
+                                        .catch(err => reject(err));
+                        resolve(results.insertId);
+                    }).catch(err => reject(err));
+                }
             }
         )   
     });
@@ -29,6 +36,18 @@ async function addUsersToChat(chatId, users) { // ф-ия добавления �
         )   
     });
     return response;
+}
+
+function updateChatPhoto(path, chatId) { // ф-ия добавление фотографий пользователя в БД
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE chats SET chat_photo_path = '${path}' WHERE (chat_id = '${chatId}');`, // удаление фотографии из БД
+            function(err, results, fields) {
+                if (err) reject(err); // отправка ошибки, если она есть
+                else resolve(results);    
+            }
+        );
+    })
 }
 
 async function selectChats(userId) { // ф-ия получения всех чатов пользователя
@@ -86,9 +105,6 @@ async function selectChatInfo(chatId) { // ф-ия получения инфор
                 if (err) reject(err);
                 else {
                     selectChatUsers(chatId).then(users => {
-                        if (users.length > 2) {
-                            resolve({chat:results[0]});
-                        }
                         resolve({chat:results[0], users});
                     }).catch(err => reject(err));
                 }

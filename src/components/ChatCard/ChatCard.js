@@ -284,6 +284,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                                     }
                                     <ChatMessage
                                                 text={message.message.chat_messege_text}
+                                                type={message.message.chat_messege_type}
                                                 isRead={message.message.chat_messege_is_read}
                                                 isEdit={message.message.chat_messege_is_edit}
                                                 isSender={userId === message.message.user_id}
