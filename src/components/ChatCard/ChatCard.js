@@ -24,6 +24,27 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     const userId = JSON.parse(localStorage.getItem('user')).user_id; // стейт для id текущего пользователя
 
 
+    function getMessage(lastId=undefined) {
+        return new Promise((resolve, reject) => {
+            socket.emit('messages:get', stateChatId, lastId, (response) => { // получение списка сообщений 
+                if (response.status === 'success') {
+                    response.messages.map(message => {
+                        setMessages(prevMess => [
+                            {
+                                message,
+                                ref: undefined
+                            },
+                            ...prevMess,
+                        ])
+                    })
+                    resolve(response);
+                } 
+                else reject(response);
+            });
+        });
+    }
+
+
     // const socket = useRef(null); // постоянная ссылка на сокет
     useEffect(() => {
         socket.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
@@ -48,21 +69,26 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             }
           });
 
-        socket.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
-            setMessages([]);
-            if (response.status === 'success') {
-                response.messages.map(message => {
-                    setMessages(prevMess => [
-                        ...prevMess,
-                        {
-                            message,
-                            ref: undefined
-                        }
-                    ])
-                })
-                setFirstUnreadMessage(response.messages.filter(message => !message.chat_messege_is_read)[0]);
-            }
-        });
+          setMessages([]);
+          getMessage()
+            .then(res => setFirstUnreadMessage(res.messages.filter(message => !message.chat_messege_is_read)[0]))
+            .catch(err => console.log(err));
+
+        // socket.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
+        //     setMessages([]);
+        //     if (response.status === 'success') {
+        //         response.messages.reverse().map(message => {
+        //             setMessages(prevMess => [
+        //                 ...prevMess,
+        //                 {
+        //                     message,
+        //                     ref: undefined
+        //                 }
+        //             ])
+        //         })
+        //         setFirstUnreadMessage(response.messages.filter(message => !message.chat_messege_is_read)[0]);
+        //     }
+        // });
         
         socket.on('messages:update_list', (message) => { // изменение списка сообщений
             if (message.chat_id === chatId) {   
@@ -119,6 +145,7 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                 setIsFirstScroll(false);
             } else { // иначе скрол вниз, если последнее сообщение в поле видимости  
                 if ((chatRef.current.scrollTop + chatRef.current.offsetHeight) > (lastMessage?.ref?.offsetTop - chatRef.current.offsetTop)) {
+
                     chatRef.current.scrollTo({top: scrollToRefs.current?.offsetTop - chatRef.current.offsetTop + 10});
                 }
             }
@@ -142,6 +169,13 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                 })
             }
         })
+
+        if (e.target.scrollTop < messages[0].ref.offsetTop) {
+            console.log('load');
+            console.dir(chatRef.current);
+            getMessage(messages[0].message.chat_messege_id);
+        }
+        
     }
 
 

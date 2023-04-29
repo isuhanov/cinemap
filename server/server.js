@@ -123,8 +123,8 @@ io.on("connection", (socket) => {
         }).catch(err => callback(err));
     });
 
-    socket.on('messages:get', (chatId, callback) => { // отправка списка сообщений
-        selectMessages(chatId).then(messages=> {
+    socket.on('messages:get', (chatId, lastId, callback) => { // отправка списка сообщений
+        selectMessages(chatId, lastId).then(messages=> {
             callback({status:'success', messages});
         }).catch(err => callback(err));
     });

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo } from 'react';
 import PhotoContainer from '../PhotoContainer/PhotoContainer';
 
 import './ImgPicker.css'

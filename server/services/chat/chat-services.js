@@ -127,10 +127,10 @@ async function selectChatUsers(chatId) { // ф-ия получения поль�
     return response;
 }
 
-async function selectMessages(chatId) { // ф-ия получения всех сообщений чата 
+async function selectMessages(chatId, lastId) { // ф-ия получения всех сообщений чата 
     let response = await new Promise((resolve, reject) => {
         connection.query(
-            `SELECT * FROM chats_messeges WHERE chat_id = ${chatId} and is_deleted = 0;`,
+            `SELECT * FROM chats_messeges WHERE chat_id = ${chatId} and is_deleted = 0 ${lastId ? 'and chat_messege_id < ' + lastId: ''} order by chat_messege_id desc limit 500;`,
             function(err, results, fields) {
                 if (err) reject(err);
                 else resolve(results); // отправка результата в ответ на запрос

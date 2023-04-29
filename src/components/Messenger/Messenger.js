@@ -92,9 +92,11 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                         <button className={`${mode === 'users' ? 'btn-is-active': 'btn-is-disabled'} header-btn `} onClick={() => setMode('users')}>
                             <span className="material-symbols-outlined">person_search</span>
                         </button>
-                        <button className="header-btn" onClick={openChatCreate}>
-                            <span className="material-symbols-outlined">add</span>
-                        </button>
+                        { userId &&
+                            <button className="header-btn" onClick={openChatCreate}>
+                                <span className="material-symbols-outlined">add</span>
+                            </button>
+                        }
                         <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
