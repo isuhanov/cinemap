@@ -28,3 +28,11 @@
 .location-list__item {
     padding: 8px 10px;
 }
+
+
+@media (max-width: 575px) {
+    .location-list {
+        min-width: 50%;
+        margin: 10px;
+    }
+}

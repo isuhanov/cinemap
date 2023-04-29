@@ -112,14 +112,41 @@
     border-bottom: 1px solid #4E4E4E;
     max-height: 32px;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .profile-card__address {
     font-size: 14px;
     max-height: 28px;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .profile-card__btn-container {
     gap: 10px;
+}
+
+
+
+@media (max-width: 575px) {
+    .profile-card {
+        width: 80%;
+    }
+
+    .profile-card__header,
+    .profile-card__info,
+    .profile-card__subtitle-block,
+    .profile-card__locations {
+        margin: auto 10px;
+    }
+
+    .profile-card__info p,
+    .profile-card__film,
+    .profile-card__subtitle {font-size: 15px;}
+
+    .profile-card__btn-container {
+        flex-direction: column;
+    }
 }

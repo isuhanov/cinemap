@@ -29,7 +29,7 @@ const Profile = memo(({ onClickOpenLoginForm, onClickOpenRegisterForm, onClickOp
             </button>
             { menuIsVisible && (
                 <ClickAwayListener onClickAway={() => setMenuVisible(false)}>
-                    <div className="profile__menu menu">
+                    <div className="menu profile__menu ">
                         <nav>
                             <ul>
                                 { currentUser ? 

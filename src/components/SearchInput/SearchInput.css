@@ -3,6 +3,7 @@
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.296);
+    background-color: white;
 }
 
 .search__input {
@@ -40,4 +41,12 @@
 .clean-btn:active {
     background-color: #9f2549;
     color: white;
+}
+
+@media (max-width: 575px) {
+    .search__input {
+        width: 80%;
+        font-size: 14px;
+        padding: 10px;
+    }
 }
