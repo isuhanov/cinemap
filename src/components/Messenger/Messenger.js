@@ -84,6 +84,9 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                 <header className="header-card messenger-card__header">
                     <p className="location-card-title title">
                         Мессенджер
+                        <button className="header-btn adaptive-close" onClick={onClickClose}>
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
                     </p>
                     <div className="header-btn-container">
                         <button className={`${mode === 'chats' ? 'btn-is-active' : 'btn-is-disabled'} header-btn `} onClick={() => setMode('chats')}>

@@ -1,7 +1,11 @@
 .timing-block {
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 70px;
-    padding: 10px 30px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.timing-block p {
+    width: 100%;
 }

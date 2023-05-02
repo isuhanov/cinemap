@@ -52,3 +52,8 @@
     background: #757d8b;
     align-self: flex-start;
 }
+
+@media (max-width: 575px) {
+    .chat-messege-text { font-size: 12px; }
+    .chat-messege__time { font-size: 9px; }
+}

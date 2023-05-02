@@ -104,3 +104,7 @@
     background-color: #ddebff93;
     border-radius: 6px;
 }
+
+@media (max-width: 575px) {
+    .chat-card { width: 100%; }
+}

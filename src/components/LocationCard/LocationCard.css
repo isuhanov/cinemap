@@ -33,11 +33,6 @@
     font-size: 13px;
 }
 
-
-
-
-
-
 .location-films-timing span{
     margin-right: 5px;
 }
@@ -51,4 +46,18 @@
 
 .location-card-btn-container {
     justify-content: space-between;
+}
+
+
+@media (max-width: 380px) {
+    .location-card {
+        width: 80%;
+        left: 10%;
+        margin: 0 0 20px 0;
+    }
+    .location-card__film { font-size: 13px; }
+    .location-card-btn-container {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
 }

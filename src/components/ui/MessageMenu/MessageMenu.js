@@ -14,7 +14,7 @@ const MessageMenu = memo(({ messageInfo, onEditClick, onDeleteClick, onReplyClic
     }, [messageInfo])
 
     return (
-        <div className="message-menu menu" ref={ref} style={coord}>
+        <div className="menu message-menu" ref={ref} style={coord}>
             <nav>
                 <ul>
                     <li onClick={onReplyClick} className="message-menu__item menu-item">Ответить<span className="material-symbols-outlined">reply</span></li>

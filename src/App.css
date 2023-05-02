@@ -50,11 +50,17 @@ body {
 .title {
   font-size: 22px;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .subtitle {
   font-weight: 700;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .blue-fon-text {
@@ -325,8 +331,8 @@ body {
 
 .checkbox-container {
   position: relative;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: auto 90%;
   align-items: center;
   width: 100%;
 }
@@ -479,7 +485,9 @@ body {
 @media (max-width: 575px) {
   /* CSS для ширины до 575px (включительно) */
   * { font-size: 13px; }
-  .title {font-size: 19px; }
+  .title {
+    font-size: 19px;
+  }
 
   .container .profile-block,
   .container .search-input-block,
@@ -495,10 +503,18 @@ body {
     margin-top: 30px;
   }
 
+  .header-btn-container {
+    gap: 5px;
+  }
+
   .search-input-block {
     width: 100%;
     padding-left: 20px;
   }
 
   .btn {min-width: initial;}
+
+  .form {
+    width: 80%;
+  }
 }
