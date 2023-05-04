@@ -49,7 +49,7 @@
 }
 
 
-@media (max-width: 380px) {
+@media (max-width: 380px), (max-height: 730px)  {
     .location-card {
         width: 80%;
         left: 10%;

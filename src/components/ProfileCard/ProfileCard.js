@@ -47,61 +47,64 @@ const ProfileCard = memo(({ onClickClose, onClickOpenLocation, otherClassName, o
                         </button>
                     </div>
                 </div>
-                <header className="profile-card__header">
-                    <ProfileAvatar imgSrc={user.user_img_path} otherClassName="profile-card__avatar"/>
-                    <p className="profile-card__login title">{ user.user_login }</p>
-                    <button className="profile-card__btn header-btn">
-                        { userId === user.user_id ?
-                                <span onClick={openEditInfoForm} className="material-symbols-outlined">edit</span>
-                            :
-                                <span onClick={() => {
-                                    openChat(user.user_id);
-                                    onClickClose();
-                                }} className="material-symbols-outlined">chat</span>
-                        }
-                    </button>
-                </header>
-                <div className="profile-card__info">
-                    <p>{ user.user_surname }</p>
-                    <p>{ user.user_name }</p>
-                    <div className="blue-fon-text">
-                        <p className="profile-card__status">{ user.user_status }</p>
-                    </div>
-                </div>
-                <div className="profile-card__subtitle-block">
-                    <p className="subtitle profile-card__subtitle">Локации:</p>
-                </div>
+                <div className="profile-card__main">
 
-                <div className="profile-card__locations">
-                    <div className="profile-card__locations-wrapper">
-                        { locations.length > 0 ? locations.map(location => {
-                            return (
-                                <div key={location.location_id} className="profile-card__location-item blue-fon-text">
-                                    <div className="profile-card__location-text">
-                                        <p className="profile-card__film">{ location.location_film }</p>
-                                        <p className="profile-card__address">{ location.location_name }</p>
-                                    </div>
-                                    <div className="header-btn-container profile-card__btn-container">
-                                        { userId &&
-                                            <button className={`header-btn ${location.favourite_id && 'btn-is-favorite'}`} onClick={() => onFavoritesBtnClick(location.location_id, location.favourite_id)}>
-                                                <span className="material-symbols-outlined">
-                                                    { location.favourite_id ? 'bookmark_added' : 'bookmark'}
-                                                </span>
+                    <header className="profile-card__header">
+                        <ProfileAvatar imgSrc={user.user_img_path} otherClassName="profile-card__avatar"/>
+                        <p className="profile-card__login title">{ user.user_login }</p>
+                        <button className="profile-card__btn header-btn">
+                            { userId === user.user_id ?
+                                    <span onClick={openEditInfoForm} className="material-symbols-outlined">edit</span>
+                                :
+                                    <span onClick={() => {
+                                        openChat(user.user_id);
+                                        onClickClose();
+                                    }} className="material-symbols-outlined">chat</span>
+                            }
+                        </button>
+                    </header>
+                    <div className="profile-card__info">
+                        <p>{ user.user_surname }</p>
+                        <p>{ user.user_name }</p>
+                        <div className="blue-fon-text">
+                            <p className="profile-card__status">{ user.user_status }</p>
+                        </div>
+                    </div>
+                    <div className="profile-card__subtitle-block">
+                        <p className="subtitle profile-card__subtitle">Локации:</p>
+                    </div>
+
+                    <div className="profile-card__locations">
+                        <div className="profile-card__locations-wrapper">
+                            { locations.length > 0 ? locations.map(location => {
+                                return (
+                                    <div key={location.location_id} className="profile-card__location-item blue-fon-text">
+                                        <div className="profile-card__location-text">
+                                            <p className="profile-card__film">{ location.location_film }</p>
+                                            <p className="profile-card__address">{ location.location_name }</p>
+                                        </div>
+                                        <div className="header-btn-container profile-card__btn-container">
+                                            { userId &&
+                                                <button className={`header-btn ${location.favourite_id && 'btn-is-favorite'}`} onClick={() => onFavoritesBtnClick(location.location_id, location.favourite_id)}>
+                                                    <span className="material-symbols-outlined">
+                                                        { location.favourite_id ? 'bookmark_added' : 'bookmark'}
+                                                    </span>
+                                                </button>
+                                            }
+                                            <button className="header-btn" onClick={() =>{
+                                                        onClickOpenLocation(location.location_id, [location.location_latitude, location.location_longitude]);
+                                                        onClickClose();
+                                                    }}>
+                                                <span className="material-symbols-outlined">pin_drop</span>
                                             </button>
-                                        }
-                                        <button className="header-btn" onClick={() =>{
-                                                    onClickOpenLocation(location.location_id, [location.location_latitude, location.location_longitude]);
-                                                    onClickClose();
-                                                }}>
-                                            <span className="material-symbols-outlined">pin_drop</span>
-                                        </button>
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        }) :
-                            'К сожалению здесь пока нет записей :(' }
-                    </div>
+                                );
+                            }) :
+                                'К сожалению здесь пока нет записей :(' }
+                        </div>
 
+                    </div>
                 </div>
             { showsEditInfoForm.isVisible && 
                 <EditUserInfoForm 

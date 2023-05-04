@@ -149,12 +149,15 @@ const ChatCreateForm = memo(({ onClickClose, openChatCard, otherClassName }) => 
     }
 
     return (
-        <div className={`location-card chat-card ${otherClassName}`}>
+        <div className={`location-card chat-card chat-create-card ${otherClassName}`}>
             <header className="header-card chat-card__header">
                 <p className="location-card-title title">
                     Создание чата
                 </p>
                 <div className="header-btn-container">
+                    <button className="header-btn" onClick={onClickCreate} type="button">
+                        <span className="material-symbols-outlined">done</span>
+                    </button>
                     <button className="header-btn" onClick={onClickClose}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -253,13 +256,6 @@ const ChatCreateForm = memo(({ onClickClose, openChatCard, otherClassName }) => 
                         </div>
                     </form>
                 </div>
-                <footer>
-                    <div className="btn-container form-btn-container">
-                        <button onClick={onClickCreate} type="button" className="location-form-btn-edit btn btn-blue">
-                            Создать
-                        </button>
-                    </div>
-                </footer>                 
         </div>
     );
 });

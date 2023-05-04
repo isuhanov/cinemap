@@ -143,6 +143,9 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                         Регистрация
                     </p>
                     <div className="header-btn-container">
+                        <button type="button" onClick={onClickSave} className="header-btn" >
+                            <span className="material-symbols-outlined">done</span>
+                        </button>
                         <button className="header-btn" onClick={ () => {
                             onClickClose();
                         }}>
@@ -254,13 +257,6 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                         </div>
                     </form>
                 </div>
-                <footer>
-                    <div className="form-btn-container btn-container">
-                        <button type="button" onClick={onClickSave} className="register-form-btn-auth btn btn-blue">
-                            Зарегистрироваться
-                        </button>
-                    </div>
-                </footer>
             </div>
         </div>
     )

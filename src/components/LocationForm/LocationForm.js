@@ -257,6 +257,9 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
                         { isUpdate ?  'Редактирование локации:' : 'Добавление локации:'}
                     </p>
                     <div className="header-btn-container">
+                        <button type="button" onClick={onClickSave} className="header-btn" >
+                            <span className="material-symbols-outlined">done</span>
+                        </button>
                         <button className="header-btn" onClick={() => {
                             onClickClose();
                         }}>
@@ -375,13 +378,6 @@ const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, oth
                         </div>
                     </form>
                 </div>
-                <footer>
-                    <div className="btn-container form-btn-container">
-                        <button type="button" onClick={onClickSave} className="location-form-btn-edit btn btn-blue">
-                            Сохранить
-                        </button>
-                    </div>
-                </footer>
             </div>
         </div>
     )

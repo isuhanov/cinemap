@@ -100,6 +100,22 @@ const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, o
                                 <span className="material-symbols-outlined">add</span>
                             </button>
                         }
+                        <div className="user-search search-adaptive">
+                            <input onChange={e => {
+                                        onSearchChange(e);
+                                    }} value={searchValue} 
+                            placeholder="Поиск..." className="subsearch-input"/>
+                            { isVisibleBtn &&
+                                <button onClick={() => {
+                                    setSearchValue('');
+                                    setIsVisibleBtn(false);
+                                    update();
+                                }} className="subsearch-btn clean-btn">
+                                    <span className="material-symbols-outlined" >close</span>
+                                </button>  
+                            }
+
+                        </div>
                         <button className="header-btn" onClick={onClickClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>

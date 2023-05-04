@@ -106,15 +106,16 @@ const LoginForm = memo(({ onClickClose, otherClassName }) => {
                                 </p>
                             }
                         </div>
-                    </form>
-                </div>
-                <footer>
-                    <div className="form-btn-container btn-container">
+                        <div className="form-btn-container btn-container">
                         <button type="button" onClick={onClickAuth} className="login-form-btn-auth btn btn-blue">
                             Войти
                         </button>
                     </div>
-                </footer>
+                    </form>
+                </div>
+                {/* <footer className="login-form__footer">
+                    
+                </footer> */}
             </div>
         </div>
     )

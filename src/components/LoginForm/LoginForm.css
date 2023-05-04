@@ -3,3 +3,26 @@
 }
 
 
+@media (max-height: 730px) {
+    .login-form-conrainer {
+        padding-bottom: 0;    
+    }  
+}
+
+@media (max-height: 230px) {
+    .login-form {
+        height: 90%;
+        overflow: hidden;
+    }
+    .login-form__main {
+        height: 90%;
+        overflow-y: scroll;
+        padding-bottom: 5px;
+    }
+    .login-form__footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 5%;
+    }
+}
