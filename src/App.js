@@ -8,7 +8,7 @@ import LocationCard from './components/LocationCard/LocationCard';
 import LocationForm from './components/LocationForm/LocationForm';
 import LocationList from './components/LocationList/LocationList';
 import LoginForm from './components/LoginForm/LoginForm';
-import Profile from './components/Profile/Profile';
+import ProfileMenu from './components/ProfileMenu/ProfileMenu';
 import ProfileCard from './components/ProfileCard/ProfileCard';
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import SearchInput from './components/SearchInput/SearchInput';
@@ -19,11 +19,14 @@ import { closeCard, openCard, showCard } from './services/open-close-services/op
 import useOpen from './services/hooks/useOpen';
 import Filter from './components/Filter/Filter';
 import { setUser } from './redux/userSlice';
+import ProfileAvatar from './components/ui/ProfileAvatar/ProfileAvatar';
 
 
 function App() {
   const dispatch = useDispatch();
   const locations = useSelector((state) => state.locations.value);
+  const currentUser = useSelector((state) => state.user.currentUser);
+
 
   useEffect(() => {
     dispatch(connect());
@@ -91,6 +94,8 @@ function App() {
   const [showsFilter, openFilter, closeFilter] = useOpen('slide', onReload);
 
   const [showsSideBar, openSideBar, closeSideBar] = useOpen('cover', onReload);
+
+  const [showsProfileMenu, openProfileMenu, closeProfileMenu] = useOpen('cover', onReload);
 
   return (
       <div className="App">
@@ -182,11 +187,22 @@ function App() {
           </div>
         }
 
+      { showsProfileMenu.isVisible && 
+          <div className={`form-conrainer ${showsProfileMenu.visibleClass}`}>
+            <ProfileMenu user={JSON.parse(localStorage.getItem('user'))}
+              onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}
+              onClickOpenProfileCard={openProfileCard}
+              onClick={closeProfileMenu}
+              />
+          </div>
+        }
+
         <div className="container">
           <div className="profile-block">
-            <Profile user={JSON.parse(localStorage.getItem('user'))}
-                    onClickOpenLoginForm={openLoginForm} onClickOpenRegisterForm={openRegisterForm}
-                    onClickOpenProfileCard={openProfileCard}/>
+            <button className="profile__avatar-btn" onClick={openProfileMenu}>
+                <ProfileAvatar imgSrc={currentUser ? currentUser.user_img_path : null} otherClassName="profile__avatar-circle" isProfile={true}/>
+                <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
+            </button>
           </div>
           <div className="search-input-block">
             <SearchInput onReload={onReload}/>  
