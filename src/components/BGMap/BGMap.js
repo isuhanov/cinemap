@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LatLng, Map, TileLayer } from 'leaflet';
+import { LatLng, Map, Marker, TileLayer } from 'leaflet';
 import { memo, useEffect, useState } from 'react';
 
 import '../../App.css';
@@ -20,12 +20,14 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const dispatch = useDispatch();
 
   function setLocationsMarker(locations) {
+    // console.log(markers);
     for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
       map.removeLayer(marker);
     }
     setMarkers([]);
     // ----------- очищаю маркеры ------------------
     for (const location of locations) {
+      // console.log(location);
       const lat = location.location_latitude; 
       const lng = location.location_longitude; 
 
@@ -34,9 +36,11 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
       
       const filterLocations = locations.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
       if (filterLocations.length > 1) {
-        addListMarker(setMarkers, map, marker, () => {
-          openLocationList(filterLocations)
-        }) 
+        if (filterLocations[0].location_id === location.location_id) { // если id совпадают, значит маркера с этим списком еще нет, иначе такой маркер уже имеется 
+          addListMarker(setMarkers, map, marker, () => {
+            openLocationList(filterLocations)
+          }) 
+        }
         continue;
       }
 
@@ -73,6 +77,7 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   useEffect(() => {
     if (map) {
       if (filterOptions) {
+        console.log(filterOptions);
         let filterLocations = 
         [
           ...locations.filter(location => (
@@ -85,6 +90,7 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
               location.location_film.toLowerCase().includes(filterOptions.film.toLowerCase())
             ))
         ];
+        console.log(filterLocations);
         setLocationsMarker(filterLocations);
 
       } else {
