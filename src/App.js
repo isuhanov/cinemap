@@ -90,6 +90,8 @@ function App() {
 
   const [showsFilter, openFilter, closeFilter] = useOpen('slide', onReload);
 
+  const [showsSideBar, openSideBar, closeSideBar] = useOpen('cover', onReload);
+
   return (
       <div className="App">
         <BGMap reload={isReload} markerPos={markerPos} 
@@ -171,6 +173,14 @@ function App() {
         } 
 
 
+        { showsSideBar.isVisible && 
+          <div className={`form-conrainer ${showsSideBar.visibleClass}`}>
+            <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
+                    onClickMessenger={() => openMessangers(undefined)}  openFilter={openFilter}
+                    onClick={closeSideBar}
+                    />
+          </div>
+        }
 
         <div className="container">
           <div className="profile-block">
@@ -188,8 +198,18 @@ function App() {
                   onClickClose={closeFilter}
               />
             }
-            <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
-                    onClickMessenger={() => openMessangers(undefined)}  openFilter={openFilter}/>
+
+            <div className="menu-container">
+              <SideBar onClickAdd={openLocationForm} onClickFavorites={openFavoritesList}
+                      onClickMessenger={() => openMessangers(undefined)}  openFilter={openFilter}/>
+            </div>
+
+            <div className="burger-menu">
+                <button className="profile-avatar" onClick={openSideBar}>
+                    <span className="material-symbols-outlined">menu</span> 
+                    <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
+                </button>
+            </div>
           </div>
         </div>
       </div>

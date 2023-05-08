@@ -25,7 +25,7 @@ const Profile = memo(({ onClickOpenLoginForm, onClickOpenRegisterForm, onClickOp
         <div className="profile">
             <button className="profile__avatar-btn" onClick={() => setMenuVisible(true)}>
                 <ProfileAvatar imgSrc={currentUser ? currentUser.user_img_path : null} otherClassName="profile__avatar-circle" isProfile={true}/>
-                <div className="profile__avatar__plane"></div> {/* Для добавление затемнения при наведении */}
+                <div className="profile__avatar__plane"></div>
             </button>
             { menuIsVisible && (
                 <ClickAwayListener onClickAway={() => setMenuVisible(false)}>
