@@ -15,6 +15,7 @@
     z-index: 100;
     background-color: white;
     width: 550px;
+    padding-bottom: 15px;
     border-radius: 10px;
     overflow: hidden;
     display: flex;
@@ -23,7 +24,6 @@
 
 .profile-card__main {
     height: 640px;
-    padding-bottom: 15px;
     overflow-y: scroll;
     flex-grow: 2;
 }

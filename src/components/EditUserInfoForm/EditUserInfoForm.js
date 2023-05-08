@@ -143,6 +143,9 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                     Редактирование профиля
                 </p>
                 <div className="header-btn-container">
+                    <button type="button" onClick={onClickSave} className="header-btn" >
+                            <span className="material-symbols-outlined">done</span>
+                        </button>
                     <button className="header-btn" onClick={onClickClose}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -235,13 +238,6 @@ const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
                         </div>
                     </form>
                 </div>
-                <footer>
-                    <div className="btn-container form-btn-container">
-                        <button onClick={onClickSave} type="button" className="location-form-btn-edit btn btn-blue">
-                            Сохранить
-                        </button>
-                    </div>
-                </footer>
         </div>
     );
 });
