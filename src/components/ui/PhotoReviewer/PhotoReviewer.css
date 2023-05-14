@@ -1,0 +1,49 @@
+.photo-reviewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 150;
+    background-color: rgba(0, 0, 0, 0.79);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-reviewer__card {
+    background-color: white;
+    width: 600px;
+    height: 600px;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.photo-reviewer__card-header {
+    flex-direction: row-reverse;
+}
+
+.photo-reviewer__img-container {
+    width: 100%;
+    flex-grow: 1;
+    background-color: rgba(221, 235, 255, 0.618);
+    height: 95%;
+}
+
+.photo-reviewer__img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%; 
+    object-fit: contain;
+}
+
+@media (max-width: 767px), (max-height: 730px) {
+    .photo-reviewer__card {
+        width: 90%;
+        height: 90%;
+    }
+}

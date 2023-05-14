@@ -20,6 +20,7 @@ import useOpen from './services/hooks/useOpen';
 import Filter from './components/Filter/Filter';
 import { setUser } from './redux/userSlice';
 import ProfileAvatar from './components/ui/ProfileAvatar/ProfileAvatar';
+import PhotoReviewer from './components/ui/PhotoReviewer/PhotoReviewer';
 
 
 function App() {
@@ -196,6 +197,9 @@ function App() {
               />
           </div>
         }
+
+
+        <PhotoReviewer />
 
         <div className="container">
           <div className="profile-block">
