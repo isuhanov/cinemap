@@ -27,6 +27,7 @@
 }
 
 .photo-reviewer__img-container {
+    position: relative;
     width: 100%;
     flex-grow: 1;
     background-color: rgba(221, 235, 255, 0.618);
@@ -40,6 +41,22 @@
     max-height: 100%; 
     object-fit: contain;
 }
+
+.btn-arrow {
+    position: absolute;
+    top: 50%;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: color .1s linear;
+}
+.btn-arrow:hover { color: #5c9dff; }
+.btn-arrow:active { color: #29508a; }
+
+.btn-arrow-left { left: 0; }
+.btn-arrow-right { right: 0; }
 
 @media (max-width: 767px), (max-height: 730px) {
     .photo-reviewer__card {

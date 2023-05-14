@@ -4,15 +4,19 @@ import { createSlice } from "@reduxjs/toolkit";
 export const photoReviewerSlice = createSlice({
     name: 'photoReviewer',
     initialState: {
-      src: 'http://localhost:8000/photo/locationphoto/1/film/TLJXxJV9Tb.jpg',
+      srcArr: [],
+      index: 0
     },
     reducers: {
-        setPhotoReviewerSrc: (state, action) => {
-            state.src = action.payload;
+        setPhotoReviewerSrcArr: (state, action) => {
+            state.srcArr = action.payload;
         },
+        setPhotoReviewerIndex: (state, action) => {
+            state.index = action.payload;
+        }
     }
 });
 
-export const { setsetPhotoReviewerSrcUser } = photoReviewerSlice.actions;
+export const { setPhotoReviewerSrcArr, setPhotoReviewerIndex } = photoReviewerSlice.actions;
 
 export default photoReviewerSlice.reducer;
