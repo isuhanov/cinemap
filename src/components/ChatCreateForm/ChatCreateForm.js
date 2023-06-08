@@ -10,6 +10,8 @@ import { formIsValid, photosFieldIsValid, textFieldIsValid } from "../../service
 
 import './ChatCreateForm.css';
 
+
+// компонент формы создания многопользовательского чата
 const ChatCreateForm = memo(({ onClickClose, openChatCard, otherClassName }) => {
     const [users, setUsers] = useState([]); // стейт для списка пользователей
     const currentUser = useSelector((state) => state.user.currentUser); // стейт для текущего пользователя

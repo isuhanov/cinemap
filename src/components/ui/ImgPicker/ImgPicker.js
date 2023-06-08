@@ -4,6 +4,7 @@ import PhotoContainer from '../PhotoContainer/PhotoContainer';
 import './ImgPicker.css'
 import { nanoid } from '@reduxjs/toolkit';
 
+// компонент поля выбора фотография
 const ImgPicker = memo(({ photos, onChange, setIsRemove }) => {
     return (
         <div className="img-picker">

@@ -2,6 +2,7 @@ import { memo } from 'react';
 import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 import './UserBox.css'
 
+// компонент элемента пользоватлея
 const UserBox = memo(({ user, openUser, otherClassName }) => {
     return (
         <div className={`user-box ${otherClassName}`} onClick={() => (openUser && openUser(user))}>

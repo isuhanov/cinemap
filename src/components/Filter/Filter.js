@@ -4,6 +4,7 @@ import { setFilter } from '../../redux/locationsSlice';
 
 import './Filter.css';
 
+// компонент фильтра
 const Filter = memo(({ otherClassName, onClickClose }) => {
     const [name, setName] = useState('');
     const [film, setFilm] = useState('');

@@ -14,6 +14,8 @@ import FormField from "../../services/form-services/form-field";
 import socket from "../../lib/socket/socket";
 import ImgPicker from "../ui/ImgPicker/ImgPicker";
 
+
+// компонент формы добавления/редактирования локации
 const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, otherClassName }) => {
     const onNameChange = (name) => { // обработка значения поля названия локации
         setName(prev => ({

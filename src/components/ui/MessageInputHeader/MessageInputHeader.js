@@ -2,13 +2,13 @@ import { memo } from "react";
 
 import './MessageInputHeader.css'
 
+// компонент шапки для поля ввода при редактировании/ответе на сообщение
 const MessageInputHeader = memo(({ title, text, type, onClickClose }) => {
 
     return (
         <div className="message-input-header">
             <div className="input-header-logo">
                 <span className="material-symbols-outlined">{ type }</span>
-                {/* <span className="material-symbols-outlined">reply</span> */}
             </div>
             <div className="input-header-text">
                 <p className="input-header-title">

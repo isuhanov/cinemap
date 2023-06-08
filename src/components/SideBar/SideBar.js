@@ -4,6 +4,7 @@ import { ClickAwayListener } from '@mui/material';
 import './SideBar.css';
 import '../../App.css';
 
+// компонент сайд-бара
 const SideBar = memo(({ onClickAdd, onClickFavorites, onClickMessenger, openFilter, onClick }) => {
     return (
         <div className="side-bar-container ">
@@ -20,7 +21,7 @@ const SideBar = memo(({ onClickAdd, onClickFavorites, onClickMessenger, openFilt
                             { localStorage.getItem('user') &&
                                 <li onClick={onClickMessenger} className="side-bar__item menu-item">Мессенджер<span className="material-symbols-outlined">mode_comment</span></li>
                             }
-                            <li className="side-bar__item menu-item">Маршрут<span className="material-symbols-outlined">pin_drop</span></li>
+                            {/* <li className="side-bar__item menu-item">Маршрут<span className="material-symbols-outlined">pin_drop</span></li> */}
                             { localStorage.getItem('user') &&
                                 <li onClick={onClickFavorites} className="side-bar__item menu-item">Избранное<span className="material-symbols-outlined">bookmark</span></li>
                             }

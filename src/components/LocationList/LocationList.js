@@ -2,6 +2,7 @@ import { memo } from 'react';
 
 import './LocationList.css';
 
+// компонент списка локаций
 const LocationList = memo(({ title, locations, onClose, openLocationCard, otherClassName }) => {
 
     return (

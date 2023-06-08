@@ -1,5 +1,6 @@
 import { memo } from "react";
 
+// компонент описания сообщения (время прихода/чтение)
 const ChatMessageDesr = memo(({ time, containerClass, timeClass, statusClass, checkClass, isEdit, isRead=false, isSender=true }) => {
     
     function getLocalTime(utcTime) { // ф-ия получения локального времени

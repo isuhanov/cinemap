@@ -10,6 +10,8 @@ import { useDispatch } from "react-redux";
 import { setWithFavoutites } from "../../redux/locationsSlice";
 import { setCurrentUser } from "../../redux/userSlice";
 
+
+// компонент формы авторизации
 const LoginForm = memo(({ onClickClose, otherClassName }) => {
     const dispatch = useDispatch();
 

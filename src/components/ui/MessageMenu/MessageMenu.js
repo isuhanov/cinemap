@@ -3,6 +3,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import '../../../App.css';
 import './MessageMenu.css'
 
+// компонент меню сообщений (ответить, изменить, удалить и тд)
 const MessageMenu = memo(({ messageInfo, onEditClick, onDeleteClick, onReplyClick }) => {
     const ref = useRef();
     const [coord, setCoord] = useState({});

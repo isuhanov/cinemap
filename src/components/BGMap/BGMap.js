@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addLocations, deleteLocations, setActions, setLocations, updateLocations } from '../../redux/locationsSlice';
 import socket from '../../lib/socket/socket';
 
+
+// компонент карты
 const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const [map, setMap] = useState(null); 
   const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте
@@ -20,20 +22,17 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const dispatch = useDispatch();
 
   function setLocationsMarker(locations) {
-    // console.log(markers);
     for (const marker of markers) { // если имеется маркер с координатами из БД, то не открепляю
       map.removeLayer(marker);
     }
     setMarkers([]);
     // ----------- очищаю маркеры ------------------
     for (const location of locations) {
-      // console.log(location);
       const lat = location.location_latitude; 
       const lng = location.location_longitude; 
 
       const marker = createMarker(lat, lng);
 
-      
       const filterLocations = locations.filter(filterLoc => filterLoc.location_latitude === lat && filterLoc.location_longitude === lng);
       if (filterLocations.length > 1) {
         if (filterLocations[0].location_id === location.location_id) { // если id совпадают, значит маркера с этим списком еще нет, иначе такой маркер уже имеется 
@@ -59,7 +58,6 @@ const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
       ],
       center: new LatLng(45.040034, 38.975828),
       zoom: 2.5,
-      // zoom: 13,
       zoomControl: false
     }));
   }, []);

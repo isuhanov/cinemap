@@ -2,6 +2,7 @@ import { memo } from "react";
 
 import './TimingInput.css'
 
+// компонент поля ввода тайминга
 const TimingInput = memo(({ value, setValue }) => {
     function setTimingValue(event) {
         if (!(event.target.value.split(':').reduce((res ,el) => !isNaN(el), true))) return;  // если элемент между ':' не является числом, то возвращается false (выход из функции); (isNaN('123') = false - проверка на число)

@@ -4,6 +4,7 @@ import './PhotoContainer.css'
 import { useDispatch } from "react-redux";
 import { setPhotoReviewerIndex, setPhotoReviewerSrcArr } from "../../../redux/photoReviewerSlice";
 
+// компонент контейнера фотографий
 const PhotoContainer = memo(({ photos = [], isUpdate, onClickRemove }) => {
     const dispatch = useDispatch();
 

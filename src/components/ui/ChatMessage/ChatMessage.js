@@ -4,6 +4,7 @@ import MessageHeader from "../MessageHeader/MessageHeader";
 
 import './ChatMessage.css'
 
+// компонент пузырька сообщения
 const ChatMessage = forwardRef(({ text, type, isRead, isEdit=false, time, isSender, openMenu, replyMessageId, setReady }, ref) => {
     
     return (

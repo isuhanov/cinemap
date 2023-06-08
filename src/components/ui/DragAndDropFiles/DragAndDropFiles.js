@@ -2,6 +2,7 @@ import { memo, useState } from "react";
 
 import './DragAndDropFiles.css';
 
+// компонент ДрагАндДропа фалйов
 const DragAndDropFiles = memo(({ photoList, onDropFiles }) => {
     const [drag, setDrag] = useState(false);
     const [fileList, setFileList] = useState(photoList);

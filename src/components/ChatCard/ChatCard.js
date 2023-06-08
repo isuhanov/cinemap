@@ -10,6 +10,7 @@ import { ClickAwayListener } from '@mui/material';
 import socket from "../../lib/socket/socket";
 
 
+// компонент карточки чата
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onReload }) => {
     const [stateChatId, setStateChatId] = useState(chatId);
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
@@ -74,22 +75,6 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
             .then(res => setFirstUnreadMessage(res.messages.filter(message => !message.chat_messege_is_read)[0]))
             .catch(err => console.log(err));
 
-        // socket.emit('messages:get', stateChatId, (response) => { // получение списка сообщений 
-        //     setMessages([]);
-        //     if (response.status === 'success') {
-        //         response.messages.reverse().map(message => {
-        //             setMessages(prevMess => [
-        //                 ...prevMess,
-        //                 {
-        //                     message,
-        //                     ref: undefined
-        //                 }
-        //             ])
-        //         })
-        //         setFirstUnreadMessage(response.messages.filter(message => !message.chat_messege_is_read)[0]);
-        //     }
-        // });
-        
         socket.on('messages:update_list', (message) => { // изменение списка сообщений
             if (message.chat_id === chatId) {   
                 setMessages(prevMess => [
@@ -335,7 +320,6 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
                                                         })
                                                     ]);
                                                 }}
-                                                // rescroll={setIsRescroll}
                                                 openMenu={() => openMenu(message.message.chat_messege_id)}
                                     />
                                 </div>

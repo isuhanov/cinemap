@@ -4,6 +4,7 @@ import './PhotoReviewer.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPhotoReviewerIndex, setPhotoReviewerSrcArr } from '../../../redux/photoReviewerSlice';
 
+// компонент для просмотра фотографий
 const PhotoReviewer = memo(() => {
     const srcArr = useSelector((state) => state.photoReviewer.srcArr);
     const index = useSelector((state) => state.photoReviewer.index);

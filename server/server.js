@@ -1,5 +1,5 @@
 import mysql from 'mysql2'
-import express, { response } from 'express'
+import express from 'express'
 import bodyParser from 'body-parser'
 import fileUpload from 'express-fileupload'
 import cors from 'cors'

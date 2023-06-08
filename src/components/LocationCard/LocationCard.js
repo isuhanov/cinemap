@@ -12,6 +12,8 @@ import API_SERVER_PATH from "../../lib/api/api-path";
 import { closeCard, showCard } from "../../services/open-close-services/open-close-services";
 import { setFavouriteId } from "../../redux/locationsSlice";
 
+
+// компонент карточки локации
 const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDelete, openUser }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий

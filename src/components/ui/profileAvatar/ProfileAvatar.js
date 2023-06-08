@@ -3,6 +3,7 @@ import { memo } from "react";
 import './ProfileAvatar.css'
 import { useSelector } from "react-redux";
 
+// компонент фотографий профилей
 const ProfileAvatar = memo(({imgSrc, otherClassName, isProfile=false}) => {
     const currentUser = useSelector((state) => state.user.currentUser);
     

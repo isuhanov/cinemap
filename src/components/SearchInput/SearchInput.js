@@ -5,7 +5,7 @@ import '../../App.css';
 import { setFilter } from '../../redux/locationsSlice';
 import './SearchInput.css';
 
-
+// компонент поля поиска 
 const SearchInput = memo(({ onReload }) => {
     const [searchValue, setSearchValue] = useState(''); // стейт для значения поля поиска
     const [visibleBtn, setVisibleBtn] = useState(true); // стейт состояния кнопки поиска (лупа/крест)

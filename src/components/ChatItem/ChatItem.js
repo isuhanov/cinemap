@@ -5,10 +5,11 @@ import ProfileAvatar from "../ui/ProfileAvatar/ProfileAvatar";
 
 import './ChatItem.css';
 
+// компонент элемента в списке чато
 const ChatItem = memo(({ chatId, onClick }) => {
-    const [chatName, setChatName] = useState('');
-    const [chatAvatar, setChatAvatar] = useState('');
-    const [chatLastMess, setChatLastMess] = useState('');
+    const [chatName, setChatName] = useState(''); // стейт для имени чата
+    const [chatAvatar, setChatAvatar] = useState(''); // стейт для фотографии чата
+    const [chatLastMess, setChatLastMess] = useState(''); // стейт для хранения последнего сообщения
     
     useEffect(() => { // обновление айтем чата
         getChatInfo();

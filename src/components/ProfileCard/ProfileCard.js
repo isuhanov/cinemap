@@ -9,6 +9,8 @@ import './ProfileCard.css';
 import EditUserInfoForm from "../EditUserInfoForm/EditUserInfoForm";
 import useOpen from "../../services/hooks/useOpen";
 
+
+// компонент карточки профиля
 const ProfileCard = memo(({ onClickClose, onClickOpenLocation, otherClassName, openChat, onReload }) => {
     const [showsEditInfoForm, openEditInfoForm, closeEditInfoForm] = useOpen('move-left', onReload);  // стейт формы
     const userId = JSON.parse(localStorage.getItem('user'))?.user_id; // стейт для id текущего пользователя

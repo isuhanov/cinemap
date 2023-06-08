@@ -1,13 +1,12 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-
 import './RegisterForm.css';
 import { addUser } from "../../services/user-services/user-service";
 import FormField from "../../services/form-services/form-field";
 import { formIsValid, loginFieldIsValid, passswordFieldIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 import ImgPicker from "../ui/ImgPicker/ImgPicker";
 
-
+// компонент формы регистрации
 const RegisterForm = memo(({ onClickClose, otherClassName }) => {
     const onLoginChange = (login) => { // обработка значения поля login
         setLogin(prev => ({
@@ -156,7 +155,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                 <div className="register-form__main">
                     <form>
                         <div className="field-block" ref={login.parent}>
-                            <label htmlFor="registerform-login">
+                            <label >
                                 Логин:
                             </label>
                             <input value={login.value} 
@@ -173,7 +172,7 @@ const RegisterForm = memo(({ onClickClose, otherClassName }) => {
                             }
                         </div>
                         <div className="field-block" ref={password.parent}>
-                            <label htmlFor="location-name">
+                            <label >
                                 Пароль:
                             </label>
                             <input type="password" 

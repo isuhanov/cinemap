@@ -8,6 +8,7 @@ import ProfileAvatar from '../ui/ProfileAvatar/ProfileAvatar';
 import './ProfileMenu.css'
 import { setCurrentUser } from '../../redux/userSlice';
 
+// компонент карточки меню работы с профилем
 const ProfileMenu = memo(({ onClickOpenLoginForm, onClickOpenRegisterForm, onClickOpenProfileCard, onClick }) => {
     const dispatch = useDispatch();
     const currentUser = useSelector((state) => state.user.currentUser);

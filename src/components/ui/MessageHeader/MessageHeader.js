@@ -3,6 +3,7 @@ import socket from "../../../lib/socket/socket";
 
 import './MessageHeader.css'
 
+// компонент шапки сообщения (для отвеченного сообщения)
 const MessageHeader = memo(({ messageId, setReady }) => {
     const [message, setMessage] = useState(undefined); // стейт для сообщения
 

@@ -3,6 +3,7 @@ import ProfileAvatar from "../ProfileAvatar/ProfileAvatar";
 
 import './SelectedUserItem.css';
 
+// компонент для пузырьков выбранных пользователей (при создании чата)
 const SelectedUserItem = memo(({ user, onClickRemove }) => {
 
     return (
