@@ -9,7 +9,23 @@ import ImgPicker from "../ui/ImgPicker/ImgPicker";
 import './EditUserInfoForm.css' 
 
 
-// компонент формы редактирования пользователя
+/**
+ * EditUserInfoForm - компонент формы редактирования пользователя
+ * 
+ * Переменные:
+ * user - текущий пользователь
+ * login - стейт для логина
+ * name - стейт для имени
+ * surname - стейт для фамилии
+ * status - стейт для статуса
+ * photos - стейт для фото
+ * form - объект для хранения полей формы
+ * 
+ * Функции:
+ * onClickCreate - событие клика по кнопке создания
+ * post - добавление в БД
+ * 
+ */
 const EditUserInfoForm = memo(({ otherClassName, onClickClose }) => {
     const user = useSelector((state) => state.user.currentUser); // получение текущего пользователя
     const dispatch = useDispatch();

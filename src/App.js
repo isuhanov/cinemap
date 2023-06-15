@@ -1,3 +1,45 @@
+/**
+ * 
+ * Название: Cinemap
+ * Разработал: Суханов И.А.
+ * Группа: ТИП-81
+ * Дата и номер версии: 8.06.23 v1.2
+ * Язык: JavaScript
+ * Краткое описание: Социальая сеть с возможностью сохранять на карте локации из фильмов
+ * 
+ * Здание:
+ * 1) Смоделировать систему
+ * 2) Разработать дизайн
+ * 3) Обеспечить работу с картой
+ * 4) Реализовать CRUD локаций
+ * 5) Реализовать чат
+ * 
+ * Использованные компоненты:
+ * LocationCard - карточка локации
+ * LocationForm - форма локации
+ * LocationList - список локаций
+ * LoginForm - форма авторизации
+ * ProfileMenu - меню профиля
+ * ProfileCard - карточка профиля
+ * RegisterForm - форма регистрации
+ * SearchInput - поле поиска
+ * SideBar - сайд-бар меню
+ * Messenger - мессенджер
+ * 
+ * 
+ *  
+ * App - главный компонент приложения
+ * 
+ * Переменные:
+ * locations - массив локаций
+ * currentUser - текущий пользователь
+ * markerPos - позиция маркера
+ * 
+ */
+
+
+
+
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { connect } from './redux/socketSlice';

@@ -5,7 +5,20 @@ import '../../App.css';
 import { setFilter } from '../../redux/locationsSlice';
 import './SearchInput.css';
 
-// компонент поля поиска 
+/**
+ * SearchInput - компонент поля поиска
+ * 
+ * Переменные:
+ * searchValue
+ * visibleBtn
+ * 
+ * Функции:
+ * onSearchBtnClick - ф-ия для кнопки поиска
+ * onCloseBtnClick - ф-ия для кнопки очистки
+ * onSearchBlur - ф-ия для расфокуса поля ввода
+ * 
+ * 
+ */ 
 const SearchInput = memo(({ onReload }) => {
     const [searchValue, setSearchValue] = useState(''); // стейт для значения поля поиска
     const [visibleBtn, setVisibleBtn] = useState(true); // стейт состояния кнопки поиска (лупа/крест)

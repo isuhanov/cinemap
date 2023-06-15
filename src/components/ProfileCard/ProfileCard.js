@@ -10,7 +10,20 @@ import EditUserInfoForm from "../EditUserInfoForm/EditUserInfoForm";
 import useOpen from "../../services/hooks/useOpen";
 
 
-// компонент карточки профиля
+/**
+ * ProfileCard - компонент карточки профиля
+ * 
+ * Переменные:
+ * userId -  стейт для id текущего пользователя
+ * user - выбранный пользователь
+ * locations - локации пользователя 
+ * 
+ * Функции: 
+ * onFavoritesBtnClick - ф-ия обработки нажатия флажка избранного
+ * addToFavorites - ф-ия добавления в "Избранное"
+ * removeFromFavorites - ф-ия удаления из "Избранное"
+ * 
+ */
 const ProfileCard = memo(({ onClickClose, onClickOpenLocation, otherClassName, openChat, onReload }) => {
     const [showsEditInfoForm, openEditInfoForm, closeEditInfoForm] = useOpen('move-left', onReload);  // стейт формы
     const userId = JSON.parse(localStorage.getItem('user'))?.user_id; // стейт для id текущего пользователя

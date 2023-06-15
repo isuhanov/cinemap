@@ -11,7 +11,18 @@ import { setWithFavoutites } from "../../redux/locationsSlice";
 import { setCurrentUser } from "../../redux/userSlice";
 
 
-// компонент формы авторизации
+/**
+ * LoginForm - компонент формы авторизации
+ * 
+ * Переменные:
+ * login - стейт для логина
+ * password - стейт для пароля
+ * 
+ * Функции:
+ * onClickAuth - ф-ия авторизации
+ * setError - ф-ия установки ошибок
+ * 
+ */
 const LoginForm = memo(({ onClickClose, otherClassName }) => {
     const dispatch = useDispatch();
 

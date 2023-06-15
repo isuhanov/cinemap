@@ -10,7 +10,30 @@ import { ClickAwayListener } from '@mui/material';
 import socket from "../../lib/socket/socket";
 
 
-// компонент карточки чата
+/**
+ * ChatCard - компонент карточки чата
+ * 
+ * Переменные:
+ * stateChatId -  стейт для айди чата
+ * messages - стейт для списка сообщений
+ * users - стейт для списка пользователей
+ * unreadMessage - стейт для списка непрочитанных сообщений
+ * firstUnreadMessage - стейт для списка непрочитанных сообщений
+ * sendValue - стейт для поля ввода 
+ * chatName - стейт для имени чата
+ * chatAvatar - стейт для аватара чата
+ * userId -  стейт для id текущего пользователя
+ * 
+ * Функции:
+ * getMessage - получение сообщений
+ * readMessageOnScroll - чтение сообщений при скроле 
+ * onEditClick - событие клика кнопки изменения
+ * onReplyClick - событие клика кнопки ответа
+ * onDeleteClick - событие клика кнопки удаления
+ * createChat - создание чата
+ * sendMessage - отправка сообщений
+ * 
+ */
 const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onReload }) => {
     const [stateChatId, setStateChatId] = useState(chatId);
     const [messages, setMessages] = useState([]); // стейт для списка сообщений
@@ -46,7 +69,6 @@ const ChatCard = memo(({ chatId, onClickClose, otherClassName, openUserId, onRel
     }
 
 
-    // const socket = useRef(null); // постоянная ссылка на сокет
     useEffect(() => {
         socket.emit('chats:getInfo', stateChatId, (response) => { // получение информации о чате
             if (response.status === 'success') { 

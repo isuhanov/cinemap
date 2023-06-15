@@ -11,7 +11,21 @@ import { addLocations, deleteLocations, setActions, setLocations, updateLocation
 import socket from '../../lib/socket/socket';
 
 
-// компонент карты
+/**
+ * BGMap - компонент карты
+ * 
+ * Переменные:
+ * map - переменная объекта карты
+ * markers - массив маркеров
+ * locations - массив локаицй
+ * action - переменная действия пользователя
+ * filterOptions - настройки фильтрации
+ * withFavoutites - состояние выборки локаций (с или без избранного)
+ * 
+ * Функции:
+ * setLocationsMarker - установка маркеров локаций на карту
+ * 
+ */
 const BGMap = memo(({ markerPos, openLocationCard, openLocationList }) => {
   const [map, setMap] = useState(null); 
   const [markers, setMarkers] = useState([]);  // стейт для массива маркеров на карте

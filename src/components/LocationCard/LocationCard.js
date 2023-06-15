@@ -13,12 +13,27 @@ import { closeCard, showCard } from "../../services/open-close-services/open-clo
 import { setFavouriteId } from "../../redux/locationsSlice";
 
 
-// компонент карточки локации
+/**
+ * LocationCard - компонент карточки локации
+ * 
+ * Переменные
+ * user - стейт для создателя карточки
+ * locationPhoto - стейт для фотографий
+ * localReload - стейт для локальной перезагрузки карточки
+ * location - выбранная локация
+ * 
+ * Функции:
+ * onDeleteClick - ф-ия удаления локации
+ * onFavoritesBtnClick - ф-ия обработки нажатия флажка избранного
+ * addToFavorites - ф-ия добавления в "Избранное"
+ * removeFromFavorites - ф-ия удаления из "Избранное"
+ * 
+ */
 const LocationCard = memo(({ otherClassName, locationId, onClose, onReload, onDelete, openUser }) => {
     const [user, setUser] = useState(null); // стейт для создателя карточки
     const [locationPhoto, setLocationPhoto] = useState([]); // стейт для фотографий
     const [localReload, setLocalReload] = useState(false); // стейт для локальной перезагрузки карточки
-    const location = useSelector((state) => state.locations.value.find(location => location.location_id === locationId));
+    const location = useSelector((state) => state.locations.value.find(location => location.location_id === locationId)); // выбранная локация
 
     const dispatch = useDispatch();
 

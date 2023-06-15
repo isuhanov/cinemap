@@ -9,7 +9,20 @@ import ChatCreateForm from "../ChatCreateForm/ChatCreateForm";
 import './Messenger.css';
 
 
-// компонент карточки мессенджера
+/**
+ * Messenger - компонент карточки мессенджера
+ * 
+ * Переменные:
+ * chats - стейт для списка чатов
+ * users - стейт для списка пользователей
+ * mode - стейт для режима отображения
+ * userId -  стейт для id текущего пользователя
+ * 
+ * Функции:
+ * update - ф-ия обновления списков списка
+ * onSearchChange - ф-ия изменения поля ввода
+ * 
+ */
 const Messenger = memo(({ onClickClose, otherClassName, onReload, otherUserId, openUser }) => {
     const [chats, setChats] = useState([]); // стейт для списка чатов
     const [users, setUsers] = useState([]); // стейт для списка пользователей

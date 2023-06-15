@@ -6,7 +6,23 @@ import FormField from "../../services/form-services/form-field";
 import { formIsValid, loginFieldIsValid, passswordFieldIsValid, photosFieldIsValid, textFieldIsValid } from "../../services/form-services/form-valid-services";
 import ImgPicker from "../ui/ImgPicker/ImgPicker";
 
-// компонент формы регистрации
+/**
+ * RegisterForm - компонент формы регистрации
+ * 
+ * Переменные:
+ * login - стейт для логина
+ * password - стейт для пароля
+ * name - стейт для имени
+ * surname - стейт для фамилии
+ * status - стейт для статуса
+ * photos - стейт для фото
+ * form - объект для хранения полей формы
+ * 
+ * Функции:
+ * onClickSave - обработчик нажатия на кнопку сохранения
+ * post - добавление в БД
+ * 
+ */
 const RegisterForm = memo(({ onClickClose, otherClassName }) => {
     const onLoginChange = (login) => { // обработка значения поля login
         setLogin(prev => ({

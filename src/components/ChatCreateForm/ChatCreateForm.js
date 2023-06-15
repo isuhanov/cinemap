@@ -11,7 +11,25 @@ import { formIsValid, photosFieldIsValid, textFieldIsValid } from "../../service
 import './ChatCreateForm.css';
 
 
-// компонент формы создания многопользовательского чата
+/**
+ * ChatCreateForm - компонент формы создания многопользовательского чата
+ * 
+ * Переменные:
+ * users - стейт для списка пользователей
+ * currentUser - стейт для текущего пользователя
+ * searchValue - стейт для значения поля поиска
+ * isVisibleBtn -  стейт для отображения кнопки отмены поиска
+ * name - стейт для названия чата
+ * photo - стейт для фото чата
+ * selectedUsers - стейт для выбранных пользователей
+ * form - объект для хранения полей формы
+ * 
+ * Функции:
+ * update -  ф-ия обновления списка пользователей
+ * onClickCreate - событие клика по кнопке создания
+ * post - добавление в БД
+ * 
+ */
 const ChatCreateForm = memo(({ onClickClose, openChatCard, otherClassName }) => {
     const [users, setUsers] = useState([]); // стейт для списка пользователей
     const currentUser = useSelector((state) => state.user.currentUser); // стейт для текущего пользователя

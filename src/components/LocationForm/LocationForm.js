@@ -15,7 +15,26 @@ import socket from "../../lib/socket/socket";
 import ImgPicker from "../ui/ImgPicker/ImgPicker";
 
 
-// компонент формы добавления/редактирования локации
+/**
+ * LocationForm - компонент формы добавления/редактирования локации
+ * 
+ * Переменные:
+ * name - стейт для названия
+ * filmName - стейт для названия фильма
+ * address - стейт для адреса
+ * route - стейт для пути
+ * timing - стейт для тайминга
+ * filmsPhoto - стейт для фото из фильма
+ * usersPhoto - стейт для фото пользователя
+ * form - объект для хранения полей формы
+ * 
+ * Функции:
+ * onClickSave - обработчик нажатия на кнопку сохранения
+ * generationData - ф-ия формирования объекта с данными из формы и вызывает ф-ию для соответсвующего запроса (POST/PUT)
+ * postLocation - добавление локации в БД 
+ * putLocation - изменение локации в БД 
+ * 
+ */
 const LocationForm = memo(({ onClickClose, isUpdate, location, moveToMarker, otherClassName }) => {
     const onNameChange = (name) => { // обработка значения поля названия локации
         setName(prev => ({
